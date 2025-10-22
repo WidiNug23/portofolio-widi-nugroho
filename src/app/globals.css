@@ -29,6 +29,9 @@
 
 body {
   background: var(--background);
+  background-color: #000; /* hitam */
+    overflow-x: hidden; /* ini mencegah scrollbar horizontal */
+
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
