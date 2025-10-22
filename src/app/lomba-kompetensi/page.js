@@ -7,19 +7,19 @@ export default function LombaPage() {
   const [popupImage, setPopupImage] = useState(null);
   const [imageIndex, setImageIndex] = useState({});
 
-  // ✅ Data langsung dari frontend
+  // ✅ Data frontend-only
   const lombaData = [
     {
       id: 1,
       nama: "Web Design International Competition Gayatama UNESA 2024",
-      deskripsi:"",
+      deskripsi: "",
       tingkat: "Internasional",
       tahun: "2024",
       hasil: "Juara 1",
       penyelenggara: "Universitas Negeri Surabaya",
       files: [
-        { id: 1, filePath: "uploads/width_800.png",fileType: "image" },
-        { id: 2, filePath: "uploads/width_800 (1).png",fileType: "image" },
+        { id: 1, filePath: "uploads/width_800.png", fileType: "image" },
+        { id: 2, filePath: "uploads/width_800 (1).png", fileType: "image" },
         { id: 3, filePath: "uploads/width_800 (2).png", fileType: "image" },
         { id: 4, filePath: "uploads/width_800 (3).png", fileType: "image" },
       ],
@@ -27,45 +27,39 @@ export default function LombaPage() {
     {
       id: 2,
       nama: "Olimpiade Vokasi Indonesia IX Tahun 2024",
-      deskripsi:
-        "",
+      deskripsi: "",
       tingkat: "Nasional",
       tahun: "2024",
       hasil: "Juara 3 - Bidang Web Technologies",
       penyelenggara: "Forum Pendidikan Tinggi Vokasi Indonesia",
       files: [
-        { id: 1, filePath: "uploads/width_750.png",fileType: "image" },
-        { id: 2, filePath: "uploads/width_600.png",fileType: "image" },
+        { id: 1, filePath: "uploads/width_750.png", fileType: "image" },
+        { id: 2, filePath: "uploads/width_600.png", fileType: "image" },
         { id: 3, filePath: "uploads/width_378.png", fileType: "image" },
         { id: 4, filePath: "uploads/width_800 (4).png", fileType: "image" },
       ],
     },
     {
       id: 3,
-      nama: "Canter 60th Anniversary Photo Contest ",
-      deskripsi:
-        "",
+      nama: "Canter 60th Anniversary Photo Contest",
+      deskripsi: "",
       tingkat: "Nasional",
       tahun: "2023",
-      hasil: "Nominasi Juara Favorit ",
+      hasil: "Nominasi Juara Favorit",
       penyelenggara: "Mitsubishi Fuso",
       files: [
-        { id: 1, filePath: "uploads/width_800 (5).png",fileType: "image" },
+        { id: 1, filePath: "uploads/width_800 (5).png", fileType: "image" },
       ],
     },
-
-        {
+    {
       id: 4,
       nama: "[COMING SOON]",
-      deskripsi:
-        "",
+      deskripsi: "",
       tingkat: "",
       tahun: "",
       hasil: "",
       penyelenggara: "",
-      files: [
-        { id: 1, filePath: "",fileType: "image" },
-      ],
+      files: [{ id: 1, filePath: "", fileType: "image" }],
     },
   ];
 
@@ -104,9 +98,7 @@ export default function LombaPage() {
     <main className="p-8 bg-gray-950 min-h-screen text-gray-100 font-poppins">
       <h1
         className="text-4xl md:text-5xl font-bold mb-8 text-center text-white"
-        style={{
-          textShadow: "0 0 10px #a855f7, 0 0 20px #8b5cf6",
-        }}
+        style={{ textShadow: "0 0 10px #a855f7, 0 0 20px #8b5cf6" }}
       >
         Lomba & Kompetensi
       </h1>
@@ -135,9 +127,7 @@ export default function LombaPage() {
                     <div className="flex-1 min-w-0">
                       <h2
                         className="text-2xl font-bold text-white mb-3 break-words"
-                        style={{
-                          textShadow: "0 0 2px #a855f7, 0 0 10px #8b5cf6",
-                        }}
+                        style={{ textShadow: "0 0 2px #a855f7, 0 0 10px #8b5cf6" }}
                       >
                         {l.nama}
                       </h2>
@@ -184,41 +174,62 @@ export default function LombaPage() {
 
                     {/* KANAN */}
                     <div className="w-full md:w-[450px] flex flex-col gap-4">
-                      {pdfs.length > 0 && (
-                        <div className="w-full">
-                          {pdfs.map((f) => (
-                            <object
-                              key={f.id}
-                              data={normalizeFileUrl(f.filePath)}
-                              type="application/pdf"
-                              width="100%"
-                              height="200px"
-                              className="rounded-xl border border-gray-700"
-                            >
-                              <p className="text-center text-gray-500 p-2">
-                                Tidak dapat menampilkan PDF.{" "}
-                                <a
-                                  href={normalizeFileUrl(f.filePath)}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="text-[#a855f7] underline"
-                                >
-                                  Klik di sini
-                                </a>
-                                .
-                              </p>
-                            </object>
-                          ))}
-                        </div>
-                      )}
-
                       {images.length > 0 && (
                         <>
                           <div className="w-full overflow-hidden border border-gray-700 rounded-xl bg-gray-950 relative h-64">
                             <div
-                              className="flex transition-transform duration-700"
+                              className="flex transition-transform duration-500 ease-in-out cursor-grab"
                               style={{
-                                transform: `translateX(${-currentIndex * 100}%)`,
+                                transform: `translateX(-${currentIndex * 100}%)`,
+                              }}
+                              onMouseDown={(e) => {
+                                const el = e.currentTarget;
+                                el.isDragging = true;
+                                el.startX = e.pageX;
+                              }}
+                              onMouseMove={(e) => {
+                                const el = e.currentTarget;
+                                if (!el.isDragging) return;
+                                const dx = e.pageX - el.startX;
+                                if (dx > 50)
+                                  setImageIndex((prev) => ({
+                                    ...prev,
+                                    [l.id]: Math.max(currentIndex - 1, 0),
+                                  }));
+                                if (dx < -50)
+                                  setImageIndex((prev) => ({
+                                    ...prev,
+                                    [l.id]: Math.min(currentIndex + 1, images.length - 1),
+                                  }));
+                              }}
+                              onMouseUp={(e) => {
+                                e.currentTarget.isDragging = false;
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.isDragging = false;
+                              }}
+                              onTouchStart={(e) => {
+                                const el = e.currentTarget;
+                                el.isDragging = true;
+                                el.startX = e.touches[0].pageX;
+                              }}
+                              onTouchMove={(e) => {
+                                const el = e.currentTarget;
+                                if (!el.isDragging) return;
+                                const dx = e.touches[0].pageX - el.startX;
+                                if (dx > 50)
+                                  setImageIndex((prev) => ({
+                                    ...prev,
+                                    [l.id]: Math.max(currentIndex - 1, 0),
+                                  }));
+                                if (dx < -50)
+                                  setImageIndex((prev) => ({
+                                    ...prev,
+                                    [l.id]: Math.min(currentIndex + 1, images.length - 1),
+                                  }));
+                              }}
+                              onTouchEnd={(e) => {
+                                e.currentTarget.isDragging = false;
                               }}
                             >
                               {images.map((img, idx) => (
@@ -246,15 +257,10 @@ export default function LombaPage() {
                                 <span
                                   key={idx}
                                   onClick={() =>
-                                    setImageIndex((prev) => ({
-                                      ...prev,
-                                      [l.id]: idx,
-                                    }))
+                                    setImageIndex((prev) => ({ ...prev, [l.id]: idx }))
                                   }
                                   className={`w-3 h-3 rounded-full cursor-pointer transition-colors duration-300 ${
-                                    idx === currentIndex
-                                      ? "bg-[#a855f7]"
-                                      : "bg-gray-500"
+                                    idx === currentIndex ? "bg-[#a855f7]" : "bg-gray-500"
                                   }`}
                                 />
                               ))}
@@ -296,7 +302,7 @@ export default function LombaPage() {
                       popupImage.allImages.length;
                     setPopupImage((prevImg) => ({
                       ...prevImg,
-                      url: normalizeFileUrl(popupImage.allImages[prev].filePath),
+                      url: normalizeFileUrl(prevImg.allImages[prev].filePath),
                       index: prev,
                     }));
                   }}
@@ -306,11 +312,10 @@ export default function LombaPage() {
                 <button
                   className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white px-3 py-1 rounded hover:bg-opacity-75"
                   onClick={() => {
-                    const next =
-                      (popupImage.index + 1) % popupImage.allImages.length;
+                    const next = (popupImage.index + 1) % popupImage.allImages.length;
                     setPopupImage((nextImg) => ({
                       ...nextImg,
-                      url: normalizeFileUrl(popupImage.allImages[next].filePath),
+                      url: normalizeFileUrl(nextImg.allImages[next].filePath),
                       index: next,
                     }));
                   }}

@@ -316,47 +316,90 @@ export default function ProjekPage() {
                       </div>
                     )}
 
-                    {imagesArray.length > 0 && (
-                      <div className="mt-2">
-                        <div className="overflow-hidden relative rounded-lg">
-                          <div
-                            className="flex transition-transform duration-700"
-                            style={{
-                              transform: `translateX(-${slideIndex * 100}%)`,
-                            }}
-                            ref={(el) => (carouselRefs.current[p.id] = el)}
-                          >
-                            {imagesArray.map((img, idx) => (
-                              <img
-                                key={idx}
-                                src={`uploads/${img}`}
-                                alt={`Gambar ${idx + 1}`}
-                                className="w-full h-64 object-cover flex-shrink-0 cursor-pointer"
-                                onClick={() => openLightbox(p.id, idx)}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        <div className="flex justify-center mt-3 gap-2">
-                          {imagesArray.map((_, idx) => (
-                            <span
-                              key={idx}
-                              className={`w-3 h-3 rounded-full cursor-pointer ${
-                                idx === slideIndex
-                                  ? "bg-blue-400"
-                                  : "bg-gray-600"
-                              }`}
-                              onClick={() =>
-                                setCurrentSlide((prev) => ({
-                                  ...prev,
-                                  [p.id]: idx,
-                                }))
-                              }
-                            ></span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+{imagesArray.length > 0 && (
+  <div className="mt-4">
+    {/* Carousel wrapper */}
+    <div
+      className="relative overflow-hidden rounded-lg"
+      onMouseDown={(e) => {
+        const el = carouselRefs.current[p.id];
+        el.isDragging = true;
+        el.startX = e.pageX - el.offsetLeft;
+        el.scrollLeftStart = el.scrollLeft;
+      }}
+      onMouseMove={(e) => {
+        const el = carouselRefs.current[p.id];
+        if (!el.isDragging) return;
+        const x = e.pageX - el.offsetLeft;
+        const walk = x - el.startX;
+        el.scrollLeft = el.scrollLeftStart - walk;
+      }}
+      onMouseUp={(e) => {
+        const el = carouselRefs.current[p.id];
+        el.isDragging = false;
+      }}
+      onMouseLeave={(e) => {
+        const el = carouselRefs.current[p.id];
+        el.isDragging = false;
+      }}
+      onTouchStart={(e) => {
+        const el = carouselRefs.current[p.id];
+        el.isDragging = true;
+        el.startX = e.touches[0].pageX - el.offsetLeft;
+        el.scrollLeftStart = el.scrollLeft;
+      }}
+      onTouchMove={(e) => {
+        const el = carouselRefs.current[p.id];
+        if (!el.isDragging) return;
+        const x = e.touches[0].pageX - el.offsetLeft;
+        const walk = x - el.startX;
+        el.scrollLeft = el.scrollLeftStart - walk;
+      }}
+      onTouchEnd={(e) => {
+        const el = carouselRefs.current[p.id];
+        el.isDragging = false;
+      }}
+    >
+      <div
+        className="flex transition-transform duration-700"
+        style={{
+          transform: `translateX(-${slideIndex * 100}%)`,
+        }}
+        ref={(el) => (carouselRefs.current[p.id] = el)}
+      >
+        {imagesArray.map((img, idx) => (
+          <img
+            key={idx}
+            src={`uploads/${img}`}
+            alt={`Gambar ${idx + 1}`}
+            className="w-full md:min-w-[400px] lg:min-w-[450px] h-64 object-cover flex-shrink-0 cursor-pointer rounded-lg"
+            onClick={() => openLightbox(p.id, idx)}
+          />
+        ))}
+      </div>
+    </div>
+
+    {/* Pagination dots */}
+    <div className="flex justify-center mt-3 gap-2">
+      {imagesArray.map((_, idx) => (
+        <span
+          key={idx}
+          className={`w-3 h-3 rounded-full cursor-pointer ${
+            idx === slideIndex ? "bg-blue-400" : "bg-gray-600"
+          }`}
+          onClick={() =>
+            setCurrentSlide((prev) => ({
+              ...prev,
+              [p.id]: idx,
+            }))
+          }
+        ></span>
+      ))}
+    </div>
+  </div>
+)}
+
+
                   </div>
                 </div>
               </div>
