@@ -13,6 +13,7 @@ export default function RootLayout({ children }) {
     { href: "/sertifikat", label: "Sertifikat" },
     { href: "/lomba-kompetensi", label: "Lomba & Kompetensi" },
     { href: "/organisasi", label: "Pengalaman & Organisasi" },
+    { href: "/pendidikan", label: "Pendidikan" },
   ];
 
   return (
@@ -51,6 +52,7 @@ export default function RootLayout({ children }) {
                 if (link.label === "Sertifikat") glowColor = "#65960a,#7cbd04";
                 if (link.label === "Lomba & Kompetensi") glowColor = "#a855f7,#8b5cf6";
                 if (link.label === "Pengalaman & Organisasi") glowColor = "#f59e0b,#facc15";
+                if (link.label === "Pendidikan") glowColor = "#f50bbbff,#facc15";
 
                 const textShadow = glowColor
                   .split(",")
