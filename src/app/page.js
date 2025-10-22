@@ -61,10 +61,12 @@ export default function Home() {
     window.addEventListener("resize", resize);
     resize();
 
-    const handleMouseMove = (e) => {
-      cursor.current = { x: e.clientX, y: e.clientY };
-    };
-    window.addEventListener("mousemove", handleMouseMove);
+    // uncoment untuk nyalakan kursor glow
+    
+    // const handleMouseMove = (e) => {
+    //   cursor.current = { x: e.clientX, y: e.clientY };
+    // };
+    // window.addEventListener("mousemove", handleMouseMove);
 
     const animate = () => {
       // tambahkan posisi terbaru
