@@ -12,7 +12,6 @@ import { useState, useEffect, useRef } from "react";
 import Head from "next/head";
 import Link from "next/link";
 
-// ✅ Komponen untuk efek reveal per item
 function RevealItem({ children, delay = 0 }) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
@@ -42,11 +41,64 @@ function RevealItem({ children, delay = 0 }) {
   );
 }
 
-// ✅ Halaman utama
 export default function Home() {
   const [expanded, setExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const canvasRef = useRef(null);
+  const cursor = useRef({ x: 0, y: 0 });
+  const trail = useRef([]);
+
   const toggleExpanded = () => setExpanded(!expanded);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    window.addEventListener("resize", resize);
+    resize();
+
+    const handleMouseMove = (e) => {
+      cursor.current = { x: e.clientX, y: e.clientY };
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+
+    const animate = () => {
+      // tambahkan posisi terbaru
+      trail.current.push({ ...cursor.current });
+      if (trail.current.length > 50) trail.current.shift(); // panjang jejak
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // gambar garis neon glow
+      ctx.lineWidth = 2;
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+      for (let i = 1; i < trail.current.length; i++) {
+        const p1 = trail.current[i - 1];
+        const p2 = trail.current[i];
+        const alpha = i / trail.current.length; // semakin tua semakin transparan
+        ctx.strokeStyle = `rgba(245,11,187,${alpha})`; // pink neon
+        ctx.shadowBlur = 5;
+        ctx.shadowColor = `rgba(245,11,187,${alpha})`;
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.stroke();
+      }
+
+      requestAnimationFrame(animate);
+    };
+    animate();
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
 
   return (
     <>
@@ -56,6 +108,18 @@ export default function Home() {
           rel="stylesheet"
         />
       </Head>
+
+      {/* Canvas jejak kursor */}
+      <canvas
+        ref={canvasRef}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          pointerEvents: "none",
+          zIndex: 9999,
+        }}
+      />
 
       <main className="bg-black min-h-screen flex flex-col items-center py-16 px-4 gap-16 font-sans">
         {/* CARD UTAMA */}
@@ -135,7 +199,7 @@ export default function Home() {
             </p>
 
             <button
-              onClick={toggleExpanded}
+              onClick={() => setExpanded(!expanded)}
               className="mt-2 text-blue-400 font-semibold hover:underline"
               style={{ fontFamily: "Poppins, sans-serif" }}
             >
