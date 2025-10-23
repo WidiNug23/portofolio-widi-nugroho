@@ -204,29 +204,44 @@ export default function Home() {
       </span>
     </h1>
 
-    <p className={`mt-4 text-base sm:text-lg md:text-xl leading-relaxed transition-all duration-500 ${theme === "dark" ? "text-white/80" : "text-black/70"}`}>
-      {expanded ? (
-        <>
-          Saya memiliki ketertarikan mendalam terhadap perancangan
-          dan pengembangan sistem berbasis web. Saya senang memahami
-          bagaimana sebuah website bekerja mulai dari alur sistem,
-          segmentasi pengguna, perancangan layout dan warna, hingga
-          pengalaman interaksi pengguna. Dalam pengembangan, saya sering
-          menggunakan React.js untuk frontend dan CodeIgniter 4 untuk
-          backend. Saya menikmati proses menerjemahkan kebutuhan pengguna
-          menjadi sistem yang fungsional dan efisien. Selain kemampuan
-          teknis, saya juga memiliki kepekaan visual dari pengalaman di
-          bidang fotografi dan videografi, yang membantu saya menciptakan
-          tampilan antarmuka yang menarik dan mudah digunakan. Saya dapat
-          bekerja baik secara individu maupun dalam tim, serta terbuka
-          untuk mempelajari berbagai tools dan teknologi baru yang relevan
-          dengan perkembangan dunia digital maupun kebutuhan proyek yang
-          saya kerjakan.
-        </>
-      ) : (
-        <>Saya memiliki ketertarikan mendalam terhadap perancangan dan pengembangan sistem berbasis web. Saya senang memahami ...</>
-      )}
-    </p>
+<p
+  className={`mt-4 text-base sm:text-lg md:text-xl leading-relaxed transition-all duration-500 ${
+    theme === "dark" ? "text-white/80" : "text-black/70"
+  }`}
+>
+  {expanded ? (
+    <>
+      Saya memiliki ketertarikan mendalam terhadap perancangan
+      dan pengembangan sistem berbasis web. Saya senang memahami
+      bagaimana sebuah website bekerja mulai dari alur sistem,
+      segmentasi pengguna, perancangan layout dan warna, hingga
+      pengalaman interaksi pengguna. Dalam pengembangan, saya sering
+      menggunakan React.js untuk frontend dan CodeIgniter 4 untuk
+      backend. Saya menikmati proses menerjemahkan kebutuhan pengguna
+      menjadi sistem yang fungsional dan efisien. Selain kemampuan
+      teknis, saya juga memiliki kepekaan visual dari pengalaman di
+      bidang fotografi dan videografi, yang membantu saya menciptakan
+      tampilan antarmuka yang menarik dan mudah digunakan. Saya dapat
+      bekerja baik secara individu maupun dalam tim, serta{" "}
+      <span
+        className={`font-semibold transition-all duration-500 ${
+          theme === "dark"
+            ? "text-yellow-400 drop-shadow-[0_0_6px_rgba(96,165,250,0.8)]"
+            : "text-blue-600 drop-shadow-[0_0_4px_rgba(37,99,235,0.5)]"
+        }`}
+      >
+        terbuka untuk mempelajari berbagai tools dan teknologi baru
+      </span>{" "}
+      yang relevan dengan perkembangan dunia digital maupun kebutuhan proyek yang
+      saya kerjakan.
+    </>
+  ) : (
+    <>
+      Saya memiliki ketertarikan mendalam terhadap perancangan dan pengembangan sistem berbasis web. Saya senang memahami ...
+    </>
+  )}
+</p>
+
 
     <button
       onClick={() => setExpanded(!expanded)}
