@@ -1,8 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useTheme } from "../ThemeContext"; // pastikan path benar
 
 export default function OrganisasiPage() {
-  // ✅ Data langsung dari frontend
+  const { theme } = useTheme();
+
   const [organisasi, setOrganisasi] = useState([
     {
       id: 1,
@@ -34,7 +36,7 @@ export default function OrganisasiPage() {
         "Melakukan perancangan dan pembuatan website bersama dengan tim",
       file_path: "",
     },
-        {
+    {
       id: 4,
       nama: "PT. Glace Kreasi Digital",
       jabatan: "Multimedia Content Creator",
@@ -44,14 +46,13 @@ export default function OrganisasiPage() {
         "Melakukan kegiatan dokumentasi kegiatan meliputi pengambilan gambar dan video serta melakukan pengeditan video",
       file_path: "",
     },
-            {
+    {
       id: 5,
       nama: "[COMING SOON]",
       jabatan: "",
       tahun_masuk: "",
       tahun_keluar: "",
-      deskripsi:
-        "",
+      deskripsi: "",
       file_path: "",
     },
   ]);
@@ -75,20 +76,55 @@ export default function OrganisasiPage() {
     return null;
   };
 
+  // Disable scroll saat popup image terbuka
   useEffect(() => {
     document.body.style.overflow = popupImage ? "hidden" : "auto";
   }, [popupImage]);
 
+  // IntersectionObserver untuk slide-in
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("slide-in");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const cards = document.querySelectorAll(".organisasi-card");
+    cards.forEach((card) => observer.observe(card));
+
+    return () => observer.disconnect();
+  }, [organisasi]);
+
   return (
-    <main className="p-8 bg-gray-950 min-h-screen text-gray-100 font-poppins">
-      <h1
-        className="text-4xl md:text-5xl font-bold mb-8 text-center text-white"
-        style={{
-          textShadow: "0 0 10px #f59e0b, 0 0 20px #facc15",
-        }}
-      >
-        Pengalaman & Organisasi
-      </h1>
+    <main
+      className={`min-h-screen font-poppins transition-colors duration-500 pt-28 p-8 ${
+        theme === "dark" ? "bg-gray-950 text-gray-100" : "bg-white text-gray-900"
+      }`}
+    >
+      {/* Judul */}
+<h1
+  className={`text-4xl md:text-5xl font-bold mb-12 text-center ${
+    theme === "dark" ? "neon-glow" : ""
+  }`}
+>
+  Pengalaman & Organisasi
+</h1>
+
+<style jsx>{`
+  .neon-glow {
+    text-shadow: 0 0 10px #f59e0b, 0 0 20px #facc15;
+    transition: text-shadow 0.3s ease-in-out;
+  }
+`}</style>
+
+
+      
 
       {organisasi.length === 0 ? (
         <p className="text-center text-gray-400">Tidak ada data organisasi.</p>
@@ -106,41 +142,70 @@ export default function OrganisasiPage() {
             const type = getFileType(o.file_path);
 
             return (
-              <div key={o.id} className="relative group">
+              <div
+                key={o.id}
+                className="organisasi-card opacity-0 transform translate-y-8 transition-all duration-700 relative group"
+              >
                 <div className="neon-border rounded-2xl p-[2px]">
-                  <div className="relative bg-gray-900 rounded-2xl p-6 flex flex-col md:flex-row gap-6 transition-transform duration-500 group-hover:scale-[1.02] group-hover:shadow-[0_0_25px_rgba(255,255,0,0.5)]">
-                    
-                    {/* KIRI: Detail Organisasi */}
+                  <div
+                    className={`relative rounded-2xl p-6 flex flex-col md:flex-row gap-6 transition-transform duration-500 group-hover:scale-[1.02] ${
+                      theme === "dark"
+                        ? "bg-gray-900 group-hover:shadow-[0_0_25px_rgba(255,255,0,0.5)]"
+                        : "bg-gray-100 group-hover:shadow-[0_0_25px_rgba(252,211,77,0.5)]"
+                    }`}
+                  >
+                    {/* Kiri: Detail Organisasi */}
                     <div className="flex-1 min-w-0">
                       <h2
-                        className="text-2xl font-bold text-white mb-3 break-words"
-                        style={{
-                          textShadow:
-                            "0 0 2px #f59e0b, 0 0 10px #facc15",
-                        }}
+                        className={`text-2xl font-bold mb-3 break-words ${
+                          theme === "dark" ? "text-white" : "text-gray-900"
+                        }`}
+                        style={
+                          theme === "dark"
+                            ? { textShadow: "0 0 2px #f59e0b, 0 0 10px #facc15" }
+                            : {}
+                        }
                       >
                         {o.nama}
                       </h2>
-                      <p className="text-gray-300 mb-3 break-words leading-relaxed whitespace-pre-line">
+                      <p
+                        className={`mb-3 break-words leading-relaxed whitespace-pre-line ${
+                          theme === "dark" ? "text-gray-300" : "text-gray-700"
+                        }`}
+                      >
                         {textToShow}
                       </p>
 
                       {o.deskripsi?.length > 250 && (
                         <button
                           onClick={() => toggleExpand(o.id)}
-                          className="text-yellow-400 hover:underline mb-4"
+                          className={`mb-4 hover:underline font-medium ${
+                            theme === "dark" ? "text-yellow-400" : "text-yellow-600"
+                          }`}
                         >
                           {isExpanded ? "Sembunyikan" : "Selengkapnya"}
                         </button>
                       )}
 
-                      <p className="text-gray-400 mb-2">
+                      <p
+                        className={`mb-2 ${
+                          theme === "dark" ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
                         <strong>Jabatan:</strong> {o.jabatan || "-"}
                       </p>
-                      <p className="text-gray-400 mb-2">
+                      <p
+                        className={`mb-2 ${
+                          theme === "dark" ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
                         <strong>Tahun Masuk:</strong> {o.tahun_masuk || "-"}
                       </p>
-                      <p className="text-gray-400 mb-2">
+                      <p
+                        className={`mb-2 ${
+                          theme === "dark" ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
                         <strong>Tahun Keluar:</strong> {o.tahun_keluar || "-"}
                       </p>
 
@@ -150,7 +215,11 @@ export default function OrganisasiPage() {
                             href={fileUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-block bg-[#f59e0b] text-gray-900 font-semibold px-4 py-2 rounded-lg hover:bg-[#facc15] transition"
+                            className={`inline-block font-semibold px-4 py-2 rounded-lg transition ${
+                              theme === "dark"
+                                ? "bg-yellow-600 text-gray-900 hover:bg-yellow-500"
+                                : "bg-yellow-400 text-gray-900 hover:bg-yellow-300"
+                            }`}
                           >
                             📄 Lihat PDF
                           </a>
@@ -158,9 +227,9 @@ export default function OrganisasiPage() {
                       )}
                     </div>
 
-                    {/* KANAN: Preview PDF / Image */}
+                    {/* Kanan: Preview */}
                     {fileUrl && type && (
-                      <div className="w-full md:w-[400px] lg:w-[450px] border border-gray-700 rounded-xl overflow-hidden shadow-inner bg-gray-950 flex justify-center items-center">
+                      <div className="w-full md:w-[400px] lg:w-[450px] border border-gray-700 rounded-xl overflow-hidden shadow-inner flex justify-center items-center">
                         {type === "pdf" ? (
                           <object
                             data={fileUrl}
@@ -212,7 +281,7 @@ export default function OrganisasiPage() {
         </div>
       )}
 
-      {/* Neon Border CSS */}
+      {/* Neon Border & Slide-in CSS */}
       <style jsx>{`
         .neon-border {
           position: relative;
@@ -246,6 +315,13 @@ export default function OrganisasiPage() {
           position: relative;
           z-index: 1;
         }
+
+        .organisasi-card.slide-in {
+          opacity: 1 !important;
+          transform: translateY(-40) !important;
+          transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+        }
+
         @keyframes spinNeon {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }

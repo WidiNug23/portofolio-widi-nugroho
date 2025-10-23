@@ -10,7 +10,7 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #000000;
 }
 
 @theme inline {
@@ -23,18 +23,46 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground: #ffffff;
   }
 }
 
-body {
-  background: var(--background);
-  background-color: #000; /* hitam */
-    overflow-x: hidden; /* ini mencegah scrollbar horizontal */
+/* globals.css */
 
+/* Default theme (light) */
+:root {
+  --background: #ffffff; /* putih */
+  --primary: #3b82f6; /* warna utama untuk neon/hover */
+  --secondary: #60a5fa;
+}
+
+/* Dark theme */
+[data-theme="dark"] {
+  --background: #000000;
+  --primary: #f50bbbff;
+  --secondary: #f472b6;
+}
+
+
+body {
+  /* margin: 0; 
+  background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden; 
+  transition: background 0.5s, color 0.5s; */
 }
+
+
+/* Opsional: class untuk text/hover glow */
+.text-primary {
+  color: var(--primary);
+}
+
+.bg-primary {
+  background-color: var(--primary);
+}
+
 
         @keyframes gradientSpin {
           0% {

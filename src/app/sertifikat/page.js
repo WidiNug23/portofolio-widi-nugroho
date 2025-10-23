@@ -1,11 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useTheme } from "../ThemeContext"; // pastikan path benar
 
 export default function SertifikatPage() {
+  const { theme } = useTheme();
   const [sertifikat, setSertifikat] = useState([]);
   const [expanded, setExpanded] = useState({});
+  const [modalPDF, setModalPDF] = useState(null);
 
-  // ✅ Data langsung di frontend (tanpa fetch dari backend)
+  // Data sertifikat
   const sertifikatData = [
     {
       id: 1,
@@ -15,7 +18,7 @@ export default function SertifikatPage() {
       tahun: "2025 - 2028",
       tingkat: "",
       hasil: "",
-      pdf_file: "uploads/serkom_widi.pdf",
+      pdf_file: "/uploads/serkom_widi.pdf",
     },
     {
       id: 2,
@@ -25,7 +28,7 @@ export default function SertifikatPage() {
       tahun: "2024",
       tingkat: "Internasional",
       hasil: "Juara 1",
-      pdf_file: "uploads/130_Winner_GAYATAMA_compressed.pdf",
+      pdf_file: "/uploads/130_Winner_GAYATAMA_compressed.pdf",
     },
     {
       id: 3,
@@ -35,12 +38,11 @@ export default function SertifikatPage() {
       tahun: "2024",
       tingkat: "Nasional",
       hasil: "Juara 3",
-      pdf_file: "uploads/Sertifikat Juara (Emas, Perak dan Perunggu) OLIVIA IX_page-0069 (1).pdf",
+      pdf_file: "/uploads/Sertifikat Juara (Emas, Perak dan Perunggu) OLIVIA IX_page-0069 (1).pdf",
     },
-
-        {
+    {
       id: 4,
-      nama: "[COMING SOON]]",
+      nama: "[COMING SOON]",
       deskripsi: ``,
       penerbit: "",
       tahun: "",
@@ -51,118 +53,182 @@ export default function SertifikatPage() {
   ];
 
   useEffect(() => {
-    // Simulasikan data dari frontend
     setSertifikat(sertifikatData);
   }, []);
 
-  const toggleExpand = (id) => {
+  const toggleExpand = (id) =>
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
 
   const normalizePdfUrl = (pdfFile) => {
     if (!pdfFile) return null;
-    if (pdfFile.startsWith("http")) return pdfFile;
-    return `${pdfFile}`;
+    return pdfFile.startsWith("/") ? pdfFile : `/${pdfFile}`;
   };
 
-  return (
-    <main className="p-8 bg-gray-950 min-h-screen text-gray-100 font-poppins">
-      <h1
-        className="text-4xl md:text-5xl font-bold mb-8 text-center text-white"
-        style={{
-          textShadow:
-            "0 0 10px #65960aff, 0 0 20px #7cbd04ea",
-        }}
-      >
-        Sertifikat
-      </h1>
+  // Update body background sesuai theme
+  useEffect(() => {
+    document.body.style.backgroundColor =
+      theme === "dark" ? "#000000ff" : "#ffffff";
+  }, [theme]);
 
+  // Disable scroll saat modal PDF terbuka
+  useEffect(() => {
+    document.body.style.overflow = modalPDF ? "hidden" : "auto";
+    return () => (document.body.style.overflow = "auto");
+  }, [modalPDF]);
+
+useEffect(() => {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("slide-in");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.1 }
+  );
+
+  const cards = document.querySelectorAll(".projek-card");
+  cards.forEach(card => observer.observe(card));
+
+  return () => observer.disconnect();
+}, [sertifikat]); // tambahkan sertifikat sebagai dependency
+
+
+  return (
+    <main
+      className={`min-h-screen font-poppins transition-colors duration-500 pt-24 p-8 ${
+        theme === "dark" ? "bg-gray-950 text-gray-100" : "bg-white text-gray-900"
+      }`}
+    >
+      {/* Header */}
+      <div className="text-center mb-8">
+<h1
+  className={`text-4xl md:text-5xl font-bold mb-12 text-center mt-5 ${
+    theme === "dark" ? "neon-glow" : ""
+  }`}
+>
+  Sertifikat
+</h1>
+
+        {/* <p className="max-w-2xl mx-auto text-lg md:text-xl leading-relaxed">
+          Berikut adalah sertifikat yang saya peroleh dalam berbagai kompetisi
+          dan sertifikasi.
+        </p> */}
+      </div>
+
+      {/* Sertifikat List */}
       {sertifikat.length === 0 ? (
-        <p className="text-center text-gray-400">
-          Memuat data sertifikat...
-        </p>
+        <p className="text-center text-gray-400">Memuat data sertifikat...</p>
       ) : (
         <div className="flex flex-col gap-10">
           {sertifikat.map((s) => {
             const isExpanded = expanded[s.id];
-            const textToShow = isExpanded
-              ? s.deskripsi
-              : s.deskripsi?.length > 250
-              ? s.deskripsi.substring(0, 250) + "..."
-              : s.deskripsi;
+            const textToShow =
+              isExpanded || s.deskripsi.length <= 250
+                ? s.deskripsi
+                : s.deskripsi.substring(0, 250) + "...";
 
             const pdfUrl = normalizePdfUrl(s.pdf_file);
 
             return (
-              <div key={s.id} className="relative group">
+              <div
+                key={s.id}
+                className="projek-card relative group opacity-0 transform translate-y-8 transition-all duration-700"
+              >
                 <div className="neon-border rounded-2xl p-[2px]">
-                  <div className="relative bg-gray-900 rounded-2xl p-6 flex flex-col md:flex-row gap-6 transition-transform duration-500 group-hover:scale-[1.02] group-hover:shadow-[0_0_25px_rgba(155,228,20,0.5)]">
-                    {/* KIRI: Detail Sertifikat */}
+<div
+  className={`relative rounded-2xl p-6 flex flex-col md:flex-row gap-6 transition-transform duration-500 group-hover:scale-[1.02] group-hover:shadow-[0_0_25px_rgba(168,85,247,0.5)] ${
+    theme === "dark" ? "bg-gray-900" : "bg-gray-100"
+  }`}
+>
+
+                    {/* KIRI */}
                     <div className="flex-1 min-w-0">
                       <h2
-                        className="text-2xl font-bold text-white mb-3 break-words"
-                        style={{
-                          textShadow:
-                            "0 0 10px #65960aff, 0 0 20px #7cbd04ea",
-                        }}
+                        className={`text-2xl font-bold mb-3 break-words ${
+                          theme === "dark" ? "text-white" : "text-gray-900"
+                        }`}
+                        style={
+                          theme === "dark"
+                            ? { textShadow: "0 0 10px #65960aff, 0 0 20px #7cbd04ea" }
+                            : {}
+                        }
                       >
                         {s.nama}
                       </h2>
 
-                      <p className="text-gray-300 mb-3 break-words leading-relaxed whitespace-pre-line">
+                      <p
+                        className={`mb-3 break-words leading-relaxed whitespace-pre-line ${
+                          theme === "dark" ? "text-gray-300" : "text-gray-700"
+                        }`}
+                      >
                         {textToShow}
                       </p>
 
                       {s.deskripsi?.length > 250 && (
                         <button
                           onClick={() => toggleExpand(s.id)}
-                          className="text-[#9be414] hover:underline mb-4"
+                          className={`mb-4 hover:underline font-medium ${
+                            theme === "dark" ? "text-blue-400" : "text-blue-500"
+                          }`}
                         >
                           {isExpanded ? "Sembunyikan" : "Selengkapnya"}
                         </button>
                       )}
 
-                      <p className="text-gray-400 mb-2">
+                      <p
+                        className={`mb-2 ${
+                          theme === "dark" ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
                         <strong>Penerbit:</strong> {s.penerbit || "-"}
                       </p>
-                      <p className="text-gray-400 mb-2">
+                      <p
+                        className={`mb-2 ${
+                          theme === "dark" ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
                         <strong>Tahun:</strong> {s.tahun || "-"}
                       </p>
-
                       {s.tingkat && (
-                        <p className="text-gray-400 mb-2">
+                        <p
+                          className={`mb-2 ${
+                            theme === "dark" ? "text-gray-400" : "text-gray-600"
+                          }`}
+                        >
                           <strong>Tingkat:</strong> {s.tingkat}
                         </p>
                       )}
                       {s.hasil && (
-                        <p className="text-gray-400 mb-2">
+                        <p
+                          className={`mb-2 ${
+                            theme === "dark" ? "text-gray-400" : "text-gray-600"
+                          }`}
+                        >
                           <strong>Hasil:</strong> {s.hasil}
                         </p>
                       )}
 
                       {pdfUrl && (
-                        <div className="mt-4">
-                          <a
-                            href={pdfUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-block bg-[#9be414] text-gray-900 font-semibold px-4 py-2 rounded-lg hover:bg-[#a6f65b] transition"
-                          >
-                            📄 Lihat PDF
-                          </a>
-                        </div>
+                        <button
+                          onClick={() => setModalPDF(pdfUrl)}
+                          className={`inline-block px-4 py-2 rounded-lg mb-4 transition ${
+                            theme === "dark"
+                              ? "bg-blue-600 text-white hover:bg-blue-700"
+                              : "bg-blue-400 text-white hover:bg-blue-500"
+                          }`}
+                        >
+                          📄 Lihat PDF
+                        </button>
                       )}
                     </div>
 
-                    {/* KANAN: Preview PDF */}
+                    {/* KANAN */}
                     {pdfUrl && (
                       <div className="w-full md:w-[400px] lg:w-[450px] border border-gray-700 rounded-xl overflow-hidden shadow-inner bg-gray-950">
-                        <object
-                          data={pdfUrl}
-                          type="application/pdf"
-                          width="100%"
-                          height="300px"
-                        >
+                        <object data={pdfUrl} type="application/pdf" width="100%" height="300px">
                           <p className="text-center text-gray-500 p-2">
                             Tidak dapat menampilkan PDF di browser ini.{" "}
                             <a
@@ -186,8 +252,33 @@ export default function SertifikatPage() {
         </div>
       )}
 
+      {/* Modal PDF */}
+      {modalPDF && (
+        <div
+          className="fixed inset-0 z-50 flex justify-center items-center bg-black/80 p-4"
+          onClick={() => setModalPDF(null)}
+        >
+          <div
+            className="relative w-full h-full max-w-[90vw] max-h-[90vh] bg-white rounded-lg overflow-hidden shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <iframe src={modalPDF} className="w-full h-full" title="PDF Preview"></iframe>
+            <button
+              onClick={() => setModalPDF(null)}
+              className="absolute top-2 right-2 text-white bg-red-600 rounded-full w-8 h-8 flex justify-center items-center font-bold hover:bg-red-700 transition"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Efek Neon */}
       <style jsx>{`
+        .neon-glow {
+    text-shadow: 0 0 10px #9be414, 0 0 20px #00ff99;
+    transition: text-shadow 0.3s ease-in-out;
+  }
         .neon-border {
           position: relative;
           overflow: visible;
@@ -198,13 +289,7 @@ export default function SertifikatPage() {
           position: absolute;
           inset: -5px;
           border-radius: inherit;
-          background: linear-gradient(
-            120deg,
-            #9be414,
-            #00ff99,
-            #9be414,
-            #1effb2
-          );
+          background: linear-gradient(120deg, #9be414, #00ff99, #9be414, #1effb2);
           background-size: 400% 400%;
           animation: spinNeon 18s linear infinite;
           z-index: 0;
@@ -220,16 +305,17 @@ export default function SertifikatPage() {
           position: relative;
           z-index: 1;
         }
+
+        .slide-in { 
+  opacity: 1 !important; 
+  transform: translateY(-40) !important; 
+}
+
+
         @keyframes spinNeon {
-          0% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
         }
       `}</style>
     </main>

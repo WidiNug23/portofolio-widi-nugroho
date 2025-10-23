@@ -1,7 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useTheme } from "../ThemeContext"; // pastikan path benar
 
 export default function PendidikanPage() {
+  const { theme } = useTheme();
+
   const [pendidikan, setPendidikan] = useState([
     {
       id: 1,
@@ -9,9 +12,8 @@ export default function PendidikanPage() {
       jurusan: "IPA",
       tahun_masuk: "2019",
       tahun_lulus: "2022",
-      nilai: "88.13", // nilai kursus
-      deskripsi:
-        "",
+      nilai: "88.13",
+      deskripsi: "",
       file_path: "",
     },
     {
@@ -20,9 +22,8 @@ export default function PendidikanPage() {
       jurusan: "D3Teknik Informatika",
       tahun_masuk: "2022",
       tahun_lulus: "2025",
-      nilai: "3.81", // IPK atau nilai
-      deskripsi:
-        "",
+      nilai: "3.81",
+      deskripsi: "",
       file_path: "",
     },
     {
@@ -43,10 +44,8 @@ export default function PendidikanPage() {
   const toggleExpand = (id) =>
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
 
-  const normalizeFileUrl = (filePath) => {
-    if (!filePath) return null;
-    return filePath.startsWith("/") ? filePath : `/${filePath}`;
-  };
+  const normalizeFileUrl = (filePath) =>
+    !filePath ? null : filePath.startsWith("/") ? filePath : `/${filePath}`;
 
   const getFileType = (filePath) => {
     if (!filePath) return null;
@@ -60,16 +59,40 @@ export default function PendidikanPage() {
     document.body.style.overflow = popupImage ? "hidden" : "auto";
   }, [popupImage]);
 
+  // Slide-in observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("slide-in");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const cards = document.querySelectorAll(".pendidikan-card");
+    cards.forEach((card) => observer.observe(card));
+
+    return () => observer.disconnect();
+  }, [pendidikan]);
+
   return (
-    <main className="p-8 bg-gray-950 min-h-screen text-gray-100 font-poppins">
+    <main
+      className={`min-h-screen font-poppins transition-colors duration-500 pt-28 p-8 ${
+        theme === "dark" ? "bg-gray-950 text-gray-100" : "bg-white text-gray-900"
+      }`}
+    >
 <h1
-  className="text-4xl md:text-5xl font-bold mb-8 text-center text-white"
-  style={{
-    textShadow: "0 0 10px #f50bbbff, 0 0 20px #f50bbbff",
-  }}
+  className={`text-4xl md:text-5xl font-bold mb-12 text-center mt-1 ${
+    theme === "dark" ? "neon-glow" : ""
+  }`}
 >
-  Pendidikan & Pelatihan
+  Pendidikan
 </h1>
+
 
       {pendidikan.length === 0 ? (
         <p className="text-center text-gray-400">Tidak ada data pendidikan.</p>
@@ -87,43 +110,77 @@ export default function PendidikanPage() {
             const type = getFileType(p.file_path);
 
             return (
-              <div key={p.id} className="relative group">
+              <div
+                key={p.id}
+                className="pendidikan-card opacity-0 transform translate-y-8 transition-all duration-700 relative group"
+              >
                 <div className="neon-border rounded-2xl p-[2px]">
-                  <div className="relative bg-gray-900 rounded-2xl p-6 flex flex-col md:flex-row gap-6 transition-transform duration-500 group-hover:scale-[1.02] group-hover:shadow-[0_0_25px_rgba(255,255,0,0.5)]">
-                    
-                    {/* KIRI: Detail Pendidikan */}
+                  <div
+                    className={`relative rounded-2xl p-6 flex flex-col md:flex-row gap-6 transition-transform duration-500 group-hover:scale-[1.02] ${
+                      theme === "dark"
+                        ? "bg-gray-900 group-hover:shadow-[0_0_25px_rgba(255,0,187,0.5)]"
+                        : "bg-gray-100 group-hover:shadow-[0_0_25px_rgba(251,182,206,0.5)]"
+                    }`}
+                  >
+                    {/* Kiri */}
                     <div className="flex-1 min-w-0">
-<h2
-  className="text-2xl font-bold text-white mb-3 break-words"
-  style={{
-    textShadow: "0 0 2px #f50bbbff, 0 0 10px #f50bbbff",
-  }}
->
-  {p.nama}
-</h2>
-                      <p className="text-gray-300 mb-3 break-words leading-relaxed whitespace-pre-line">
+                      <h2
+                        className={`text-2xl font-bold mb-3 break-words ${
+                          theme === "dark" ? "text-white" : "text-gray-900"
+                        }`}
+                        style={
+                          theme === "dark"
+                            ? { textShadow: "0 0 2px #f50bbbff, 0 0 10px #f50bbbff" }
+                            : {}
+                        }
+                      >
+                        {p.nama}
+                      </h2>
+                      <p
+                        className={`mb-3 break-words leading-relaxed whitespace-pre-line ${
+                          theme === "dark" ? "text-gray-300" : "text-gray-700"
+                        }`}
+                      >
                         {textToShow}
                       </p>
 
                       {p.deskripsi?.length > 250 && (
                         <button
                           onClick={() => toggleExpand(p.id)}
-                          className="text-yellow-400 hover:underline mb-4"
+                          className={`mb-4 hover:underline font-medium ${
+                            theme === "dark" ? "text-yellow-400" : "text-yellow-600"
+                          }`}
                         >
                           {isExpanded ? "Sembunyikan" : "Selengkapnya"}
                         </button>
                       )}
 
-                      <p className="text-gray-400 mb-2">
+                      <p
+                        className={`mb-2 ${
+                          theme === "dark" ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
                         <strong>Jurusan:</strong> {p.jurusan || "-"}
                       </p>
-                      <p className="text-gray-400 mb-2">
+                      <p
+                        className={`mb-2 ${
+                          theme === "dark" ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
                         <strong>Tahun Masuk:</strong> {p.tahun_masuk || "-"}
                       </p>
-                      <p className="text-gray-400 mb-2">
+                      <p
+                        className={`mb-2 ${
+                          theme === "dark" ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
                         <strong>Tahun Lulus:</strong> {p.tahun_lulus || "-"}
                       </p>
-                      <p className="text-gray-400 mb-2">
+                      <p
+                        className={`mb-2 ${
+                          theme === "dark" ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
                         <strong>Nilai/IPK:</strong> {p.nilai || "-"}
                       </p>
 
@@ -133,7 +190,11 @@ export default function PendidikanPage() {
                             href={fileUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-block bg-[#f59e0b] text-gray-900 font-semibold px-4 py-2 rounded-lg hover:bg-[#facc15] transition"
+                            className={`inline-block font-semibold px-4 py-2 rounded-lg transition ${
+                              theme === "dark"
+                                ? "bg-pink-600 text-gray-900 hover:bg-pink-500"
+                                : "bg-pink-400 text-gray-900 hover:bg-pink-300"
+                            }`}
                           >
                             📄 Lihat PDF
                           </a>
@@ -141,9 +202,9 @@ export default function PendidikanPage() {
                       )}
                     </div>
 
-                    {/* KANAN: Preview PDF / Image */}
+                    {/* Kanan */}
                     {fileUrl && type && (
-                      <div className="w-full md:w-[400px] lg:w-[450px] border border-gray-700 rounded-xl overflow-hidden shadow-inner bg-gray-950 flex justify-center items-center">
+                      <div className="w-full md:w-[400px] lg:w-[450px] border border-gray-700 rounded-xl overflow-hidden shadow-inner flex justify-center items-center">
                         {type === "pdf" ? (
                           <object
                             data={fileUrl}
@@ -181,7 +242,7 @@ export default function PendidikanPage() {
         </div>
       )}
 
-      {/* Popup Image */}
+      {/* Popup */}
       {popupImage && (
         <div
           className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50"
@@ -195,41 +256,52 @@ export default function PendidikanPage() {
         </div>
       )}
 
-      {/* Neon Border CSS */}
+      {/* Neon & slide-in */}
       <style jsx>{`
         .neon-border {
           position: relative;
           overflow: visible;
         }
-.neon-border::before,
-.neon-border::after {
-  content: "";
-  position: absolute;
-  inset: -5px;
-  border-radius: inherit;
-  background: linear-gradient(
-    120deg,
-    #f50bbbff,
-    #f50bbbff,
-    #f50bbbff,
-    #f50bbbff
-  );
-  background-size: 400% 400%;
-  animation: spinNeon 18s linear infinite;
-  z-index: 0;
-  filter: blur(15px);
-  opacity: 0.25;
-}
-.neon-border::after {
-  inset: -10px;
-  filter: blur(25px);
-  opacity: 0.5;
-}
 
+          .neon-glow {
+    text-shadow: 0 0 10px #f50bbbff, 0 0 20px #f50bbbff;
+    transition: text-shadow 0.3s ease-in-out;
+  }
+        .neon-border::before,
+        .neon-border::after {
+          content: "";
+          position: absolute;
+          inset: -5px;
+          border-radius: inherit;
+          background: linear-gradient(
+            120deg,
+            #f50bbbff,
+            #f50bbbff,
+            #f50bbbff,
+            #f50bbbff
+          );
+          background-size: 400% 400%;
+          animation: spinNeon 18s linear infinite;
+          z-index: 0;
+          filter: blur(15px);
+          opacity: 0.25;
+        }
+        .neon-border::after {
+          inset: -10px;
+          filter: blur(25px);
+          opacity: 0.5;
+        }
         .neon-border > * {
           position: relative;
           z-index: 1;
         }
+
+        .pendidikan-card.slide-in {
+          opacity: 1 !important;
+          transform: translateY(-40) !important;
+          transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+        }
+
         @keyframes spinNeon {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }

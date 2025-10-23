@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-
+import { useTheme } from "../ThemeContext"; // pastikan path benar
 // ✅ Data frontend-only
 const projekData = [
   {
@@ -125,18 +125,53 @@ sistem ini dibuat menggunakan python, streamlit, dan naive bayes. Saya melihat p
 ];
 
 export default function ProjekPage() {
+  const { theme } = useTheme();
   const [projek, setProjek] = useState(projekData);
   const [expanded, setExpanded] = useState({});
   const [modalVideoID, setModalVideoID] = useState(null);
   const [modalPDF, setModalPDF] = useState(null);
   const [currentSlide, setCurrentSlide] = useState({});
-  const [lightbox, setLightbox] = useState({
-    isOpen: false,
-    projekID: null,
-    imgIndex: 0,
-  });
-
+  const [lightbox, setLightbox] = useState({ isOpen: false, projekID: null, imgIndex: 0 });
   const carouselRefs = useRef({});
+
+  useEffect(() => {
+  const interval = setInterval(() => {
+    setCurrentSlide(prev => {
+      const updated = { ...prev };
+      projek.forEach(p => {
+        const imagesArray = p.images ? JSON.parse(p.images) : [];
+        if (imagesArray.length > 0) {
+          updated[p.id] = (prev[p.id] ?? 0) + 1 >= imagesArray.length ? 0 : (prev[p.id] ?? 0) + 1;
+        }
+      });
+      return updated;
+    });
+  }, 2000); // ganti 4000 untuk kecepatan 4 detik per slide
+  return () => clearInterval(interval);
+}, [projek]);
+
+
+useEffect(() => {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("slide-in");
+          observer.unobserve(entry.target); // agar hanya muncul sekali
+        }
+      });
+    },
+    { threshold: 0.1 } // 10% card muncul
+  );
+
+  document.querySelectorAll(".projek-card").forEach(card => observer.observe(card));
+
+  return () => observer.disconnect();
+}, []);
+
+  useEffect(() => {
+  document.body.style.backgroundColor = theme === "dark" ? "#000000ff" : "#ffffff"; // bg-gray-950 / putih
+}, [theme]);
 
   useEffect(() => {
     document.body.style.overflow =
@@ -144,8 +179,7 @@ export default function ProjekPage() {
     return () => (document.body.style.overflow = "auto");
   }, [modalVideoID, lightbox.isOpen, modalPDF]);
 
-  const toggleExpand = (id) =>
-    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+  const toggleExpand = (id) => setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
 
   const extractYouTubeID = (url) => {
     const regExp =
@@ -154,64 +188,21 @@ export default function ProjekPage() {
     return match && match[2].length === 11 ? match[2] : null;
   };
 
-  // Auto-slide
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => {
-        const newSlide = { ...prev };
-        projek.forEach((p) => {
-          let imagesArray = [];
-          try {
-            imagesArray = p.images ? JSON.parse(p.images) : [];
-          } catch {
-            imagesArray = [];
-          }
-          if (imagesArray.length > 0) {
-            newSlide[p.id] = (prev[p.id] ?? 0) + 1;
-            if (newSlide[p.id] >= imagesArray.length) newSlide[p.id] = 0;
-          }
-        });
-        return newSlide;
-      });
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [projek]);
-
-  const openLightbox = (projekID, imgIndex) => {
-    setLightbox({ isOpen: true, projekID, imgIndex });
-  };
-
-  const closeLightbox = () => {
-    setLightbox({ isOpen: false, projekID: null, imgIndex: 0 });
-  };
-
-  const navigateLightbox = (direction) => {
-    const currentProj = projek.find((p) => p.id === lightbox.projekID);
-    if (!currentProj) return;
-    let imagesArray = [];
-    try {
-      imagesArray = currentProj.images ? JSON.parse(currentProj.images) : [];
-    } catch {
-      imagesArray = [];
-    }
-    let newIndex = lightbox.imgIndex + direction;
-    if (newIndex < 0) newIndex = imagesArray.length - 1;
-    if (newIndex >= imagesArray.length) newIndex = 0;
-    setLightbox((prev) => ({ ...prev, imgIndex: newIndex }));
-  };
-
   return (
-    <main className="p-8 bg-gray-950 min-h-screen text-gray-100 font-poppins">
+    <main
+      className={`min-h-screen font-poppins transition-colors duration-500 pt-24 p-8
+        ${theme === "dark" ? "bg-gray-950 text-gray-100" : "bg-white text-gray-900"}`}
+    >
       <div className="text-center mb-8">
-        <h1
-          className="text-4xl md:text-5xl font-bold mb-4 text-white drop-shadow-lg"
-          style={{
-            textShadow: "0 0 10px #0066ff, 0 0 20px #00ffff",
-          }}
-        >
-          Projek
-        </h1>
-        <p className="max-w-2xl mx-auto text-gray-300 text-lg md:text-xl leading-relaxed">
+<h1
+  className={`text-4xl md:text-5xl font-bold mb-8 text-center mt-5 ${
+    theme === "dark" ? "neon-glow" : ""
+  }`}
+>
+  Projek
+</h1>
+
+        <p className="max-w-2xl mx-auto text-lg md:text-xl leading-relaxed">
           Saat ini, projek yang saya kerjakan mencakup{" "}
           <span className="text-blue-400 font-semibold">website development</span>,{" "}
           <span className="text-blue-400 font-semibold">videografi</span>, dan{" "}
@@ -231,57 +222,59 @@ export default function ProjekPage() {
           const youtubeID = p.link_demo ? extractYouTubeID(p.link_demo) : null;
 
           let imagesArray = [];
-          try {
-            imagesArray = p.images ? JSON.parse(p.images) : [];
-          } catch {
-            imagesArray = [];
-          }
-
+          try { imagesArray = p.images ? JSON.parse(p.images) : []; } catch { imagesArray = []; }
           const slideIndex = currentSlide[p.id] ?? 0;
 
           return (
-            <div key={p.id} className="relative group">
+            <div key={p.id} className="relative group projek-card opacity-0 transform translate-y-10 transition-all duration-700">
               <div className="neon-border rounded-2xl p-[2px]">
-                <div className="relative bg-gray-900 rounded-2xl p-6 flex flex-col md:flex-row md:items-start gap-6 transition-transform duration-500 group-hover:scale-[1.02] group-hover:shadow-[0_0_25px_rgba(59,130,246,0.5)]">
+                <div className={`relative rounded-2xl p-6 flex flex-col md:flex-row gap-6 transition-transform duration-500 group-hover:scale-[1.02] group-hover:shadow-[0_0_25px_rgba(168,85,247,0.5)
+                  ${theme === "dark" ? "bg-gray-900" : "bg-gray-100"}`}
+                >
                   <div className="flex-1 min-w-0">
-                    <h2
-                      className="text-2xl font-bold text-white mb-3 break-words"
-                      style={{
-                        textShadow:
-                          "0 0 2px #004dc0ff, 0 0 20px #06b4b4ff",
-                      }}
-                    >
-                      {p.judul}
-                    </h2>
-                    <p className="text-gray-300 mb-3 break-words leading-relaxed whitespace-pre-line">
+                      <h2
+                        className={`text-2xl font-bold mb-3 break-words ${
+                          theme === "dark" ? "text-white" : "text-gray-900"
+                        }`}
+                        style={
+                          theme === "dark"
+                            ? { textShadow: "0 0 10px #3b82f6, 0 0 20px #38bdf8" }
+                            : {}
+                        }
+                      >
+                        {p.judul}
+                      </h2>
+                    <p className={`mb-3 break-words leading-relaxed whitespace-pre-line
+                      ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
                       {textToShow}
                     </p>
                     {p.deskripsi?.length > 250 && (
                       <button
                         onClick={() => toggleExpand(p.id)}
-                        className="text-blue-400 hover:underline mb-4"
+                        className={`mb-4 hover:underline font-medium
+                          ${theme === "dark" ? "text-blue-400" : "text-blue-500"}`}
                       >
                         {isExpanded ? "Sembunyikan" : "Selengkapnya"}
                       </button>
                     )}
-
                     {p.link_demo && (
                       <a
                         href={p.link_demo}
                         target="_blank"
                         rel="noreferrer"
-                        className="block text-blue-400 font-medium hover:underline mb-2"
+                        className={`block mb-2 font-medium hover:underline
+                          ${theme === "dark" ? "text-blue-400" : "text-blue-500"}`}
                       >
                         🔗 Lihat Situs
                       </a>
                     )}
-
                     {p.link_github && (
                       <a
                         href={p.link_github}
                         target="_blank"
                         rel="noreferrer"
-                        className="block text-blue-400 font-medium hover:underline mb-4"
+                        className={`block mb-4 font-medium hover:underline
+                          ${theme === "dark" ? "text-blue-400" : "text-blue-500"}`}
                       >
                         💻 Repositori GitHub
                       </a>
@@ -290,7 +283,9 @@ export default function ProjekPage() {
                     {p.pdf_file && (
                       <button
                         onClick={() => setModalPDF(p.pdf_file)}
-                        className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition mb-4"
+                        className={`inline-block px-4 py-2 rounded-lg mb-4 transition ${
+                          theme === "dark" ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-blue-400 text-white hover:bg-blue-500"
+                        }`}
                       >
                         📄 Lihat PDF
                       </button>
@@ -515,7 +510,10 @@ export default function ProjekPage() {
           position: relative;
           overflow: visible;
         }
-
+            .neon-glow {
+    text-shadow: 0 0 10px #0066ff, 0 0 20px #00ffff;
+    transition: text-shadow 0.3s ease-in-out;
+  }
         .neon-border::before,
         .neon-border::after {
           content: "";
@@ -544,6 +542,11 @@ export default function ProjekPage() {
         .neon-border > * {
           position: relative;
           z-index: 1;
+        }
+
+          .slide-in {
+          opacity: 1 !important;
+          transform: translateY(-40) !important;
         }
 
         @keyframes spinNeon {
