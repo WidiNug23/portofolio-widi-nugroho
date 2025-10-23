@@ -81,6 +81,10 @@ export default function OrganisasiPage() {
     document.body.style.overflow = popupImage ? "hidden" : "auto";
   }, [popupImage]);
 
+      useEffect(() => {
+    document.body.style.backgroundColor = theme === "dark" ? "#000000ff" : "#ffffff"; // bg-gray-950 / putih
+  }, [theme]);
+
   // IntersectionObserver untuk slide-in
   useEffect(() => {
     const observer = new IntersectionObserver(

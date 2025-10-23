@@ -58,6 +58,9 @@ export default function PendidikanPage() {
   useEffect(() => {
     document.body.style.overflow = popupImage ? "hidden" : "auto";
   }, [popupImage]);
+      useEffect(() => {
+    document.body.style.backgroundColor = theme === "dark" ? "#000000ff" : "#ffffff"; // bg-gray-950 / putih
+  }, [theme]);
 
   // Slide-in observer
   useEffect(() => {

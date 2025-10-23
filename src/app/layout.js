@@ -23,7 +23,7 @@ function LayoutContent({ children }) {
   return (
     <body
       className={`min-h-screen flex flex-col font-sans transition-colors duration-500 ${
-        theme === "dark" ? "bg-gray-900 text-gray-100" : "bg-gray-100 text-gray-900"
+        theme === "dark" ? "bg-gray-900 text-gray-100" : "bg-black-100 text-gray-900"
       }`}
     >
       {/* NAVBAR */}
@@ -73,40 +73,41 @@ function LayoutContent({ children }) {
           </div>
 
           {/* Navbar links */}
-          <ul
-            className={`flex flex-col md:flex-row md:items-center md:gap-4 absolute md:static top-full left-0 w-full md:w-auto transition-all duration-300 overflow-hidden ${
-              menuOpen ? "max-h-60" : "max-h-0"
-            } md:max-h-full ${theme === "dark" ? "bg-black" : "bg-white-100"}`}
-          >
-            {navLinks.map((link) => {
-              let glowColor = "#3b82f6,#60a5fa,#38bdf8";
-              if (link.label === "Sertifikat") glowColor = "#65960a,#7cbd04";
-              if (link.label === "Lomba & Kompetensi") glowColor = "#a855f7,#8b5cf6";
-              if (link.label === "Pengalaman & Organisasi") glowColor = "#f59e0b,#facc15";
-              if (link.label === "Pendidikan") glowColor = "#f50bbbff,#facc15";
+<ul
+  className={`flex flex-col md:flex-row md:items-center md:gap-4 absolute md:static top-full left-0 w-full md:w-auto transition-all duration-300 overflow-hidden
+    ${menuOpen ? "max-h-60" : "max-h-0 md:max-h-full"}
+    ${theme === "dark" ? "bg-black text-white" : "bg-white text-gray-900"}
+    ${!menuOpen ? "hidden md:flex" : "block"}
+  `}
+>
+  {navLinks.map((link) => {
+    let glowColor = "#3b82f6,#60a5fa,#38bdf8";
+    if (link.label === "Sertifikat") glowColor = "#65960a,#7cbd04";
+    if (link.label === "Lomba & Kompetensi") glowColor = "#a855f7,#8b5cf6";
+    if (link.label === "Pengalaman & Organisasi") glowColor = "#f59e0b,#facc15";
+    if (link.label === "Pendidikan") glowColor = "#f50bbbff,#facc15";
 
-              const textShadow = glowColor
-                .split(",")
-                .map((c, i) => `0 0 ${5 * (i + 1)}px ${c}`)
-                .join(", ");
+    const textShadow = glowColor
+      .split(",")
+      .map((c, i) => `0 0 ${5 * (i + 1)}px ${c}`)
+      .join(", ");
 
-              return (
-                <li key={link.href} className="border-b border-gray-700 md:border-none">
-                  <Link
-                    href={link.href}
-                    className={`block px-4 py-2 md:py-1 font-semibold rounded-md font-poppins transition-colors duration-300 relative ${
-                      theme === "dark" ? "text-gray-200" : "text-gray-900"
-                    }`}
-                    onMouseEnter={(e) => (e.currentTarget.style.textShadow = textShadow)}
-                    onMouseLeave={(e) => (e.currentTarget.style.textShadow = "none")}
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+    return (
+      <li key={link.href} className="border-b border-gray-300 md:border-none">
+        <Link
+          href={link.href}
+          className={`block px-4 py-2 md:py-1 font-semibold rounded-md font-poppins transition-colors duration-300 relative`}
+          onMouseEnter={(e) => (e.currentTarget.style.textShadow = textShadow)}
+          onMouseLeave={(e) => (e.currentTarget.style.textShadow = "none")}
+          onClick={() => setMenuOpen(false)}
+        >
+          {link.label}
+        </Link>
+      </li>
+    );
+  })}
+</ul>
+
         </div>
       </nav>
 

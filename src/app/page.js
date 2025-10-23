@@ -57,6 +57,9 @@ export default function Home() {
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
+    useEffect(() => {
+  document.body.style.backgroundColor = theme === "dark" ? "#000000ff" : "#ffffff"; // bg-gray-950 / putih
+}, [theme]);
 
   // // Canvas trail
   // useEffect(() => {
