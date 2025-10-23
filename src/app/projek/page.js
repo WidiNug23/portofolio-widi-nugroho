@@ -134,6 +134,31 @@ export default function ProjekPage() {
   const [lightbox, setLightbox] = useState({ isOpen: false, projekID: null, imgIndex: 0 });
   const carouselRefs = useRef({});
 
+  // Buka popup gambar
+const openLightbox = (projekID, imgIndex) => {
+  setLightbox({ isOpen: true, projekID, imgIndex });
+};
+
+// Tutup popup gambar
+const closeLightbox = () => {
+  setLightbox({ isOpen: false, projekID: null, imgIndex: 0 });
+};
+
+// Navigasi antar gambar dalam popup
+const navigateLightbox = (direction) => {
+  const currentProject = projek.find((p) => p.id === lightbox.projekID);
+  if (!currentProject) return;
+  const imagesArray = JSON.parse(currentProject.images || "[]");
+  if (imagesArray.length === 0) return;
+
+  setLightbox((prev) => ({
+    ...prev,
+    imgIndex:
+      (prev.imgIndex + direction + imagesArray.length) % imagesArray.length,
+  }));
+};
+
+
   useEffect(() => {
   const interval = setInterval(() => {
     setCurrentSlide(prev => {
