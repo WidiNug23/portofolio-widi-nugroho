@@ -12,7 +12,7 @@ function LayoutContent({ children }) {
   const { theme, toggleTheme } = useTheme(); // aman karena di dalam ThemeProvider
 
   const navLinks = [
-    { href: "/", label: "Home" },
+    { href: "/", label: "Beranda" },
     { href: "/projek", label: "Projek" },
     { href: "/sertifikat", label: "Sertifikat" },
     { href: "/lomba-kompetensi", label: "Lomba & Kompetensi" },

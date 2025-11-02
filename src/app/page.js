@@ -52,6 +52,8 @@ export default function Home() {
   const canvasRef = useRef(null);
   const cursor = useRef({ x: 0, y: 0 });
   const trail = useRef([]);
+  const [closing, setClosing] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   // Update data-theme di root
   useEffect(() => {
@@ -60,6 +62,29 @@ export default function Home() {
     useEffect(() => {
   document.body.style.backgroundColor = theme === "dark" ? "#000000ff" : "#ffffff"; // bg-gray-950 / putih
 }, [theme]);
+
+    // efek untuk menunggu animasi tutup sebelum konten pendek muncul
+  useEffect(() => {
+    if (!expanded && closing) {
+      const timeout = setTimeout(() => {
+        setVisible(false);
+        setClosing(false);
+      }, 700); // durasi sama dengan animasi
+      return () => clearTimeout(timeout);
+    }
+  }, [expanded, closing]);
+
+  const handleToggle = () => {
+    if (expanded) {
+      // mulai animasi menutup
+      setClosing(true);
+      setExpanded(false);
+    } else {
+      // buka langsung
+      setVisible(true);
+      setExpanded(true);
+    }
+  };
 
   // // Canvas trail
   // useEffect(() => {
@@ -204,55 +229,62 @@ export default function Home() {
       </span>
     </h1>
 
-<p
-  className={`mt-4 text-base sm:text-lg md:text-xl leading-relaxed transition-all duration-500 ${
-    theme === "dark" ? "text-white/80" : "text-black/70"
-  }`}
->
-  {expanded ? (
-    <>
-      Saya memiliki ketertarikan mendalam terhadap perancangan
-      dan pengembangan sistem berbasis web. Saya senang memahami
-      bagaimana sebuah website bekerja mulai dari alur sistem,
-      segmentasi pengguna, perancangan layout dan warna, hingga
-      pengalaman interaksi pengguna. Dalam pengembangan, saya sering
-      menggunakan React.js untuk frontend dan CodeIgniter 4 untuk
-      backend. Saya menikmati proses menerjemahkan kebutuhan pengguna
-      menjadi sistem yang fungsional dan efisien. Selain kemampuan
-      teknis, saya juga memiliki kepekaan visual dari pengalaman di
-      bidang fotografi dan videografi, yang membantu saya menciptakan
-      tampilan antarmuka yang menarik dan mudah digunakan. Saya dapat
-      bekerja baik secara individu maupun dalam tim, serta{" "}
-      <span
-        className={`font-semibold transition-all duration-500 ${
-          theme === "dark"
-            ? "text-yellow-400 drop-shadow-[0_0_6px_rgba(96,165,250,0.8)]"
-            : "text-blue-600 drop-shadow-[0_0_4px_rgba(37,99,235,0.5)]"
+      <p
+        className={`mt-4 text-base sm:text-lg md:text-xl leading-relaxed overflow-hidden transition-all duration-700 ease-in-out ${
+          theme === "dark" ? "text-white/80" : "text-black/70"
         }`}
+        style={{
+          maxHeight: expanded ? "1000px" : "70px",
+          opacity: expanded ? 1 : 0.9,
+          transform: expanded ? "translateY(0)" : "translateY(-5px)",
+          transition:
+            "max-height 0.7s ease-in-out, opacity 0.5s ease, transform 0.5s ease",
+        }}
       >
-        terbuka untuk mempelajari berbagai tools dan teknologi baru
-      </span>{" "}
-      yang relevan dengan perkembangan dunia digital maupun kebutuhan proyek yang
-      saya kerjakan.
-    </>
-  ) : (
-    <>
-      Saya memiliki ketertarikan mendalam terhadap perancangan dan pengembangan sistem berbasis web. Saya senang memahami ...
-    </>
-  )}
-</p>
+        {expanded || closing ? (
+          <>
+            Saya memiliki ketertarikan mendalam terhadap perancangan
+            dan pengembangan sistem berbasis web. Saya senang memahami
+            bagaimana sebuah website bekerja mulai dari alur sistem,
+            segmentasi pengguna, perancangan layout dan warna, hingga
+            pengalaman interaksi pengguna. Dalam pengembangan, saya sering
+            menggunakan React.js untuk frontend dan CodeIgniter 4 untuk
+            backend. Saya menikmati proses menerjemahkan kebutuhan pengguna
+            menjadi sistem yang fungsional dan efisien. Selain kemampuan
+            teknis, saya juga memiliki kepekaan visual dari pengalaman di
+            bidang fotografi dan videografi, yang membantu saya menciptakan
+            tampilan antarmuka yang menarik dan mudah digunakan. Saya dapat
+            bekerja baik secara individu maupun dalam tim, serta{" "}
+            <span
+              className={`font-semibold transition-all duration-500 ${
+                theme === "dark"
+                  ? "text-yellow-400 drop-shadow-[0_0_6px_rgba(96,165,250,0.8)]"
+                  : "text-blue-600 drop-shadow-[0_0_4px_rgba(37,99,235,0.5)]"
+              }`}
+            >
+              terbuka untuk mempelajari berbagai tools dan teknologi baru
+            </span>{" "}
+            yang relevan dengan perkembangan dunia digital maupun kebutuhan proyek yang
+            saya kerjakan.
+          </>
+        ) : (
+          <>
+            Saya memiliki ketertarikan mendalam terhadap perancangan dan pengembangan sistem berbasis web. Saya senang memahami ...
+          </>
+        )}
+      </p>
 
+      <button
+        onClick={handleToggle}
+        className="mt-2 font-semibold hover:underline transition-colors duration-300"
+        style={{
+          fontFamily: "Poppins, sans-serif",
+          color: theme === "dark" ? "#3b82f6" : "#1e40af",
+        }}
+      >
+        {expanded ? "Tampilkan Lebih Sedikit" : "Selengkapnya ..."}
+      </button>
 
-    <button
-      onClick={() => setExpanded(!expanded)}
-      className="mt-2 font-semibold hover:underline"
-      style={{
-        fontFamily: "Poppins, sans-serif",
-        color: theme === "dark" ? "#3b82f6" : "#1e40af",
-      }}
-    >
-      {expanded ? "Tampilkan Lebih Sedikit" : "Selengkapnya ..."}
-    </button>
   </div>
 </div>
 
@@ -321,7 +353,7 @@ export default function Home() {
   <div className="flex flex-wrap justify-center gap-6 font-poppins">
     {[
       { name: "Canon M50", shadow: "#3b82f6", logo: "https://image.similarpng.com/file/similarpng/original-picture/2020/06/Logo-canon-transparent-PNG.png" },
-      { name: "CapCut", shadow: "#000", logo: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/capcut-icon.png" },
+      { name: "CapCut", shadow: theme === "dark" ? "#fff" : "#111", logo: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/capcut-icon.png" },
       { name: "Canva", shadow: "#187cf6", logo: "https://freelogopng.com/images/all_img/1656733807canva-icon-png.png" },
       { name: "Visual Studio Code", shadow: "#60a5fa", logo: "https://chris-ayers.com/assets/images/vscode-logo.png" },
       { name: "HTML", shadow: "#f59e0b", logo: "https://icones.pro/wp-content/uploads/2021/05/icone-html-orange.png" },
