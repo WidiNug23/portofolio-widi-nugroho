@@ -45,6 +45,77 @@ function RevealItem({ children, delay = 0 }) {
   );
 }
 
+function RotatingLabelItem({ item, theme }) {
+  const [currentLabel, setCurrentLabel] = useState(0);
+  const [fade, setFade] = useState(true);
+  const [labelWidth, setLabelWidth] = useState(0);
+  const labelRef = useRef(null);
+
+  useEffect(() => {
+    if (labelRef.current) {
+      setLabelWidth(labelRef.current.offsetWidth);
+    }
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFade(false);
+
+      setTimeout(() => {
+        setCurrentLabel((prev) => (prev + 1) % item.labels.length);
+        setFade(true);
+      }, 400);
+    }, 2100);
+
+    return () => clearInterval(interval);
+  }, [item.labels.length]);
+
+  useEffect(() => {
+    if (labelRef.current) {
+      setLabelWidth(labelRef.current.offsetWidth);
+    }
+  }, [currentLabel]);
+
+  return (
+    <a
+      href={item.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`flex items-center gap-3 px-6 py-4 rounded-2xl transition-all duration-500 transform hover:scale-105 ${
+        theme === "dark" ? "bg-gray-800" : "bg-white"
+      }`}
+      style={{
+        boxShadow: `0 0 12px ${item.color}`,
+        width: `calc(${labelWidth}px + 90px)`,
+        transition: "all 0.5s ease-in-out",
+        whiteSpace: "nowrap",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = `0 0 25px ${item.color}, 0 0 50px ${item.color}`;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = `0 0 12px ${item.color}`;
+      }}
+    >
+      {/* Logo tetap stay */}
+      <div className="flex-shrink-0">{item.icon}</div>
+
+      {/* Teks yang berganti */}
+      <span
+        ref={labelRef}
+        className={`text-lg font-semibold transition-opacity duration-500 ${
+          fade ? "opacity-100" : "opacity-0"
+        } ${theme === "dark" ? "text-white" : "text-black"}`}
+        style={{
+          whiteSpace: "nowrap",
+        }}
+      >
+        {item.labels[currentLabel]}
+      </span>
+    </a>
+  );
+}
+
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
   const [expanded, setExpanded] = useState(false);
@@ -399,10 +470,15 @@ export default function Home() {
 <section className="w-full max-w-4xl mx-auto text-center mt-10">
   <RevealItem delay={0}>
     <h2
-      className={`text-3xl md:text-4xl font-bold mb-6 ${theme === "dark" ? "text-white" : "text-black"}`}
+      className={`text-3xl md:text-4xl font-bold mb-6 ${
+        theme === "dark" ? "text-white" : "text-black"
+      }`}
       style={{
         fontFamily: "Poppins, sans-serif",
-        textShadow: theme === "dark" ? "0 0 10px rgba(255,255,255,0.6)" : "0 0 5px rgba(0,0,0,0.3)",
+        textShadow:
+          theme === "dark"
+            ? "0 0 10px rgba(255,255,255,0.6)"
+            : "0 0 5px rgba(0,0,0,0.3)",
       }}
     >
       Kontak & Media Sosial
@@ -413,33 +489,42 @@ export default function Home() {
     {[
       {
         href: "https://github.com/WidiNug23",
-        icon: <FaGithub className="text-2xl" style={{ color: theme === "light" ? "#111" : "#fff" }} />,
-        label: "Github",
+        icon: (
+          <FaGithub
+            className="text-2xl"
+            style={{ color: theme === "light" ? "#111" : "#fff" }}
+          />
+        ),
+        labels: ["Explore code", "Github"],
         color: theme === "dark" ? "#fff" : "#111",
       },
-      { href: "mailto:collabswithwidi@gmail.com", icon: <FaEnvelope className="text-[#EA4335] text-2xl" />, label: "Gmail", color: "#EA4335" },
-      { href: "https://www.instagram.com/widingr23", icon: <FaInstagram className="text-pink-400 text-2xl" />, label: "Instagram", color: "#ec4899" },
-      { href: "https://www.linkedin.com/in/widi-suryo-nugroho-a607632a2/", icon: <FaLinkedin className="text-blue-300 text-2xl" />, label: "LinkedIn", color: "#93c5fd" },
-      { href: "https://wa.me/6285727609498", icon: <FaWhatsapp className="text-[#25D366] text-2xl" />, label: "WhatsApp", color: "#25D366" },
-
+      {
+        href: "mailto:collabswithwidi@gmail.com",
+        icon: <FaEnvelope className="text-[#EA4335] text-2xl" />,
+        labels: ["Send mail", "Gmail"],
+        color: "#EA4335",
+      },
+      {
+        href: "https://www.instagram.com/widingr23",
+        icon: <FaInstagram className="text-pink-400 text-2xl" />,
+        labels: ["Follow me", "Instagram"],
+        color: "#ec4899",
+      },
+      {
+        href: "https://www.linkedin.com/in/widi-suryo-nugroho-a607632a2/",
+        icon: <FaLinkedin className="text-blue-300 text-2xl" />,
+        labels: ["Let's connect", "LinkedIn"],
+        color: "#93c5fd",
+      },
+      {
+        href: "https://wa.me/6285727609498",
+        icon: <FaWhatsapp className="text-[#25D366] text-2xl" />,
+        labels: ["Let's chat", "WhatsApp"],
+        color: "#25D366",
+      },
     ].map((item, index) => (
-      <RevealItem key={item.label} delay={150 * (index + 1)}>
-        <a
-          href={item.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`flex items-center gap-3 px-6 py-4 rounded-2xl transition-all duration-300 transform hover:scale-105 ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}
-          style={{ boxShadow: `0 0 12px ${item.color}` }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = `0 0 25px ${item.color}, 0 0 50px ${item.color}`;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = `0 0 12px ${item.color}`;
-          }}
-        >
-          {item.icon}
-          <span className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-black"}`}>{item.label}</span>
-        </a>
+      <RevealItem key={index} delay={150 * (index + 1)}>
+        <RotatingLabelItem item={item} theme={theme} />
       </RevealItem>
     ))}
   </div>
