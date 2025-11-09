@@ -102,6 +102,42 @@ useEffect(() => {
         theme === "dark" ? "bg-gray-950 text-gray-100" : "bg-white text-gray-900"
       }`}
     >
+      {/* ===== LATAR BELAKANG OUTLINE "Widi Nugroh0" ===== */}
+<div
+  className="fixed inset-0 pointer-events-none select-none overflow-hidden"
+  style={{
+    zIndex: 0,
+    background: "transparent",
+    fontFamily: "'Poppins', sans-serif", // pastikan nama font sesuai import
+  }}
+>
+  <div
+    style={{
+      position: "absolute",
+      top: "-50%",
+      left: "-50%",
+      width: "200%",
+      height: "200%",
+      transform: "rotate(-45deg)",
+      display: "flex",
+      flexWrap: "wrap",
+      justifyContent: "flex-start",
+      alignItems: "flex-start",
+      opacity: theme === "dark" ? 0.05 : 0.07,
+      fontWeight: 300, // gunakan bobot ringan agar tampak elegan
+      fontSize: "6rem",
+      color: "transparent",
+      WebkitTextStroke: theme === "dark" ? "1px #ffffff" : "1px #000000",
+      lineHeight: "6rem",
+      gap: "1.2rem",
+    }}
+  >
+    {Array.from({ length: 2000 }).map((_, i) => (
+      <span key={i}>Widi Nugroh0</span>
+    ))}
+  </div>
+</div>
+{/* ===== END BACKGROUND ===== */}
       {/* Header */}
       <div className="text-center mb-8">
 <h1

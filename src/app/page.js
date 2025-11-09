@@ -125,6 +125,17 @@ export default function Home() {
   const trail = useRef([]);
   const [closing, setClosing] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [highlightKontak, setHighlightKontak] = useState(false);
+
+  // === Dengarkan event dari navbar ===
+  useEffect(() => {
+    const handler = () => {
+      setHighlightKontak(true);
+      setTimeout(() => setHighlightKontak(false), 3000);
+    };
+    window.addEventListener("highlightKontak", handler);
+    return () => window.removeEventListener("highlightKontak", handler);
+  }, []);
 
   // Update data-theme di root
   useEffect(() => {
@@ -228,6 +239,43 @@ export default function Home() {
           zIndex: 9999,
         }}
       /> */}
+
+{/* ===== LATAR BELAKANG OUTLINE "Widi Nugroh0" ===== */}
+<div
+  className="fixed inset-0 pointer-events-none select-none overflow-hidden"
+  style={{
+    zIndex: 0,
+    background: "transparent",
+    fontFamily: "'Poppins', sans-serif", // pastikan nama font sesuai import
+  }}
+>
+  <div
+    style={{
+      position: "absolute",
+      top: "-50%",
+      left: "-50%",
+      width: "200%",
+      height: "200%",
+      transform: "rotate(-45deg)",
+      display: "flex",
+      flexWrap: "wrap",
+      justifyContent: "flex-start",
+      alignItems: "flex-start",
+      opacity: theme === "dark" ? 0.05 : 0.07,
+      fontWeight: 300, // gunakan bobot ringan agar tampak elegan
+      fontSize: "6rem",
+      color: "transparent",
+      WebkitTextStroke: theme === "dark" ? "1px #ffffff" : "1px #000000",
+      lineHeight: "6rem",
+      gap: "1.2rem",
+    }}
+  >
+    {Array.from({ length: 2000 }).map((_, i) => (
+      <span key={i}>Widi Nugroh0</span>
+    ))}
+  </div>
+</div>
+{/* ===== END BACKGROUND ===== */}
 
       <main
         className="min-h-screen flex flex-col items-center py-16 px-4 gap-16 font-sans transition-colors duration-500"
@@ -467,71 +515,75 @@ export default function Home() {
 
 
 {/* KONTAK */}
-<section className="w-full max-w-4xl mx-auto text-center mt-10">
-  <RevealItem delay={0}>
-    <h2
-      className={`text-3xl md:text-4xl font-bold mb-6 ${
-        theme === "dark" ? "text-white" : "text-black"
-      }`}
-      style={{
-        fontFamily: "Poppins, sans-serif",
-        textShadow:
-          theme === "dark"
-            ? "0 0 10px rgba(255,255,255,0.6)"
-            : "0 0 5px rgba(0,0,0,0.3)",
-      }}
-    >
-      Kontak & Media Sosial
-    </h2>
-  </RevealItem>
-
-  <div className="flex flex-wrap justify-center gap-6 font-poppins">
-    {[
-      {
-        href: "https://github.com/WidiNug23",
-        icon: (
-          <FaGithub
-            className="text-2xl"
-            style={{ color: theme === "light" ? "#111" : "#fff" }}
-          />
-        ),
-        labels: ["Explore code", "Github"],
-        color: theme === "dark" ? "#fff" : "#111",
-      },
-      {
-        href: "mailto:collabswithwidi@gmail.com",
-        icon: <FaEnvelope className="text-[#EA4335] text-2xl" />,
-        labels: ["Send mail", "Gmail"],
-        color: "#EA4335",
-      },
-      {
-        href: "https://www.instagram.com/widingr23",
-        icon: <FaInstagram className="text-pink-400 text-2xl" />,
-        labels: ["Follow me", "Instagram"],
-        color: "#ec4899",
-      },
-      {
-        href: "https://www.linkedin.com/in/widi-suryo-nugroho-a607632a2/",
-        icon: <FaLinkedin className="text-blue-300 text-2xl" />,
-        labels: ["Let's connect", "LinkedIn"],
-        color: "#93c5fd",
-      },
-      {
-        href: "https://wa.me/6285727609498",
-        icon: <FaWhatsapp className="text-[#25D366] text-2xl" />,
-        labels: ["Let's chat", "WhatsApp"],
-        color: "#25D366",
-      },
-    ].map((item, index) => (
-      <RevealItem key={index} delay={150 * (index + 1)}>
-        <RotatingLabelItem item={item} theme={theme} />
+    <section id="kontak" className="w-full max-w-4xl mx-auto text-center mt-10">
+      <RevealItem delay={0}>
+        <h2
+          className={`text-3xl md:text-4xl font-bold mb-6 transition-all duration-500 ${
+            theme === "dark" ? "text-white" : "text-black"
+          } ${highlightKontak ? "text-[#3b82f6] neon-glow" : ""}`}
+          style={{
+            fontFamily: "Poppins, sans-serif",
+          }}
+        >
+          Kontak & Media Sosial
+        </h2>
       </RevealItem>
-    ))}
-  </div>
-</section>
 
+      <div className="flex flex-wrap justify-center gap-6 font-poppins">
+        {[
+          {
+            href: "https://github.com/WidiNug23",
+            icon: (
+              <FaGithub
+                className="text-2xl"
+                style={{ color: theme === "light" ? "#111" : "#fff" }}
+              />
+            ),
+            labels: ["Explore code", "Github"],
+            color: theme === "dark" ? "#fff" : "#111",
+          },
+          {
+            href: "mailto:collabswithwidi@gmail.com",
+            icon: <FaEnvelope className="text-[#EA4335] text-2xl" />,
+            labels: ["Send mail", "Gmail"],
+            color: "#EA4335",
+          },
+          {
+            href: "https://www.instagram.com/widingr23",
+            icon: <FaInstagram className="text-pink-400 text-2xl" />,
+            labels: ["Follow me", "Instagram"],
+            color: "#ec4899",
+          },
+          {
+            href: "https://www.linkedin.com/in/widi-suryo-nugroho-a607632a2/",
+            icon: <FaLinkedin className="text-blue-300 text-2xl" />,
+            labels: ["Let's connect", "LinkedIn"],
+            color: "#93c5fd",
+          },
+          {
+            href: "https://wa.me/6285727609498",
+            icon: <FaWhatsapp className="text-[#25D366] text-2xl" />,
+            labels: ["Let's chat", "WhatsApp"],
+            color: "#25D366",
+          },
+        ].map((item, index) => (
+          <RevealItem key={index} delay={150 * (index + 1)}>
+            <RotatingLabelItem item={item} theme={theme} />
+          </RevealItem>
+        ))}
+      </div>
 
-
+      <style jsx>{`
+        .neon-glow {
+          text-shadow:
+            0 0 8px #3b82f6,
+            0 0 16px #60a5fa,
+            0 0 24px #93c5fd,
+            0 0 32px #3b82f6;
+          transition: all 0.3s ease-in-out;
+        }
+      `}</style>
+    </section>
       </main>
     </>
   );
