@@ -56,10 +56,9 @@ sistem ini dibuat menggunakan python, streamlit, dan naive bayes. Saya melihat p
     link_github: "https://github.com/WidiNug23/filterisasi-data-lowongan-maganghub",
     pdf_file: "",
     images: JSON.stringify([
-"Screenshot 2025-10-12 104407.png",
-"Screenshot 2025-10-12 104509.png",
-"Screenshot 2025-10-12 104949.png",
-"Screenshot 2025-10-12 105053.png",
+"filter1.png",
+"filter2.png",
+"filter3.png",
     ]),
   },
   {
