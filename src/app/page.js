@@ -15,6 +15,11 @@ import React from "react";
 import { useTheme } from "./ThemeContext"; // pastikan path benar
 import Head from "next/head";
 import Link from "next/link";
+import ProjekPage from "./projek/page";
+import SertifikatPage from "./sertifikat/page";
+import LombaPage from "./lomba-kompetensi/page";
+import OrganisasiPage from "./organisasi/page";
+import PendidikanPage from "./pendidikan/page";
 
 function RevealItem({ children, delay = 0 }) {
   const ref = useRef(null);
@@ -168,6 +173,28 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+  const target = sessionStorage.getItem("scrollToTarget");
+  const offset = Number(sessionStorage.getItem("scrollOffset")) || 0;
+
+  if (target) {
+    const section = document.querySelector(target);
+    if (section) {
+      setTimeout(() => {
+        const y =
+          section.getBoundingClientRect().top +
+          window.pageYOffset -
+          offset;
+
+        window.scrollTo({ top: y, behavior: "smooth" });
+      }, 300);
+    }
+  }
+
+  sessionStorage.removeItem("scrollToTarget");
+  sessionStorage.removeItem("scrollOffset");
+}, []);
+
   // // Canvas trail
   // useEffect(() => {
   //   const canvas = canvasRef.current;
@@ -241,7 +268,7 @@ export default function Home() {
       /> */}
 
 {/* ===== LATAR BELAKANG OUTLINE "Widi Nugroh0" ===== */}
-<div
+{/* <div
   className="fixed inset-0 pointer-events-none select-none overflow-hidden"
   style={{
     zIndex: 0,
@@ -274,7 +301,7 @@ export default function Home() {
       <span key={i}>Widi Nugroh0</span>
     ))}
   </div>
-</div>
+</div> */}
 {/* ===== END BACKGROUND ===== */}
 
       <main
@@ -424,22 +451,47 @@ export default function Home() {
     </h2>
   </RevealItem>
 
-  <div className="flex flex-wrap justify-center gap-6 font-poppins">
-    {[
-      { href: "/projek", title: "Projek", desc: "Kumpulan projek web & konten video", color: "#3b82f6" },
-      { href: "/sertifikat", title: "Sertifikat", desc: "Sertifikasi yang telah didapatkan", color: "#22c55e" },
-      { href: "/lomba-kompetensi", title: "Lomba & Kompetensi", desc: "Prestasi & perlombaan yang diikuti", color: "#a855f7" },
-      { href: "/organisasi", title: "Pengalaman & Organisasi", desc: "Daftar pengalaman yang pernah dijalani", color: "#eab308" },
-      { href: "/pendidikan", title: "Pendidikan", desc: "Daftar pendidikan yang ditempuh", color: "#f50bbbff" },
-      { href: "https://drive.google.com/file/d/1Kd5D2FGKnzQq7zFAFWd2aksUeG3ENbMA/view?usp=drive_link", title: "Curriculum Vitae", desc: "Lihat dan unduh CV", color: "#3b82f6" },
-    ].map((item, index) => (
+<div className="flex flex-wrap justify-center gap-6 font-poppins">
+  {[
+    { href: "/#projek", title: "Projek", desc: "Kumpulan projek web & konten video", color: "#3b82f6" },
+    { href: "/#sertifikat", title: "Sertifikat", desc: " Kumpulan Sertifikasi yang telah didapatkan", color: "#22c55e" },
+    { href: "/#lomba", title: "Lomba & Kompetensi", desc: "Prestasi & perlombaan yang diikuti", color: "#a855f7" },
+    { href: "/#organisasi", title: "Pengalaman & Organisasi", desc: "Daftar pengalaman yang pernah dijalani", color: "#eab308" },
+    { href: "/#pendidikan", title: "Pendidikan", desc: "Daftar pendidikan yang ditempuh", color: "#f50bbbff" },
+
+    // CV tetap khusus wide
+    { 
+      href: "https://drive.google.com/file/d/1Kd5D2FGKnzQq7zFAFWd2aksUeG3ENbMA/view?usp=drive_link", 
+      title: "Curriculum Vitae", 
+      desc: "Lihat dan unduh CV", 
+      color: "#3b82f6",
+      // wide: true 
+    },
+  ].map((item, index) => {
+    
+    const isExternal = item.href.startsWith("http");
+    const isInternalScroll = item.href.startsWith("/#");
+
+    // Semua card lebih panjang, CV paling panjang
+    const cardWidth = item.wide ? "w-[380px]" : "w-[300px]";
+
+    return (
       <RevealItem key={item.title} delay={150 * (index + 1)}>
         <Link
           href={item.href}
-          className={`flex flex-col items-center justify-center px-6 py-4 w-[250px] rounded-2xl transition-all duration-300 transform hover:scale-105 ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}
-          style={{
-            boxShadow: `0 0 12px ${item.color}`,
+          target={isExternal ? "_blank" : undefined}
+          onClick={(e) => {
+            if (isInternalScroll) {
+              e.preventDefault();
+              const id = item.href.replace("/#", "");
+              const section = document.getElementById(id);
+              if (section) section.scrollIntoView({ behavior: "smooth" });
+            }
           }}
+          className={`flex flex-col items-center justify-center px-6 py-4 ${cardWidth} rounded-2xl transition-all duration-300 transform hover:scale-105 ${
+            theme === "dark" ? "bg-gray-800" : "bg-white"
+          }`}
+          style={{ boxShadow: `0 0 12px ${item.color}` }}
           onMouseEnter={(e) => {
             e.currentTarget.style.boxShadow = `0 0 25px ${item.color}, 0 0 50px ${item.color}`;
           }}
@@ -447,71 +499,22 @@ export default function Home() {
             e.currentTarget.style.boxShadow = `0 0 12px ${item.color}`;
           }}
         >
-          <span className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-black"}`}>{item.title}</span>
-          <span className={`text-sm mt-1 text-center ${theme === "dark" ? "text-white/80" : "text-black/70"}`}>{item.desc}</span>
+          <span className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-black"}`}>
+            {item.title}
+          </span>
+          <span className={`text-sm mt-1 text-center ${theme === "dark" ? "text-white/80" : "text-black/70"}`}>
+            {item.desc}
+          </span>
         </Link>
       </RevealItem>
-    ))}
-  </div>
+    );
+  })}
+</div>
+
+
+
 </section>
 
-{/* TOOLS */}
-<section className="w-full max-w-4xl mx-auto text-center mt-8">
-  <RevealItem delay={0}>
-    <h2
-      className={`text-3xl md:text-4xl font-bold mb-6 ${theme === "dark" ? "text-white" : "text-black"}`}
-      style={{
-        fontFamily: "Poppins, sans-serif",
-        textShadow: theme === "dark" ? "0 0 10px rgba(255,255,255,0.6)" : "0 0 5px rgba(0,0,0,0.3)",
-      }}
-    >
-      Tools
-    </h2>
-  </RevealItem>
-
-  <div className="flex flex-wrap justify-center gap-6 font-poppins">
-    {[
-      { name: "Canon M50", shadow: "#3b82f6", logo: "https://image.similarpng.com/file/similarpng/original-picture/2020/06/Logo-canon-transparent-PNG.png" },
-      { name: "CapCut", shadow: theme === "dark" ? "#fff" : "#111", logo: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/capcut-icon.png" },
-      { name: "Canva", shadow: "#187cf6", logo: "https://freelogopng.com/images/all_img/1656733807canva-icon-png.png" },
-      { name: "Visual Studio Code", shadow: "#60a5fa", logo: "https://chris-ayers.com/assets/images/vscode-logo.png" },
-      { name: "HTML", shadow: "#f59e0b", logo: "https://icones.pro/wp-content/uploads/2021/05/icone-html-orange.png" },
-      { name: "CSS", shadow: "#3b82f6", logo: "https://upload.wikimedia.org/wikipedia/commons/d/d5/CSS3_logo_and_wordmark.svg" },
-      { name: "JavaScript", shadow: "#facc15", logo: "https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" },
-      { name: "Python", shadow: "#3b82f6", logo: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" },
-      { name: "PHP", shadow: "#6e41aa", logo: "https://upload.wikimedia.org/wikipedia/commons/2/27/PHP-logo.svg" },
-      { name: "React JS", shadow: "#61dafb", logo: "https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" },
-      { name: "CodeIgniter", shadow: "#DD4814", logo: "https://cdn.iconscout.com/icon/free/png-256/free-codeigniter-logo-icon-svg-download-png-1579761.png?f=webp" },
-      { name: "MySQL", shadow: "#2ac3edff", logo: "https://images.icon-icons.com/2699/PNG/512/mysql_logo_icon_169940.png" },
-      { name: "Next JS", shadow: theme === "dark" ? "#fff" : "#111", logo: "https://logo.svgcdn.com/devicon/nextjs-original.png" },
-      { name: "Golang", shadow: "#00ADD8", logo: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/go-programming-language-icon.png" },
-      { name: "Windows", shadow: "#facc15", logo: "https://w7.pngwing.com/pngs/719/781/png-transparent-windows-logo-microsoft-windows-scalable-graphics-logo-computer-file-microsoft-logo-icon-angle-text-rectangle.png" },
-      { name: "Android", shadow: "#2bd800ff", logo: "https://www.freepnglogos.com/uploads/android-logo-png/android-logo-powerful-mobile-apps-for-those-with-disabilities-3.png" },
-      { name: "Tools lain segera hadir", shadow:"#ffe600ff", logo: "https://cdn.pixabay.com/photo/2024/01/17/20/03/cartoon-8515557_960_720.png" },
-    ].map((tool, index) => (
-      <RevealItem key={tool.name} delay={150 * (index + 1)}>
-        <div
-          className={`flex items-center gap-3 px-6 py-4 rounded-2xl transition-all duration-500 transform hover:scale-105 ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}
-          style={{ boxShadow: `0 0 12px ${tool.shadow}` }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = `0 0 25px ${tool.shadow}, 0 0 50px ${tool.shadow}`;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = `0 0 12px ${tool.shadow}`;
-          }}
-        >
-          <img 
-            src={tool.logo} 
-            alt={tool.name} 
-            className="w-8 h-8 object-contain" 
-            style={{ filter: tool.name === "Next JS" && theme === "light" ? "invert(1)" : "none" }}
-          />
-          <span className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-black"}`}>{tool.name}</span>
-        </div>
-      </RevealItem>
-    ))}
-  </div>
-</section>
 
 
 {/* KONTAK */}
@@ -584,6 +587,68 @@ export default function Home() {
         }
       `}</style>
     </section>
+    {/* TOOLS */}
+<section className="w-full max-w-4xl mx-auto text-center mt-8">
+  <RevealItem delay={0}>
+    <h2
+      className={`text-3xl md:text-4xl font-bold mb-6 ${theme === "dark" ? "text-white" : "text-black"}`}
+      style={{
+        fontFamily: "Poppins, sans-serif",
+        textShadow: theme === "dark" ? "0 0 10px rgba(255,255,255,0.6)" : "0 0 5px rgba(0,0,0,0.3)",
+      }}
+    >
+      Tools
+    </h2>
+  </RevealItem>
+
+  <div className="flex flex-wrap justify-center gap-6 font-poppins">
+    {[
+      { name: "Canon M50", shadow: "#3b82f6", logo: "https://image.similarpng.com/file/similarpng/original-picture/2020/06/Logo-canon-transparent-PNG.png" },
+      { name: "CapCut", shadow: theme === "dark" ? "#fff" : "#111", logo: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/capcut-icon.png" },
+      { name: "Canva", shadow: "#187cf6", logo: "https://freelogopng.com/images/all_img/1656733807canva-icon-png.png" },
+      { name: "Visual Studio Code", shadow: "#60a5fa", logo: "https://chris-ayers.com/assets/images/vscode-logo.png" },
+      { name: "HTML", shadow: "#f59e0b", logo: "https://icones.pro/wp-content/uploads/2021/05/icone-html-orange.png" },
+      { name: "CSS", shadow: "#3b82f6", logo: "https://upload.wikimedia.org/wikipedia/commons/d/d5/CSS3_logo_and_wordmark.svg" },
+      { name: "JavaScript", shadow: "#facc15", logo: "https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" },
+      { name: "Python", shadow: "#3b82f6", logo: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" },
+      { name: "PHP", shadow: "#6e41aa", logo: "https://upload.wikimedia.org/wikipedia/commons/2/27/PHP-logo.svg" },
+      { name: "React JS", shadow: "#61dafb", logo: "https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" },
+      { name: "CodeIgniter", shadow: "#DD4814", logo: "https://cdn.iconscout.com/icon/free/png-256/free-codeigniter-logo-icon-svg-download-png-1579761.png?f=webp" },
+      { name: "MySQL", shadow: "#2ac3edff", logo: "https://images.icon-icons.com/2699/PNG/512/mysql_logo_icon_169940.png" },
+      { name: "Next JS", shadow: theme === "dark" ? "#fff" : "#111", logo: "https://logo.svgcdn.com/devicon/nextjs-original.png" },
+      { name: "Golang", shadow: "#00ADD8", logo: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/go-programming-language-icon.png" },
+      { name: "Windows", shadow: "#facc15", logo: "https://w7.pngwing.com/pngs/719/781/png-transparent-windows-logo-microsoft-windows-scalable-graphics-logo-computer-file-microsoft-logo-icon-angle-text-rectangle.png" },
+      { name: "Android", shadow: "#2bd800ff", logo: "https://www.freepnglogos.com/uploads/android-logo-png/android-logo-powerful-mobile-apps-for-those-with-disabilities-3.png" },
+      { name: "Tools lain segera hadir", shadow:"#ffe600ff", logo: "https://cdn.pixabay.com/photo/2024/01/17/20/03/cartoon-8515557_960_720.png" },
+    ].map((tool, index) => (
+      <RevealItem key={tool.name} delay={150 * (index + 1)}>
+        <div
+          className={`flex items-center gap-3 px-6 py-4 rounded-2xl transition-all duration-500 transform hover:scale-105 ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}
+          style={{ boxShadow: `0 0 12px ${tool.shadow}` }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.boxShadow = `0 0 25px ${tool.shadow}, 0 0 50px ${tool.shadow}`;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.boxShadow = `0 0 12px ${tool.shadow}`;
+          }}
+        >
+          <img 
+            src={tool.logo} 
+            alt={tool.name} 
+            className="w-8 h-8 object-contain" 
+            style={{ filter: tool.name === "Next JS" && theme === "light" ? "invert(1)" : "none" }}
+          />
+          <span className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-black"}`}>{tool.name}</span>
+        </div>
+      </RevealItem>
+    ))}
+  </div>
+</section>
+    <section id="projek">   <ProjekPage /></section>
+<section id="sertifikat">   <SertifikatPage /></section>
+<section id="lomba">   <LombaPage /></section>
+<section id="organisasi">   <OrganisasiPage /></section>
+<section id="pendidikan">   <PendidikanPage /></section>
       </main>
     </>
   );

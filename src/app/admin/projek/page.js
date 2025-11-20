@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 
-export default function ProjekPage() {
+export default function ProjekPageAdmin() {
   const [projek, setProjek] = useState([]);
   const [form, setForm] = useState({
     judul: "",

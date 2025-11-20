@@ -112,10 +112,14 @@ export default function LombaPage() {
 
   
   return (
-    <main className={`${isDark ? "bg-gray-950 text-gray-100" : "bg-white text-gray-900"} p-8 md:p-12 min-h-screen font-poppins`}>
-
+<main
+  className={`min-h-screen font-poppins transition-colors duration-500 pt-24 
+    px-1 sm:px-12 md:px-6 lg:px-8
+    ${theme === "dark" ? "bg-transparent text-gray-100" : "bg-white text-gray-900"}
+  `}
+>
 {/* ===== LATAR BELAKANG OUTLINE "Widi Nugroh0" ===== */}
-<div
+{/* <div
   className="fixed inset-0 pointer-events-none select-none overflow-hidden"
   style={{
     zIndex: 0,
@@ -148,7 +152,7 @@ export default function LombaPage() {
       <span key={i}>Widi Nugroh0</span>
     ))}
   </div>
-</div>
+</div> */}
 {/* ===== END BACKGROUND ===== */}
 <h1
   className={`text-4xl md:text-5xl font-bold mb-12 text-center mt-16 ${

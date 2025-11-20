@@ -107,12 +107,13 @@ export default function OrganisasiPage() {
 
   return (
     <main
-      className={`min-h-screen font-poppins transition-colors duration-500 pt-28 p-8 ${
-        theme === "dark" ? "bg-gray-950 text-gray-100" : "bg-white text-gray-900"
-      }`}
-    >
+  className={`min-h-screen font-poppins transition-colors duration-500 pt-24 
+    px-1 sm:px-12 md:px-6 lg:px-8
+    ${theme === "dark" ? "bg-transparent text-gray-100" : "bg-white text-gray-900"}
+  `}
+>
       {/* ===== LATAR BELAKANG OUTLINE "Widi Nugroh0" ===== */}
-<div
+{/* <div
   className="fixed inset-0 pointer-events-none select-none overflow-hidden"
   style={{
     zIndex: 0,
@@ -145,7 +146,7 @@ export default function OrganisasiPage() {
       <span key={i}>Widi Nugroh0</span>
     ))}
   </div>
-</div>
+</div> */}
 {/* ===== END BACKGROUND ===== */}
       {/* Judul */}
 <h1

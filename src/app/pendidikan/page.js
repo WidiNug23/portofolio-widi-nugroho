@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useTheme } from "../ThemeContext"; // pastikan path benar
+import { useTheme } from "../ThemeContext";
 
 export default function PendidikanPage() {
   const { theme } = useTheme();
@@ -58,8 +58,10 @@ export default function PendidikanPage() {
   useEffect(() => {
     document.body.style.overflow = popupImage ? "hidden" : "auto";
   }, [popupImage]);
-      useEffect(() => {
-    document.body.style.backgroundColor = theme === "dark" ? "#000000ff" : "#ffffff"; // bg-gray-950 / putih
+
+  useEffect(() => {
+    document.body.style.backgroundColor =
+      theme === "dark" ? "#000000" : "#ffffff";
   }, [theme]);
 
   // Slide-in observer
@@ -84,59 +86,23 @@ export default function PendidikanPage() {
 
   return (
     <main
-      className={`min-h-screen font-poppins transition-colors duration-500 pt-28 p-8 ${
-        theme === "dark" ? "bg-gray-950 text-gray-100" : "bg-white text-gray-900"
-      }`}
+      className={`min-h-screen font-poppins transition-colors duration-500 pt-24
+        px-2 sm:px-6 md:px-10
+        ${theme === "dark" ? "bg-transparent text-gray-100" : "bg-white text-gray-900"}
+      `}
     >
-      {/* ===== LATAR BELAKANG OUTLINE "Widi Nugroh0" ===== */}
-<div
-  className="fixed inset-0 pointer-events-none select-none overflow-hidden"
-  style={{
-    zIndex: 0,
-    background: "transparent",
-    fontFamily: "'Poppins', sans-serif", // pastikan nama font sesuai import
-  }}
->
-  <div
-    style={{
-      position: "absolute",
-      top: "-50%",
-      left: "-50%",
-      width: "200%",
-      height: "200%",
-      transform: "rotate(-45deg)",
-      display: "flex",
-      flexWrap: "wrap",
-      justifyContent: "flex-start",
-      alignItems: "flex-start",
-      opacity: theme === "dark" ? 0.05 : 0.07,
-      fontWeight: 300, // gunakan bobot ringan agar tampak elegan
-      fontSize: "6rem",
-      color: "transparent",
-      WebkitTextStroke: theme === "dark" ? "1px #ffffff" : "1px #000000",
-      lineHeight: "6rem",
-      gap: "1.2rem",
-    }}
-  >
-    {Array.from({ length: 2000 }).map((_, i) => (
-      <span key={i}>Widi Nugroh0</span>
-    ))}
-  </div>
-</div>
-{/* ===== END BACKGROUND ===== */}
-<h1
-  className={`text-4xl md:text-5xl font-bold mb-12 text-center mt-1 ${
-    theme === "dark" ? "neon-glow" : ""
-  }`}
->
-  Pendidikan
-</h1>
-
+      <h1
+        className={`text-4xl md:text-5xl font-bold mb-12 text-center mt-1 ${
+          theme === "dark" ? "neon-glow" : ""
+        }`}
+      >
+        Pendidikan
+      </h1>
 
       {pendidikan.length === 0 ? (
         <p className="text-center text-gray-400">Tidak ada data pendidikan.</p>
       ) : (
-        <div className="flex flex-col gap-10">
+        <div className="flex flex-col gap-10 w-full max-w-7xl mx-auto px-2">
           {pendidikan.map((p) => {
             const isExpanded = expanded[p.id];
             const textToShow = isExpanded
@@ -151,11 +117,11 @@ export default function PendidikanPage() {
             return (
               <div
                 key={p.id}
-                className="pendidikan-card opacity-0 transform translate-y-8 transition-all duration-700 relative group"
+                className="pendidikan-card opacity-0 translate-y-8 transition-all duration-700 relative group"
               >
                 <div className="neon-border rounded-2xl p-[2px]">
                   <div
-                    className={`relative rounded-2xl p-6 flex flex-col md:flex-row gap-6 transition-transform duration-500 group-hover:scale-[1.02] ${
+                    className={`relative rounded-2xl p-6 flex flex-col sm:flex-row gap-6 transition-transform duration-500 group-hover:scale-[1.02] ${
                       theme === "dark"
                         ? "bg-gray-900 group-hover:shadow-[0_0_25px_rgba(255,0,187,0.5)]"
                         : "bg-gray-100 group-hover:shadow-[0_0_25px_rgba(251,182,206,0.5)]"
@@ -169,7 +135,10 @@ export default function PendidikanPage() {
                         }`}
                         style={
                           theme === "dark"
-                            ? { textShadow: "0 0 2px #f50bbbff, 0 0 10px #f50bbbff" }
+                            ? {
+                                textShadow:
+                                  "0 0 2px #f50bbbff, 0 0 10px #f50bbbff",
+                              }
                             : {}
                         }
                       >
@@ -187,7 +156,9 @@ export default function PendidikanPage() {
                         <button
                           onClick={() => toggleExpand(p.id)}
                           className={`mb-4 hover:underline font-medium ${
-                            theme === "dark" ? "text-yellow-400" : "text-yellow-600"
+                            theme === "dark"
+                              ? "text-yellow-400"
+                              : "text-yellow-600"
                           }`}
                         >
                           {isExpanded ? "Sembunyikan" : "Selengkapnya"}
@@ -243,13 +214,14 @@ export default function PendidikanPage() {
 
                     {/* Kanan */}
                     {fileUrl && type && (
-                      <div className="w-full md:w-[400px] lg:w-[450px] border border-gray-700 rounded-xl overflow-hidden shadow-inner flex justify-center items-center">
+                      <div className="w-full sm:w-[380px] md:w-[420px] lg:w-[450px] border border-gray-700 rounded-xl overflow-hidden shadow-inner flex justify-center items-center bg-transparent">
                         {type === "pdf" ? (
                           <object
                             data={fileUrl}
                             type="application/pdf"
                             width="100%"
                             height="300px"
+                            className="bg-transparent"
                           >
                             <p className="text-center text-gray-500 p-2">
                               Tidak dapat menampilkan PDF.{" "}
@@ -302,10 +274,11 @@ export default function PendidikanPage() {
           overflow: visible;
         }
 
-          .neon-glow {
-    text-shadow: 0 0 10px #f50bbbff, 0 0 20px #f50bbbff;
-    transition: text-shadow 0.3s ease-in-out;
-  }
+        .neon-glow {
+          text-shadow: 0 0 10px #f50bbbff, 0 0 20px #f50bbbff;
+          transition: text-shadow 0.3s ease-in-out;
+        }
+
         .neon-border::before,
         .neon-border::after {
           content: "";
@@ -337,14 +310,20 @@ export default function PendidikanPage() {
 
         .pendidikan-card.slide-in {
           opacity: 1 !important;
-          transform: translateY(-40) !important;
+          transform: translateY(0) !important;
           transition: opacity 0.7s ease-out, transform 0.7s ease-out;
         }
 
         @keyframes spinNeon {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
         }
       `}</style>
     </main>

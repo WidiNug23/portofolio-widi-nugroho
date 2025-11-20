@@ -97,11 +97,13 @@ useEffect(() => {
 
 
   return (
-    <main
-      className={`min-h-screen font-poppins transition-colors duration-500 pt-24 p-8 ${
-        theme === "dark" ? "bg-gray-950 text-gray-100" : "bg-white text-gray-900"
-      }`}
-    >
+<main
+  className={`min-h-screen font-poppins transition-colors duration-500 pt-24 
+    px-1 sm:px-12 md:px-6 lg:px-8
+    ${theme === "dark" ? "bg-transparent text-gray-100" : "bg-white text-gray-900"}
+  `}
+>
+
       {/* ===== LATAR BELAKANG OUTLINE "Widi Nugroh0" ===== */}
 <div
   className="fixed inset-0 pointer-events-none select-none overflow-hidden"
@@ -133,7 +135,7 @@ useEffect(() => {
     }}
   >
     {Array.from({ length: 2000 }).map((_, i) => (
-      <span key={i}>Widi Nugroh0</span>
+      <span key={i}>Widi Nugroho</span>
     ))}
   </div>
 </div>
