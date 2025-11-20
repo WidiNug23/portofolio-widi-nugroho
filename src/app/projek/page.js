@@ -214,7 +214,7 @@ useEffect(() => {
 
   return (
     <main
-      className={`min-h-screen font-poppins transition-colors duration-500 pt-24 p-8
+      className={`min-h-screen font-poppins transition-colors duration-500 pt-24 px-2 sm:px-6 md:px-8 lg:px-12 
         ${theme === "dark" ? "bg-transparent text-gray-100" : "bg-white text-gray-900"}`}
     >
       <div className="text-center mb-8">
@@ -316,7 +316,7 @@ useEffect(() => {
                     )}
                   </div>
 
-                  <div className="w-full md:w-[400px] lg:w-[450px] flex flex-col gap-4">
+<div className="w-full md:w-1/2 lg:w-1/2 flex flex-col gap-4">
                     {youtubeID && (
                       <div
                         className="relative w-full h-56 cursor-pointer rounded-xl overflow-hidden"

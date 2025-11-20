@@ -105,7 +105,7 @@ useEffect(() => {
 >
 
       {/* ===== LATAR BELAKANG OUTLINE "Widi Nugroh0" ===== */}
-<div
+{/* <div
   className="fixed inset-0 pointer-events-none select-none overflow-hidden"
   style={{
     zIndex: 0,
@@ -138,7 +138,7 @@ useEffect(() => {
       <span key={i}>Widi Nugroho</span>
     ))}
   </div>
-</div>
+</div> */}
 {/* ===== END BACKGROUND ===== */}
       {/* Header */}
       <div className="text-center mb-8">

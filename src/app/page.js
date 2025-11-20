@@ -20,6 +20,8 @@ import SertifikatPage from "./sertifikat/page";
 import LombaPage from "./lomba-kompetensi/page";
 import OrganisasiPage from "./organisasi/page";
 import PendidikanPage from "./pendidikan/page";
+import { SiShutterstock } from "react-icons/si";
+import { FiLink } from "react-icons/fi";
 
 function RevealItem({ children, delay = 0 }) {
   const ref = useRef(null);
@@ -172,28 +174,6 @@ export default function Home() {
       setExpanded(true);
     }
   };
-
-  useEffect(() => {
-  const target = sessionStorage.getItem("scrollToTarget");
-  const offset = Number(sessionStorage.getItem("scrollOffset")) || 0;
-
-  if (target) {
-    const section = document.querySelector(target);
-    if (section) {
-      setTimeout(() => {
-        const y =
-          section.getBoundingClientRect().top +
-          window.pageYOffset -
-          offset;
-
-        window.scrollTo({ top: y, behavior: "smooth" });
-      }, 300);
-    }
-  }
-
-  sessionStorage.removeItem("scrollToTarget");
-  sessionStorage.removeItem("scrollOffset");
-}, []);
 
   // // Canvas trail
   // useEffect(() => {
@@ -532,49 +512,56 @@ export default function Home() {
         </h2>
       </RevealItem>
 
-      <div className="flex flex-wrap justify-center gap-6 font-poppins">
-        {[
-          {
-            href: "https://github.com/WidiNug23",
-            icon: (
-              <FaGithub
-                className="text-2xl"
-                style={{ color: theme === "light" ? "#111" : "#fff" }}
-              />
-            ),
-            labels: ["Explore code", "Github"],
-            color: theme === "dark" ? "#fff" : "#111",
-          },
-          {
-            href: "mailto:collabswithwidi@gmail.com",
-            icon: <FaEnvelope className="text-[#EA4335] text-2xl" />,
-            labels: ["Send mail", "Gmail"],
-            color: "#EA4335",
-          },
-          {
-            href: "https://www.instagram.com/widingr23",
-            icon: <FaInstagram className="text-pink-400 text-2xl" />,
-            labels: ["Follow me", "Instagram"],
-            color: "#ec4899",
-          },
-          {
-            href: "https://www.linkedin.com/in/widi-suryo-nugroho-a607632a2/",
-            icon: <FaLinkedin className="text-blue-300 text-2xl" />,
-            labels: ["Let's connect", "LinkedIn"],
-            color: "#93c5fd",
-          },
-          {
-            href: "https://wa.me/6285727609498",
-            icon: <FaWhatsapp className="text-[#25D366] text-2xl" />,
-            labels: ["Let's chat", "WhatsApp"],
-            color: "#25D366",
-          },
-        ].map((item, index) => (
-          <RevealItem key={index} delay={150 * (index + 1)}>
-            <RotatingLabelItem item={item} theme={theme} />
-          </RevealItem>
-        ))}
-      </div>
+<div className="flex flex-wrap justify-center gap-6 font-poppins">
+  {[
+    {
+      href: "https://github.com/WidiNug23",
+      icon: <FaGithub className="text-2xl" style={{ color: theme === "light" ? "#111" : "#fff" }} />,
+      labels: ["Explore code", "Github"],
+      color: theme === "dark" ? "#fff" : "#111",
+    },
+    {
+      href: "mailto:collabswithwidi@gmail.com",
+      icon: <FaEnvelope className="text-[#EA4335] text-2xl" />,
+      labels: ["Send mail", "Gmail"],
+      color: "#EA4335",
+    },
+    {
+      href: "https://www.instagram.com/widingr23",
+      icon: <FaInstagram className="text-pink-400 text-2xl" />,
+      labels: ["Follow me", "Instagram"],
+      color: "#ec4899",
+    },
+    {
+      href: "https://www.linkedin.com/in/widi-suryo-nugroho-a607632a2/",
+      icon: <FaLinkedin className="text-blue-300 text-2xl" />,
+      labels: ["Let's connect", "LinkedIn"],
+      color: "#93c5fd",
+    },
+    {
+      href: "https://wa.me/6285727609498",
+      icon: <FaWhatsapp className="text-[#25D366] text-2xl" />,
+      labels: ["Let's chat", "WhatsApp"],
+      color: "#25D366",
+    },
+    {
+      href: "https://www.shutterstock.com/g/widinugroho23?rid=360011507",
+      icon: <SiShutterstock className="text-red-600 text-2xl" />,
+      labels: ["View portfolio", "Shutterstock"],
+      color: "#FF3A00", 
+    },
+    {
+      href: "https://lynk.id/widinugroho23",
+      icon: <FiLink className="text-purple-600 text-2xl" />,
+      labels: ["Visit my Lynk", "Lynk"],
+      color: "#14b8a6",
+    },
+  ].map((item, index) => (
+    <RevealItem key={index} delay={150 * (index + 1)}>
+      <RotatingLabelItem item={item} theme={theme} />
+    </RevealItem>
+  ))}
+</div>
 
       <style jsx>{`
         .neon-glow {
@@ -644,11 +631,38 @@ export default function Home() {
     ))}
   </div>
 </section>
-    <section id="projek">   <ProjekPage /></section>
-<section id="sertifikat">   <SertifikatPage /></section>
-<section id="lomba">   <LombaPage /></section>
-<section id="organisasi">   <OrganisasiPage /></section>
-<section id="pendidikan">   <PendidikanPage /></section>
+{/* Gunakan wrapper konsisten untuk semua section agar layout center */}
+<section id="projek" className="w-full">
+  <div className="w-full max-w-7xl mx-auto px-4">
+    <ProjekPage />
+  </div>
+</section>
+
+<section id="sertifikat" className="w-full">
+  <div className="w-full max-w-7xl mx-auto px-4">
+    <SertifikatPage />
+  </div>
+</section>
+
+<section id="lomba" className="w-full">
+  <div className="w-full max-w-7xl mx-auto px-4">
+    <LombaPage />
+  </div>
+</section>
+
+<section id="organisasi" className="w-full">
+  <div className="w-full max-w-7xl mx-auto px-4">
+    <OrganisasiPage />
+  </div>
+</section>
+
+<section id="pendidikan" className="w-full">
+  <div className="w-full max-w-7xl mx-auto px-4">
+    <PendidikanPage />
+  </div>
+</section>
+
+
       </main>
     </>
   );

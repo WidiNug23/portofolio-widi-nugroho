@@ -8,6 +8,8 @@ import { useRouter, usePathname } from "next/navigation";
 import { FaSun, FaMoon } from "react-icons/fa";
 import { ThemeProvider, useTheme } from "./ThemeContext";
 import "./globals.css";
+import { FaInstagram, FaLinkedin, FaGithub, FaWhatsapp } from "react-icons/fa";
+import { MdEmail } from "react-icons/md"; // untuk Gmail
 
 function LayoutContent({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -261,19 +263,60 @@ const handleScrollToSection = (e, targetId, href) => {
 </nav>
 
 
-      <main className="flex-1 p-6 md:p-8">{children}</main>
+<main className="flex-1 p-6 md:p-8">{children}</main>
 
-      <footer
-        className={`py-6 mt-8 w-full border-t transition ${
-          theme === "dark"
-            ? "bg-black text-gray-200 border-gray-700"
-            : "bg-gray-100 text-gray-900 border-gray-300"
-        }`}
+<footer
+  className={`py-6 mt-8 w-full border-t transition ${
+    theme === "dark"
+      ? "bg-black text-gray-200 border-gray-700"
+      : "bg-gray-100 text-gray-900 border-gray-300"
+  }`}
+>
+  <div className="max-w-7xl mx-auto text-center flex flex-col md:flex-row justify-center items-center gap-4">
+    <p className="mb-2 md:mb-0">© {new Date().getFullYear()} Widi Nugroho.</p>
+
+    <div className="flex gap-4 text-xl">
+      <a
+        href="https://www.instagram.com/widingr23" // ganti dengan username Instagram kamu
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:text-pink-500 transition-colors"
       >
-        <div className="max-w-7xl mx-auto text-center">
-          <p>© {new Date().getFullYear()} Widi Nugroho.</p>
-        </div>
-      </footer>
+        <FaInstagram />
+      </a>
+      <a
+        href="https://www.linkedin.com/in/widi-suryo-nugroho-a607632a2/" // ganti dengan LinkedIn kamu
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:text-blue-600 transition-colors"
+      >
+        <FaLinkedin />
+      </a>
+      <a
+        href="https://github.com/WidiNug23" // ganti dengan GitHub kamu
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:text-gray-700 transition-colors"
+      >
+        <FaGithub />
+      </a>
+      <a
+        href="mailto:collabswithwidi@gmail.com" // ganti dengan email kamu
+        className="hover:text-red-500 transition-colors"
+      >
+        <MdEmail />
+      </a>
+      <a
+        href="https://wa.me/6285727609498" // ganti dengan nomor WhatsApp kamu (format internasional tanpa +)
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:text-green-500 transition-colors"
+      >
+        <FaWhatsapp />
+      </a>
+    </div>
+  </div>
+</footer>
     </body>
   );
 }
