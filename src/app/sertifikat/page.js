@@ -15,7 +15,7 @@ export default function SertifikatPage() {
       nama: "Sertifikat Kompetensi Pemrogram",
       deskripsi: `No. 62019 2514 5 00000439 2025`,
       penerbit: "BNSP LSP Universitas Sebelas Maret",
-      tahun: "2025 - 2028",
+      tahun: "2025-2028",
       tingkat: "",
       hasil: "",
       pdf_file: "/uploads/serkom_widi.pdf",
