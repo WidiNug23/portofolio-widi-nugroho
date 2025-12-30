@@ -28,7 +28,7 @@ export default function OrganisasiPage() {
     },
     {
       id: 3,
-      nama: "Garapan ID",
+      nama: "PT. Garapan Indonesia Sukses",
       jabatan: "Full Stack Developer",
       tahun_masuk: "2024",
       tahun_keluar: "2024",
@@ -38,7 +38,7 @@ export default function OrganisasiPage() {
     },
     {
       id: 4,
-      nama: "PT. Glace Kreasi Digital",
+      nama: "PT. Garapan Indonesia Sukses",
       jabatan: "Multimedia Content Creator",
       tahun_masuk: "2025",
       tahun_keluar: "2025",
