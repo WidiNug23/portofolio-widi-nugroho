@@ -56,12 +56,12 @@ export default function LombaPage() {
     {
       id: 4,
       nama: "[COMING SOON]",
-      deskripsi: "",
-      tingkat: "",
-      tahun: "",
-      hasil: "",
-      penyelenggara: "",
-      files: [{ id: 1, filePath: "", fileType: "image" }],
+      // deskripsi: "",
+      // tingkat: "",
+      // tahun: "",
+      // hasil: "",
+      // penyelenggara: "",
+      // files: [{ id: 1, filePath: "", fileType: "image" }],
     },
   ];
 

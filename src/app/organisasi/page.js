@@ -49,11 +49,11 @@ export default function OrganisasiPage() {
     {
       id: 5,
       nama: "[COMING SOON]",
-      jabatan: "",
-      tahun_masuk: "",
-      tahun_keluar: "",
-      deskripsi: "",
-      file_path: "",
+      // jabatan: "",
+      // tahun_masuk: "",
+      // tahun_keluar: "",
+      // deskripsi: "",
+      // file_path: "",
     },
   ]);
 

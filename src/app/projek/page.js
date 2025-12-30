@@ -112,13 +112,13 @@ sistem ini dibuat menggunakan python, streamlit, dan naive bayes. Saya melihat p
 {
   id: 8,
   judul: "[COMING SOON]",
-  deskripsi: ``,
-  link_demo: "",
-  link_github: "",
-  pdf_file: "",
-  images: JSON.stringify([
+  // deskripsi: ``,
+  // link_demo: "",
+  // link_github: "",
+  // pdf_file: "",
+  // images: JSON.stringify([
 
-  ]),
+  // ]),
 },
 
 ];

@@ -29,12 +29,12 @@ export default function PendidikanPage() {
     {
       id: 3,
       nama: "[COMING SOON]",
-      jurusan: "",
-      tahun_masuk: "",
-      tahun_lulus: "",
-      nilai: "",
-      deskripsi: "",
-      file_path: "",
+      // jurusan: "",
+      // tahun_masuk: "",
+      // tahun_lulus: "",
+      // nilai: "",
+      // deskripsi: "",
+      // file_path: "",
     },
   ]);
 
