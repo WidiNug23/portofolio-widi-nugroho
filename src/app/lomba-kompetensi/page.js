@@ -13,6 +13,18 @@ export default function LombaPage() {
   const lombaData = [
     {
       id: 1,
+      nama: "Olimpiade Vokasi Indonesia X Tahun 2025",
+      deskripsi: "",
+      tingkat: "Nasional",
+      tahun: "2025",
+      hasil: "Finalist",
+      penyelenggara: "Forum Pendidikan Tinggi Vokasi Indonesia",
+      files: [
+        { id: 1, filePath: "/uploads/DSC079288.JPG", fileType: "image" },
+      ],
+    },
+    {
+      id: 2,
       nama: "Web Design International Competition Gayatama UNESA 2024",
       deskripsi: "",
       tingkat: "Internasional",
@@ -27,7 +39,7 @@ export default function LombaPage() {
       ],
     },
     {
-      id: 2,
+      id: 3,
       nama: "Olimpiade Vokasi Indonesia IX Tahun 2024",
       deskripsi: "",
       tingkat: "Nasional",
@@ -42,7 +54,7 @@ export default function LombaPage() {
       ],
     },
     {
-      id: 3,
+      id: 4,
       nama: "Canter 60th Anniversary Photo Contest",
       deskripsi: "",
       tingkat: "Nasional",
@@ -54,7 +66,7 @@ export default function LombaPage() {
       ],
     },
     {
-      id: 4,
+      id: 5,
       nama: "[COMING SOON]",
       // deskripsi: "",
       // tingkat: "",
