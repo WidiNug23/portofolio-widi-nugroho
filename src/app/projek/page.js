@@ -36,9 +36,23 @@ const projekData = [
       "Screenshot 2025-10-22 135731.png",
     ]),
   },
-
       {
     id: 3,
+    judul: "NopolIndo - Informasi Plat Nomor Indonesia",
+    deskripsi: `NopolIndo dibuat sebagai pencarian informasi plat nomor kendaraan di Indonesia secara umum dan tidak detail. NopolIndo disusun sedemikian rupa untuk memudahkan pengguna dalam mencari informasi plat nomor kendaraan di Indonesia.
+ \n Fitur NopolIndo: \n •Pencarian kode plat kendaraan berdasarkan huruf depan, huruf akhir, provinsi, atau wilayah secara umum, cepat, dan fleksibel. \n •Informasi Jenis Plat Nomor Indonesia \n •Cara Membaca Plat Nomor Kendaraan`,
+    link_demo: "https://nopolindo.vercel.app/",
+    link_github: "",
+    // pdf_file: "uploads/Biru Isometrik Elemen & Mockup Teknologi dalam Hidup Konsumen Teknologi Presentasi.pdf",
+    images: JSON.stringify([
+      "nopolindo.vercel.app_ (1).png",
+      "nopolindo.vercel.app_ (2).png",
+      "nopolindo.vercel.app_ (3).png",
+    ]),
+  },
+
+      {
+    id: 4,
     judul: "Sistem Filterisasi Lowongan MagangHub",
     deskripsi: `Pada https://maganghub.kemnaker.go.id/ filterisasi yang dilakukan hanya mampu sebatas pencarian berdasarkan posisi/jabatan dan provinsi. Maka dari itu, Sistem Filterisasi Lowongan MagangHub ini dibuat dengan menyediakan fitur filterisasi yang lebih banyak di antaranya yaitu:
 
@@ -62,7 +76,7 @@ sistem ini dibuat menggunakan python, streamlit, dan naive bayes. Saya melihat p
     ]),
   },
   {
-  id: 4,
+  id: 5,
   judul: "[Pembuatan Video] Pengenalan CareBot",
   deskripsi: `Ini merupakan projek video untuk pengenalan website CareBot. Dalam pembuatan video tersebut, dilakukan perancangan dan penyusunan konten, implementasi, hingga publikasi. CapCut dan Canva merupakan software yang digunakan dalam pengeditan video tersebut.`,
   link_demo: "https://www.youtube.com/watch?si=hDY9MOOPSze4uJzb&v=lJcgUrdF3ws&feature=youtu.be",
@@ -74,7 +88,7 @@ sistem ini dibuat menggunakan python, streamlit, dan naive bayes. Saya melihat p
 },
 
 {
-  id: 5,
+  id: 6,
   judul: "[Pembuatan Video] GoMadiun : Sistem Manajemen Data Wisata di Kabupaten Madiun",
   deskripsi: `Ini merupakan projek video untuk pengenalan website GoMadiun. Dalam pembuatan video tersebut, dilakukan perancangan dan penyusunan konten, implementasi, hingga publikasi. CapCut dan Canva merupakan software yang digunakan dalam pengeditan video tersebut.`,
   link_demo: "https://www.youtube.com/watch?si=m96KiOELpEuc_GZL&v=7_L8LXGKcTI&feature=youtu.be",
@@ -86,7 +100,7 @@ sistem ini dibuat menggunakan python, streamlit, dan naive bayes. Saya melihat p
 },
 
 {
-  id: 6,
+  id: 7,
   judul: "[Pembuatan Video] PENGAPLIKASIAN VIRTUALTOUR WONDERFUL KAMPUNG PESILAT BERBASIS VIRTUAL REALITY DI KABUPATEN MADIUN",
   deskripsi: `Dalam pembuatan konten video ini, saya bertugas untuk melakukan perekaman video, pengeditan video, dan dubbing video.`,
   link_demo: "https://www.youtube.com/watch?si=3CsBo7yA2jUohaCs&v=XfP6P09axso&feature=youtu.be",
@@ -98,7 +112,7 @@ sistem ini dibuat menggunakan python, streamlit, dan naive bayes. Saya melihat p
 },
 
 {
-  id: 7,
+  id: 8,
   judul: "[Pembuatan Video] Pameran Inovasi Teknologi di Era Revolusi Industri 5.0",
   deskripsi: `Pembuatan video tersebut dilakukan dengan merekam aktivitas yang sedang berlangsung menggunakan kamera. Setelah itu, hasil rekaman dilakukan pengeditan hingga publikasi.`,
   link_demo: "https://www.youtube.com/watch?si=ldaddUyULuR-J4Ar&v=nHV9A8DgE8Q&feature=youtu.be",
@@ -110,7 +124,7 @@ sistem ini dibuat menggunakan python, streamlit, dan naive bayes. Saya melihat p
 },
 
 {
-  id: 8,
+  id: 9,
   judul: "[COMING SOON]",
   // deskripsi: ``,
   // link_demo: "",
