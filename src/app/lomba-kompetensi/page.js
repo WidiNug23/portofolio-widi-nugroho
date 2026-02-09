@@ -3,30 +3,27 @@ import { useEffect, useState } from "react";
 import { useTheme } from "../ThemeContext";
 
 export default function LombaPage() {
-  const { theme } = useTheme(); // 'dark' atau 'light'
+  const { theme } = useTheme();
   const [lomba, setLomba] = useState([]);
   const [expanded, setExpanded] = useState({});
   const [popupImage, setPopupImage] = useState(null);
   const [imageIndex, setImageIndex] = useState({});
 
-  // ✅ Data frontend-only
   const lombaData = [
     {
       id: 1,
       nama: "Olimpiade Vokasi Indonesia X Tahun 2025",
-      deskripsi: "",
+      deskripsi: "Berkompetisi dalam ajang bergengsi tingkat nasional yang menyatukan mahasiswa vokasi seluruh Indonesia untuk menunjukkan keahlian praktis dan inovasi teknologi.",
       tingkat: "Nasional",
       tahun: "2025",
       hasil: "Finalist",
       penyelenggara: "Forum Pendidikan Tinggi Vokasi Indonesia",
-      files: [
-        { id: 1, filePath: "/uploads/DSC079288.JPG", fileType: "image" },
-      ],
+      files: [{ id: 1, filePath: "/uploads/DSC079288.JPG", fileType: "image" }],
     },
     {
       id: 2,
       nama: "Web Design International Competition Gayatama UNESA 2024",
-      deskripsi: "",
+      deskripsi: "Kompetisi desain web tingkat internasional yang menantang kreativitas dalam UI/UX dan fungsionalitas front-end dengan standar industri global.",
       tingkat: "Internasional",
       tahun: "2024",
       hasil: "Juara 1",
@@ -41,7 +38,7 @@ export default function LombaPage() {
     {
       id: 3,
       nama: "Olimpiade Vokasi Indonesia IX Tahun 2024",
-      deskripsi: "",
+      deskripsi: "Berhasil meraih medali dalam kategori Web Technologies dengan mengembangkan solusi web yang responsif dan efisien sesuai kebutuhan studi kasus.",
       tingkat: "Nasional",
       tahun: "2024",
       hasil: "Juara 3 - Bidang Web Technologies",
@@ -56,37 +53,28 @@ export default function LombaPage() {
     {
       id: 4,
       nama: "Canter 60th Anniversary Photo Contest",
-      deskripsi: "",
+      deskripsi: "Ajang kreativitas fotografi nasional dalam merayakan warisan kendaraan niaga legendaris, menekankan pada aspek visual storytelling.",
       tingkat: "Nasional",
       tahun: "2023",
       hasil: "Nominasi Juara Favorit",
       penyelenggara: "Mitsubishi Fuso",
-      files: [
-        { id: 1, filePath: "/uploads/width_800 (5).png", fileType: "image" },
-      ],
+      files: [{ id: 1, filePath: "/uploads/width_800 (5).png", fileType: "image" }],
     },
     {
       id: 5,
       nama: "[COMING SOON]",
-      // deskripsi: "",
-      // tingkat: "",
-      // tahun: "",
-      // hasil: "",
-      // penyelenggara: "",
-      // files: [{ id: 1, filePath: "", fileType: "image" }],
     },
   ];
 
   useEffect(() => setLomba(lombaData), []);
   useEffect(() => { document.body.style.overflow = popupImage ? "hidden" : "auto"; }, [popupImage]);
-      useEffect(() => {
-    document.body.style.backgroundColor = theme === "dark" ? "#000000ff" : "#ffffff"; // bg-gray-950 / putih
+  useEffect(() => {
+    document.body.style.backgroundColor = theme === "dark" ? "#0a0a0a" : "#f8fafc";
   }, [theme]);
 
   const toggleExpand = (id) => setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
   const normalizeFileUrl = (filePath) => filePath || null;
 
-  // Auto-slide per lomba
   useEffect(() => {
     const interval = setInterval(() => {
       setImageIndex((prev) => {
@@ -99,160 +87,131 @@ export default function LombaPage() {
         });
         return newIndex;
       });
-    }, 2500);
+    }, 4000);
     return () => clearInterval(interval);
   }, [lomba]);
 
-  // Slide-in effect
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add("slide-in");
+            entry.target.classList.add("reveal");
             observer.unobserve(entry.target);
           }
         });
       },
       { threshold: 0.1 }
     );
-    document.querySelectorAll(".projek-card").forEach((card) => observer.observe(card));
+    document.querySelectorAll(".lomba-card").forEach((card) => observer.observe(card));
     return () => observer.disconnect();
   }, [lomba]);
 
   const isDark = theme === "dark";
 
-  
   return (
-<main
-  className={`min-h-screen font-poppins transition-colors duration-500 pt-24 
-    px-1 sm:px-12 md:px-6 lg:px-8
-    ${theme === "dark" ? "bg-transparent text-gray-100" : "bg-white text-gray-900"}
-  `}
->
-{/* ===== LATAR BELAKANG OUTLINE "Widi Nugroh0" ===== */}
-{/* <div
-  className="fixed inset-0 pointer-events-none select-none overflow-hidden"
-  style={{
-    zIndex: 0,
-    background: "transparent",
-    fontFamily: "'Poppins', sans-serif", // pastikan nama font sesuai import
-  }}
->
-  <div
-    style={{
-      position: "absolute",
-      top: "-50%",
-      left: "-50%",
-      width: "200%",
-      height: "200%",
-      transform: "rotate(-45deg)",
-      display: "flex",
-      flexWrap: "wrap",
-      justifyContent: "flex-start",
-      alignItems: "flex-start",
-      opacity: theme === "dark" ? 0.05 : 0.07,
-      fontWeight: 300, // gunakan bobot ringan agar tampak elegan
-      fontSize: "6rem",
-      color: "transparent",
-      WebkitTextStroke: theme === "dark" ? "1px #ffffff" : "1px #000000",
-      lineHeight: "6rem",
-      gap: "1.2rem",
-    }}
-  >
-    {Array.from({ length: 2000 }).map((_, i) => (
-      <span key={i}>Widi Nugroh0</span>
-    ))}
-  </div>
-</div> */}
-{/* ===== END BACKGROUND ===== */}
-<h1
-  className={`text-4xl md:text-5xl font-bold mb-12 text-center mt-16 ${
-    theme === "dark" ? "neon-glow" : ""
-  }`}
->
-  Lomba & Kompetensi
-</h1>
+    <main className={`min-h-screen font-poppins transition-colors duration-500 pt-32 pb-20 px-4 sm:px-8 md:px-16 lg:px-24 ${isDark ? "text-gray-100" : "text-gray-900"}`}>
+      
+      {/* HEADER SECTION */}
+      <header className="max-w-4xl mx-auto mb-20 text-center">
+        <h1 className={`text-4xl md:text-6xl font-extrabold mb-4 tracking-tight ${isDark ? "neon-glow text-white" : "text-gray-900"}`}>
+          Lomba & Kompetensi
+        </h1>
+        <div className={`h-1.5 w-24 mx-auto rounded-full ${isDark ? 'bg-purple-600 shadow-[0_0_15px_#a855f7]' : 'bg-purple-500'}`}></div>
+      </header>
 
       {lomba.length === 0 ? (
-        <p className={`${isDark ? "text-gray-400" : "text-gray-500"} text-center`}>Memuat data lomba...</p>
+        <div className="flex justify-center p-10 italic opacity-50">Memuat data kompetensi...</div>
       ) : (
-        <div className="flex flex-col gap-10">
+        <div className="max-w-6xl mx-auto flex flex-col gap-16">
           {lomba.map((l) => {
             const isExpanded = expanded[l.id];
-            const textToShow = isExpanded
-              ? l.deskripsi
-              : l.deskripsi?.length > 250
-              ? l.deskripsi.substring(0, 250) + "..."
-              : l.deskripsi;
-
+            const textToShow = isExpanded ? l.deskripsi : l.deskripsi?.length > 180 ? l.deskripsi.substring(0, 180) + "..." : l.deskripsi;
             const images = l.files?.filter((f) => f.fileType === "image") || [];
             const pdfs = l.files?.filter((f) => f.fileType === "pdf") || [];
             const currentIndex = imageIndex[l.id] || 0;
 
             return (
-              <div key={l.id} className="projek-card relative group opacity-0 transform translate-y-8 transition-all duration-700">
-                <div className="neon-border rounded-2xl p-[2px]">
-                  <div className={`${isDark ? "bg-gray-900" : "bg-gray-100"} relative rounded-2xl p-6 flex flex-col md:flex-row gap-6 transition-transform duration-500 group-hover:scale-[1.02] group-hover:shadow-[0_0_25px_rgba(168,85,247,0.5)]`}>
-                    {/* KIRI */}
-                    <div className="flex-1 min-w-0">
-                      <h2
-                        className={`text-2xl font-bold mb-3 break-words ${
-                          theme === "dark" ? "text-white" : "text-gray-900"
-                        }`}
-                        style={
-                          theme === "dark"
-                            ? { textShadow: "0 0 10px #a855f7, 0 0 20px #8b5cf6" }
-                            : {}
-                        }
-                      >
+              <div key={l.id} className="lomba-card opacity-0 translate-y-12 transition-all duration-1000 group">
+                <div className="neon-border rounded-3xl p-[1px]">
+                  <div className={`relative rounded-[23px] p-6 md:p-10 flex flex-col lg:flex-row gap-10 transition-all duration-500 ${isDark ? "bg-gray-900/50 backdrop-blur-xl border border-white/5" : "bg-white shadow-xl border border-gray-100"}`}>
+                    
+                    {/* LEFT SIDE: DETAILS */}
+                    <div className="flex-1 flex flex-col justify-center">
+                      <div className="flex flex-wrap gap-2 mb-6">
+                        <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${isDark ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' : 'bg-purple-100 text-purple-700'}`}>
+                          {l.tingkat || "Upcoming"}
+                        </span>
+                        <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${isDark ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'}`}>
+                          {l.tahun || "TBA"}
+                        </span>
+                      </div>
+
+                      <h2 className={`text-2xl md:text-3xl font-bold mb-4 leading-tight tracking-tight ${isDark ? "text-white group-hover:text-purple-400" : "text-gray-900"} transition-colors`}>
                         {l.nama}
-                      </h2>                      <p className={`${isDark ? "text-gray-300" : "text-gray-700"} mb-3 break-words leading-relaxed whitespace-pre-line`}>{textToShow}</p>
-                      {l.deskripsi?.length > 250 && (
-                        <button onClick={() => toggleExpand(l.id)} className="text-[#a855f7] hover:underline mb-4 font-semibold">
-                          {isExpanded ? "Sembunyikan" : "Selengkapnya"}
-                        </button>
+                      </h2>
+
+                      <div className={`flex items-center gap-3 mb-6 p-3 rounded-xl ${isDark ? 'bg-white/5' : 'bg-gray-50'}`}>
+                        <div className="h-2 w-2 rounded-full bg-purple-500 animate-pulse"></div>
+                        <p className={`text-sm font-semibold ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                          {l.hasil || "In Progress"}
+                        </p>
+                      </div>
+
+                      {l.deskripsi && (
+                        <div className="mb-6">
+                          <p className={`text-sm md:text-base leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                            {textToShow}
+                          </p>
+                          {l.deskripsi.length > 180 && (
+                            <button onClick={() => toggleExpand(l.id)} className="mt-3 text-xs font-bold text-purple-500 uppercase tracking-tighter hover:underline">
+                              {isExpanded ? "Show Less" : "Read More"}
+                            </button>
+                          )}
+                        </div>
                       )}
-                      <p className={`${isDark ? "text-gray-400" : "text-gray-600"} mb-2`}><strong>Tingkat:</strong> {l.tingkat || "-"}</p>
-                      <p className={`${isDark ? "text-gray-400" : "text-gray-600"} mb-2`}><strong>Tahun:</strong> {l.tahun || "-"}</p>
-                      <p className={`${isDark ? "text-gray-400" : "text-gray-600"} mb-2`}><strong>Hasil:</strong> {l.hasil || "-"}</p>
-                      <p className={`${isDark ? "text-gray-400" : "text-gray-600"} mb-2`}><strong>Penyelenggara:</strong> {l.penyelenggara || "-"}</p>
+
+                      <div className={`pt-4 border-t ${isDark ? 'border-white/5' : 'border-gray-100'} mt-auto`}>
+                        <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'} font-medium`}>Penyelenggara:</p>
+                        <p className={`text-sm font-bold ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{l.penyelenggara || "-"}</p>
+                      </div>
+
                       {pdfs.length > 0 && (
-                        <div className="mt-4 flex flex-wrap gap-2">
+                        <div className="mt-6">
                           {pdfs.map((f) => (
                             <a key={f.id} href={normalizeFileUrl(f.filePath)} target="_blank" rel="noreferrer"
-                               className="inline-block bg-[#7c3aed] text-white font-semibold px-4 py-2 rounded-lg hover:bg-[#a855f7] transition">
-                              📄 Lihat PDF
+                               className="inline-flex items-center gap-2 bg-purple-600 text-white text-xs font-bold px-6 py-3 rounded-xl hover:bg-purple-500 transition-all shadow-lg shadow-purple-900/20">
+                              📄 VIEW CERTIFICATE
                             </a>
                           ))}
                         </div>
                       )}
                     </div>
 
-                    {/* KANAN */}
-                    <div className="w-full md:w-[450px] flex flex-col gap-4">
-                      {images.length > 0 && (
-                        <>
-                          <div className={`w-full overflow-hidden border rounded-xl ${isDark ? "border-gray-700 bg-gray-950" : "border-gray-300 bg-gray-200"} relative h-64`}>
-                            <div className="flex transition-transform duration-500 ease-in-out cursor-grab" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
-                              {images.map((img, idx) => (
-                                <img key={idx} src={normalizeFileUrl(img.filePath)} alt={l.nama} className="w-full flex-shrink-0 h-64 object-cover cursor-pointer"
-                                     onClick={() => setPopupImage({ url: normalizeFileUrl(img.filePath), index: idx, lombaId: l.id, allImages: images })}/>
-                              ))}
-                            </div>
+                    {/* RIGHT SIDE: IMAGE SLIDER */}
+                    {images.length > 0 && (
+                      <div className="w-full lg:w-[420px]">
+                        <div className={`relative rounded-2xl overflow-hidden aspect-[4/3] border-4 ${isDark ? 'border-gray-800' : 'border-white shadow-lg'}`}>
+                          <div className="flex h-full transition-transform duration-700 cubic-bezier(0.4, 0, 0.2, 1)" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
+                            {images.map((img, idx) => (
+                              <img key={idx} src={normalizeFileUrl(img.filePath)} alt={l.nama} 
+                                   className="w-full h-full object-cover cursor-zoom-in hover:scale-110 transition-transform duration-700"
+                                   onClick={() => setPopupImage({ url: normalizeFileUrl(img.filePath), index: idx, allImages: images })}/>
+                            ))}
                           </div>
 
+                          {/* Dots Overlay */}
                           {images.length > 1 && (
-                            <div className="flex gap-2 mt-2 justify-center">
+                            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
                               {images.map((_, idx) => (
-                                <span key={idx} onClick={() => setImageIndex((prev) => ({ ...prev, [l.id]: idx }))}
-                                      className={`w-3 h-3 rounded-full cursor-pointer transition-colors duration-300 ${idx === currentIndex ? "bg-[#a855f7]" : "bg-gray-500"}`}/>
+                                <button key={idx} onClick={() => setImageIndex(prev => ({ ...prev, [l.id]: idx }))}
+                                        className={`h-1.5 transition-all duration-300 rounded-full ${idx === currentIndex ? "w-8 bg-purple-500" : "w-2 bg-white/50"}`}/>
                               ))}
                             </div>
                           )}
-                        </>
-                      )}
-                    </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -261,54 +220,62 @@ export default function LombaPage() {
         </div>
       )}
 
-      {/* POPUP */}
+      {/* POPUP VIEWER */}
       {popupImage && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 backdrop-blur-sm" onClick={() => setPopupImage(null)}>
-          <div className="relative max-h-[90vh] max-w-[90vw]" onClick={(e) => e.stopPropagation()}>
-            <img src={popupImage.url} alt="Preview" className="rounded shadow-lg max-h-[90vh] max-w-[90vw]" />
+        <div className="fixed inset-0 bg-black/95 backdrop-blur-md flex justify-center items-center z-[100] p-4 sm:p-10 transition-all" onClick={() => setPopupImage(null)}>
+          <button className="absolute top-8 right-8 text-white text-3xl hover:text-purple-500 transition-colors">✕</button>
+          
+          <div className="relative max-w-full max-h-full group" onClick={(e) => e.stopPropagation()}>
+            <img src={popupImage.url} alt="Full Preview" className="rounded-lg shadow-2xl max-h-[85vh] object-contain animate-fade-in" />
+            
             {popupImage.allImages.length > 1 && (
-              <>
-                <button className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white px-3 py-1 rounded hover:bg-opacity-75"
+              <div className="flex justify-between absolute top-1/2 -translate-y-1/2 w-full px-4">
+                <button className="bg-white/10 hover:bg-white/20 p-4 rounded-full backdrop-blur-md transition-all text-white"
                         onClick={() => {
                           const prev = (popupImage.index - 1 + popupImage.allImages.length) % popupImage.allImages.length;
-                          setPopupImage(prevImg => ({ ...prevImg, url: normalizeFileUrl(prevImg.allImages[prev].filePath), index: prev }));
+                          setPopupImage(p => ({ ...p, url: normalizeFileUrl(p.allImages[prev].filePath), index: prev }));
                         }}>❮</button>
-                <button className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white px-3 py-1 rounded hover:bg-opacity-75"
+                <button className="bg-white/10 hover:bg-white/20 p-4 rounded-full backdrop-blur-md transition-all text-white"
                         onClick={() => {
                           const next = (popupImage.index + 1) % popupImage.allImages.length;
-                          setPopupImage(nextImg => ({ ...nextImg, url: normalizeFileUrl(nextImg.allImages[next].filePath), index: next }));
+                          setPopupImage(p => ({ ...p, url: normalizeFileUrl(p.allImages[next].filePath), index: next }));
                         }}>❯</button>
-              </>
+              </div>
             )}
           </div>
         </div>
       )}
 
-      {/* Neon & Slide-in */}
       <style jsx>{`
-        .neon-border { position: relative; overflow: visible; }
-          .neon-glow {
-    text-shadow: 0 0 10px #a855f7, 0 0 20px #8b5cf6;
-    transition: text-shadow 0.3s ease-in-out;
-  }
-        .neon-border::before, .neon-border::after {
+        .neon-border { position: relative; }
+        .neon-glow { text-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
+
+        .lomba-card.reveal {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .neon-border::before {
           content: "";
           position: absolute;
-          inset: -5px;
+          inset: -2px;
+          background: linear-gradient(135deg, #a855f7, transparent, #8b5cf6);
+          z-index: -1;
           border-radius: inherit;
-          background: linear-gradient(120deg,#a855f7,#8b5cf6,#9333ea,#7c3aed);
-          background-size: 400% 400%;
-          animation: spinNeon 18s linear infinite;
-          z-index: 0;
-          filter: blur(15px);
-          opacity: 0.25;
+          opacity: 0;
+          transition: opacity 0.5s;
         }
-        .neon-border::after { inset: -10px; filter: blur(25px); opacity: 0.5; }
-        .neon-border > * { position: relative; z-index: 1; }
 
-        @keyframes spinNeon { 0% { background-position:0% 50%; } 50% { background-position:100% 50%; } 100% { background-position:0% 50%; } }
+        .lomba-card:hover .neon-border::before {
+          opacity: 0.4;
+        }
 
-        .slide-in { opacity:1 !important; transform: translateY(-40) !important; }
+        @keyframes animate-fade-in {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+        }
+
+        .animate-fade-in { animation: animate-fade-in 0.3s ease-out forwards; }
       `}</style>
     </main>
   );

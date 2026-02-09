@@ -285,7 +285,7 @@ export default function Home() {
 {/* ===== END BACKGROUND ===== */}
 
       <main
-        className="min-h-screen flex flex-col items-center py-16 px-4 gap-16 font-sans transition-colors duration-500"
+        className="min-h-screen flex flex-col items-center py-16 px-1 gap-16 font-sans transition-colors duration-500"
         style={{
           backgroundColor: "var(--background)",
           color: "var(--foreground)",
@@ -636,31 +636,31 @@ export default function Home() {
 </section>
 {/* Gunakan wrapper konsisten untuk semua section agar layout center */}
 <section id="projek" className="w-full">
-  <div className="w-full max-w-7xl mx-auto px-4">
+  <div className="w-full max-w-7xl mx-auto px-1">
     <ProjekPage />
   </div>
 </section>
 
 <section id="sertifikat" className="w-full">
-  <div className="w-full max-w-7xl mx-auto px-4">
+  <div className="w-full max-w-7xl mx-auto px-1">
     <SertifikatPage />
   </div>
 </section>
 
 <section id="lomba" className="w-full">
-  <div className="w-full max-w-7xl mx-auto px-4">
+  <div className="w-full max-w-7xl mx-auto px-1">
     <LombaPage />
   </div>
 </section>
 
 <section id="organisasi" className="w-full">
-  <div className="w-full max-w-7xl mx-auto px-4">
+  <div className="w-full max-w-7xl mx-auto px-1">
     <OrganisasiPage />
   </div>
 </section>
 
 <section id="pendidikan" className="w-full">
-  <div className="w-full max-w-7xl mx-auto px-4">
+  <div className="w-full max-w-7xl mx-auto px-1">
     <PendidikanPage />
   </div>
 </section>
