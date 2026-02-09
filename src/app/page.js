@@ -55,47 +55,37 @@ function RevealItem({ children, delay = 0 }) {
 function RotatingLabelItem({ item, theme }) {
   const [currentLabel, setCurrentLabel] = useState(0);
   const [fade, setFade] = useState(true);
-  const [labelWidth, setLabelWidth] = useState(0);
-  const labelRef = useRef(null);
-
-  useEffect(() => {
-    if (labelRef.current) {
-      setLabelWidth(labelRef.current.offsetWidth);
-    }
-  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
+      // 1. Teks lama menghilang ke arah KANAN
       setFade(false);
 
       setTimeout(() => {
+        // 2. Ganti teks
         setCurrentLabel((prev) => (prev + 1) % item.labels.length);
+        // 3. Teks baru muncul dari KANAN (tapi karena kita ingin searah, 
+        // kita reset posisinya secara instan jika perlu, 
+        // namun cara termudah adalah menggunakan slide transisi)
         setFade(true);
-      }, 400);
-    }, 2100);
+      }, 500); 
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [item.labels.length]);
-
-  useEffect(() => {
-    if (labelRef.current) {
-      setLabelWidth(labelRef.current.offsetWidth);
-    }
-  }, [currentLabel]);
 
   return (
     <a
       href={item.href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`flex items-center gap-3 px-6 py-4 rounded-2xl transition-all duration-500 transform hover:scale-105 ${
+      className={`flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-500 transform hover:scale-105 ${
         theme === "dark" ? "bg-gray-800" : "bg-white"
       }`}
       style={{
         boxShadow: `0 0 12px ${item.color}`,
-        width: `calc(${labelWidth}px + 90px)`,
-        transition: "all 0.5s ease-in-out",
-        whiteSpace: "nowrap",
+        minWidth: "280px", // Mencegah layout di bawahnya naik-turun
+        justifyContent: "flex-start",
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.boxShadow = `0 0 25px ${item.color}, 0 0 50px ${item.color}`;
@@ -104,21 +94,29 @@ function RotatingLabelItem({ item, theme }) {
         e.currentTarget.style.boxShadow = `0 0 12px ${item.color}`;
       }}
     >
-      {/* Logo tetap stay */}
-      <div className="flex-shrink-0">{item.icon}</div>
+      <div className="flex-shrink-0 w-8 flex justify-center items-center">
+        {item.icon}
+      </div>
 
-      {/* Teks yang berganti */}
-      <span
-        ref={labelRef}
-        className={`text-lg font-semibold transition-opacity duration-500 ${
-          fade ? "opacity-100" : "opacity-0"
-        } ${theme === "dark" ? "text-white" : "text-black"}`}
-        style={{
-          whiteSpace: "nowrap",
-        }}
-      >
-        {item.labels[currentLabel]}
-      </span>
+      <div className="relative flex-1 overflow-hidden h-8">
+        <span
+          className={`absolute left-0 text-lg font-semibold whitespace-nowrap ${
+            theme === "dark" ? "text-white" : "text-black"
+          }`}
+          style={{
+            // Logika Animasi:
+            // Jika fade true: opacity 1, posisi di 0 (tengah)
+            // Jika fade false: opacity 0, posisi geser ke kanan (30px)
+            opacity: fade ? 1 : 0,
+            transform: fade ? "translateX(0)" : "translateX(30px)",
+            transition: fade 
+              ? "transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease" // Saat masuk (dengan efek sedikit memantul/bounce)
+              : "transform 0.4s ease-in, opacity 0.4s ease", // Saat keluar
+          }}
+        >
+          {item.labels[currentLabel]}
+        </span>
+      </div>
     </a>
   );
 }
@@ -512,7 +510,7 @@ export default function Home() {
         </h2>
       </RevealItem>
 
-<div className="flex flex-wrap justify-center gap-6 font-poppins">
+<div className="flex flex-wrap justify-center gap-9 font-poppins">
   {[
     {
       href: "https://github.com/WidiNug23",

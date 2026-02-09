@@ -1,18 +1,16 @@
-// app/layout.js
 "use client";
 
 import Link from "next/link";
-import Head from "next/head";
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { FaSun, FaMoon } from "react-icons/fa";
+import { FaSun, FaMoon, FaInstagram, FaLinkedin, FaGithub, FaWhatsapp, FaBars, FaTimes } from "react-icons/fa";
+import { MdEmail } from "react-icons/md";
 import { ThemeProvider, useTheme } from "./ThemeContext";
 import "./globals.css";
-import { FaInstagram, FaLinkedin, FaGithub, FaWhatsapp } from "react-icons/fa";
-import { MdEmail } from "react-icons/md"; // untuk Gmail
 
 function LayoutContent({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
@@ -21,315 +19,180 @@ function LayoutContent({ children }) {
     { href: "/", label: "Beranda" },
     { href: "/#projek", label: "Projek" },
     { href: "/#sertifikat", label: "Sertifikat" },
-    { href: "/#lomba", label: "Lomba & Kompetensi" },
-    { href: "/#organisasi", label: "Pengalaman & Organisasi" },
+    { href: "/#lomba", label: "Lomba" },
+    { href: "/#organisasi", label: "Organisasi" },
     { href: "/#pendidikan", label: "Pendidikan" },
     { href: "/#kontak", label: "Kontak" },
   ];
 
-  // Auto-scroll jika URL memiliki hash
+  // Efek Shadow Navbar saat Scroll
   useEffect(() => {
-    if (typeof window !== "undefined" && window.location.hash) {
-      const hash = window.location.hash;
-      const el = document.querySelector(hash);
-      if (el) {
-        setTimeout(() => {
-          el.scrollIntoView({ behavior: "smooth" });
-        }, 300);
-      }
-    }
-  }, [pathname]);
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-  // Highlight kontak lintas halaman
-  useEffect(() => {
-    if (sessionStorage.getItem("triggerHighlightKontak") === "true") {
-      sessionStorage.removeItem("triggerHighlightKontak");
-
-      setTimeout(() => {
-        setTimeout(() => {
-          window.dispatchEvent(new Event("highlightKontak"));
-        }, 1000);
-      }, 400);
-    }
-  }, [pathname]);
-
-  // Scroll ke target setelah pindah halaman
-  useEffect(() => {
-    const target = sessionStorage.getItem("scrollToTarget");
-    if (!target) return;
-
-    sessionStorage.removeItem("scrollToTarget");
-
-    const t = setTimeout(() => {
-      const el = document.querySelector(target);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
-      }
-    }, 400);
-
-    return () => clearTimeout(t);
-  }, [pathname]);
-
-  // --- FIX BERANDA DITAMBAHKAN DI SINI ---
-const handleScrollToSection = (e, targetId, href) => {
-  e.preventDefault();
-
-  const offset = 120; // hanya dipakai untuk kontak
-
-  // Klik Beranda
-  if (href === "/") {
-    router.push("/");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  const handleScrollToSection = (e, targetId, href) => {
+    e.preventDefault();
     setMenuOpen(false);
-    return;
-  }
 
-  // Validasi hash
-  if (!targetId || !targetId.startsWith("#")) return;
+    if (href === "/") {
+      if (pathname === "/") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        router.push("/");
+      }
+      return;
+    }
 
-  const isKontak = targetId === "#kontak";
+    const cleanId = targetId.replace(/^\/?#?/, "");
+    const isKontak = cleanId === "kontak";
 
-  // Simpan flag highlight untuk kontak
-  if (isKontak) {
-    sessionStorage.setItem("triggerHighlightKontak", "true");
-  }
+    if (isKontak) sessionStorage.setItem("triggerHighlightKontak", "true");
 
-  // Jika sudah berada di halaman Home
-  if (pathname === "/") {
-    const section = document.querySelector(targetId);
-    if (section) {
-      setTimeout(() => {
-        // Jika KONTak → pakai offset
+    if (pathname === "/") {
+      const section = document.getElementById(cleanId);
+      if (section) {
+        const offset = 80;
+        const bodyRect = document.body.getBoundingClientRect().top;
+        const elementRect = section.getBoundingClientRect().top;
+        const elementPosition = elementRect - bodyRect;
+        const offsetPosition = elementPosition - offset;
+
+        window.scrollTo({ top: offsetPosition, behavior: "smooth" });
         if (isKontak) {
-          const y =
-            section.getBoundingClientRect().top +
-            window.pageYOffset -
-            offset;
-
-          window.scrollTo({ top: y, behavior: "smooth" });
-        } else {
-          // Selain kontak → scroll normal
-          section.scrollIntoView({ behavior: "smooth" });
+          setTimeout(() => window.dispatchEvent(new Event("highlightKontak")), 800);
         }
-      }, 150);
+      }
+    } else {
+      sessionStorage.setItem("scrollToTarget", `#${cleanId}`);
+      router.push("/");
     }
-
-    if (isKontak) {
-      setTimeout(() => {
-        window.dispatchEvent(new Event("highlightKontak"));
-      }, 650);
-    }
-
-    setMenuOpen(false);
-    return;
-  }
-
-  // Jika bukan di halaman Home
-  sessionStorage.setItem("scrollToTarget", targetId);
-
-  // Untuk kontak → kirim offset, lainnya → kosong
-  if (isKontak) {
-    sessionStorage.setItem("scrollOffset", offset);
-  } else {
-    sessionStorage.removeItem("scrollOffset");
-  }
-
-  router.push("/");
-  setMenuOpen(false);
-};
-
-  // --- END FIX BERANDA ---
+  };
 
   return (
-    <body
-      className={`min-h-screen flex flex-col transition-colors duration-500 font-poppins ${
-        theme === "dark"
-          ? "bg-gray-900 text-gray-100"
-          : "bg-gray-50 text-gray-900"
-      }`}
-    >
-<nav
-  className={`fixed w-full top-0 z-50 transition-colors duration-500 ${
-    theme === "dark"
-      ? "bg-black text-white shadow-black"
-      : "bg-white text-black shadow-gray-300"
-  }`}
->
-  <div className="max-w-[90rem] mx-auto flex items-center justify-between px-6 py-4 md:py-5">
+    <body className={`min-h-screen flex flex-col transition-colors duration-500 font-poppins ${
+      theme === "dark" ? "bg-gray-950 text-gray-100" : "bg-white text-gray-900"
+    }`}>
+      
+      {/* NAVBAR */}
+      <nav className={`fixed w-full top-0 z-[100] transition-all duration-300 ${
+        scrolled 
+          ? (theme === "dark" ? "bg-black/80 backdrop-blur-md py-3 shadow-2xl" : "bg-white/80 backdrop-blur-md py-3 shadow-lg")
+          : "bg-transparent py-5"
+      }`}>
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-6">
+          
+          {/* LOGO */}
+          <Link href="/" className="group">
+            <h1 className={`text-2xl font-black tracking-tighter transition-all duration-300 ${
+              theme === "dark" ? "text-white group-hover:text-blue-400" : "text-gray-900 group-hover:text-blue-600"
+            }`}>
+              WIDI<span className="text-blue-500">.</span>
+            </h1>
+          </Link>
 
-    {/* LEFT: Nama */}
-    <h1
-      className={`text-xl md:text-2xl font-bold ${
-        theme === "dark" ? "text-white" : "text-gray-900"
-      }`}
-      style={{
-        textShadow:
-          theme === "dark"
-            ? "0 0 8px #3b82f6, 0 0 16px #3b82f6"
-            : "0 0 8px #60a5fa, 0 0 16px #3b82f6",
-      }}
-    >
-      Widi Nugroho
-    </h1>
+          {/* DESKTOP NAV */}
+          <ul className="hidden lg:flex items-center gap-1">
+            {navLinks.map((link) => (
+              <li key={link.href}>
+                <a
+                  href={link.href}
+                  onClick={(e) => handleScrollToSection(e, link.href, link.href)}
+                  className={`relative px-4 py-2 text-sm font-medium transition-all duration-300 hover:text-blue-500 group`}
+                >
+                  {link.label}
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                </a>
+              </li>
+            ))}
+            <li className="ml-4 pl-4 border-l border-gray-500/30">
+              <button
+                onClick={toggleTheme}
+                className={`p-2.5 rounded-xl transition-all duration-300 ${
+                  theme === "dark" ? "bg-gray-800 text-yellow-400 hover:bg-gray-700" : "bg-gray-100 text-yellow-600 hover:bg-gray-200"
+                }`}
+              >
+                {theme === "dark" ? <FaSun size={18} /> : <FaMoon size={18} />}
+              </button>
+            </li>
+          </ul>
 
-    {/* RIGHT: Theme Icon (mobile visible), Hamburger */}
-    <div className="flex items-center gap-3 md:hidden">
-      {/* Theme Icon mobile */}
-      <button
-        onClick={toggleTheme}
-        className={`p-2 rounded-full transition-colors duration-300 ${
-          theme === "dark"
-            ? "bg-gray-800 text-yellow-400"
-            : "bg-gray-200 text-yellow-600"
-        }`}
-      >
-        {theme === "dark" ? <FaSun size={20} /> : <FaMoon size={20} />}
-      </button>
+          {/* MOBILE TOGGLE */}
+          <div className="flex items-center gap-3 lg:hidden">
+            <button onClick={toggleTheme} className="p-2 text-yellow-500">
+              {theme === "dark" ? <FaSun size={20} /> : <FaMoon size={20} />}
+            </button>
+            <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 transition-transform active:scale-90">
+              {menuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+            </button>
+          </div>
+        </div>
 
-      {/* Hamburger menu */}
-      <button
-        onClick={() => setMenuOpen(!menuOpen)}
-        className="text-3xl"
-      >
-        ☰
-      </button>
-    </div>
+        {/* MOBILE MENU DROPDOWN */}
+        <div className={`absolute top-full left-0 w-full lg:hidden transition-all duration-500 overflow-hidden ${
+          menuOpen ? "max-h-[500px] border-b shadow-xl" : "max-h-0"
+        } ${theme === "dark" ? "bg-gray-900 border-gray-800" : "bg-white border-gray-100"}`}>
+          <ul className="flex flex-col p-4">
+            {navLinks.map((link) => (
+              <li key={link.href}>
+                <a
+                  href={link.href}
+                  onClick={(e) => handleScrollToSection(e, link.href, link.href)}
+                  className="block px-4 py-4 text-base font-semibold border-b border-gray-500/10 last:border-0 hover:text-blue-500"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </nav>
 
-    {/* NAV LINKS + Theme Icon (desktop only) */}
-    <ul
-      className={`hidden md:flex items-center gap-2`}
-    >
-      {navLinks.map((link) => (
-        <li key={link.href}>
-          <a
-            href={link.href}
-            onClick={(e) =>
-              handleScrollToSection(
-                e,
-                link.href.replace(/^\/?#?/, "#"),
-                link.href
-              )
-            }
-            className="px-4 py-2 font-semibold transition"
-          >
-            {link.label}
-          </a>
-        </li>
-      ))}
+      <main className="flex-1 pt-20">{children}</main>
 
-      {/* Theme Icon desktop */}
-      <li className="ml-2">
-        <button
-          onClick={toggleTheme}
-          className={`p-2 rounded-full transition-colors duration-300 ${
-            theme === "dark"
-              ? "bg-gray-800 text-yellow-400"
-              : "bg-gray-200 text-yellow-600"
-          }`}
-        >
-          {theme === "dark" ? <FaSun size={20} /> : <FaMoon size={20} />}
-        </button>
-      </li>
-    </ul>
-
-    {/* DROPDOWN MENU FOR MOBILE */}
-    <ul
-      className={`md:hidden absolute top-full left-0 w-full transition-all duration-500 ${
-        menuOpen
-          ? "opacity-100 translate-y-0"
-          : "opacity-0 -translate-y-4 pointer-events-none"
-      } ${theme === "dark" ? "bg-black" : "bg-white"}`}
-    >
-      {navLinks.map((link) => (
-        <li key={link.href} className="border-b">
-          <a
-            href={link.href}
-            onClick={(e) =>
-              handleScrollToSection(
-                e,
-                link.href.replace(/^\/?#?/, "#"),
-                link.href
-              )
-            }
-            className="block px-4 py-2 font-semibold"
-          >
-            {link.label}
-          </a>
-        </li>
-      ))}
-    </ul>
-
-  </div>
-</nav>
-
-
-<main className="flex-1 p-6 md:p-8">{children}</main>
-
-<footer
-  className={`py-6 mt-8 w-full border-t transition ${
-    theme === "dark"
-      ? "bg-black text-gray-200 border-gray-700"
-      : "bg-gray-100 text-gray-900 border-gray-300"
-  }`}
->
-  <div className="max-w-7xl mx-auto text-center flex flex-col md:flex-row justify-center items-center gap-4">
-    <p className="mb-2 md:mb-0">© {new Date().getFullYear()} Widi Nugroho.</p>
-
-    <div className="flex gap-4 text-xl">
-      <a
-        href="https://www.instagram.com/widingr23" // ganti dengan username Instagram kamu
-        target="_blank"
-        rel="noopener noreferrer"
-        className="hover:text-pink-500 transition-colors"
-      >
-        <FaInstagram />
-      </a>
-      <a
-        href="https://www.linkedin.com/in/widi-suryo-nugroho-a607632a2/" // ganti dengan LinkedIn kamu
-        target="_blank"
-        rel="noopener noreferrer"
-        className="hover:text-blue-600 transition-colors"
-      >
-        <FaLinkedin />
-      </a>
-      <a
-        href="https://github.com/WidiNug23" // ganti dengan GitHub kamu
-        target="_blank"
-        rel="noopener noreferrer"
-        className="hover:text-gray-700 transition-colors"
-      >
-        <FaGithub />
-      </a>
-      <a
-        href="mailto:collabswithwidi@gmail.com" // ganti dengan email kamu
-        className="hover:text-red-500 transition-colors"
-      >
-        <MdEmail />
-      </a>
-      <a
-        href="https://wa.me/6285727609498" // ganti dengan nomor WhatsApp kamu (format internasional tanpa +)
-        target="_blank"
-        rel="noopener noreferrer"
-        className="hover:text-green-500 transition-colors"
-      >
-        <FaWhatsapp />
-      </a>
-    </div>
-  </div>
-</footer>
+      {/* FOOTER */}
+      <footer className={`py-12 mt-20 border-t transition-all duration-500 ${
+        theme === "dark" ? "bg-gray-950 border-gray-800" : "bg-gray-50 border-gray-200"
+      }`}>
+        <div className="max-w-7xl mx-auto px-6 flex flex-col items-center">
+          <div className="flex gap-6 mb-8">
+            {[
+              { icon: <FaInstagram />, href: "https://www.instagram.com/widingr23", color: "hover:text-pink-500" },
+              { icon: <FaLinkedin />, href: "https://www.linkedin.com/in/widi-suryo-nugroho-a607632a2/", color: "hover:text-blue-500" },
+              { icon: <FaGithub />, href: "https://github.com/WidiNug23", color: "hover:text-gray-400" },
+              { icon: <MdEmail />, href: "mailto:collabswithwidi@gmail.com", color: "hover:text-red-500" },
+              { icon: <FaWhatsapp />, href: "https://wa.me/6285727609498", color: "hover:text-green-500" },
+            ].map((soc, i) => (
+              <a 
+                key={i} 
+                href={soc.href} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className={`text-2xl transition-all duration-300 hover:scale-125 ${soc.color} ${
+                  theme === "dark" ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
+                {soc.icon}
+              </a>
+            ))}
+          </div>
+          
+          <div className="text-center">
+            <h2 className="text-lg font-bold mb-2">Widi Nugroho</h2>
+            <p className={`text-sm ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}>
+              © {new Date().getFullYear()} — Portofolio
+            </p>
+          </div>
+        </div>
+      </footer>
     </body>
   );
 }
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="id">
-      <Head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;400;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </Head>
+    <html lang="id" className="scroll-smooth">
       <ThemeProvider>
         <LayoutContent>{children}</LayoutContent>
       </ThemeProvider>

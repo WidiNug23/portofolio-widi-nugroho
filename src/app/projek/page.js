@@ -97,50 +97,56 @@ const projekData = [
 
 export default function ProjekPage() {
   const { theme } = useTheme();
-  const [projek] = useState(projekData);
   const [expanded, setExpanded] = useState({});
   const [modalVideoID, setModalVideoID] = useState(null);
   const [modalPDF, setModalPDF] = useState(null);
   const [currentSlide, setCurrentSlide] = useState({});
   const [lightbox, setLightbox] = useState({ isOpen: false, projekID: null, imgIndex: 0 });
-  const carouselRefs = useRef({});
-
   const isDark = theme === "dark";
 
   // Lightbox Handlers
   const openLightbox = (projekID, imgIndex) => setLightbox({ isOpen: true, projekID, imgIndex });
   const closeLightbox = () => setLightbox({ isOpen: false, projekID: null, imgIndex: 0 });
-  const navigateLightbox = (dir) => {
-    const p = projek.find((x) => x.id === lightbox.projekID);
+  
+  const navigateLightbox = (e, dir) => {
+    e.stopPropagation();
+    const p = projekData.find((x) => x.id === lightbox.projekID);
     const imgs = JSON.parse(p.images || "[]");
-    setLightbox((prev) => ({ ...prev, imgIndex: (prev.imgIndex + dir + imgs.length) % imgs.length }));
+    setLightbox((prev) => ({ 
+      ...prev, 
+      imgIndex: (prev.imgIndex + dir + imgs.length) % imgs.length 
+    }));
   };
 
-  // Carousel Auto-play
+  // Carousel Handlers (Dots)
+  const handleDotClick = (projekID, index) => {
+    setCurrentSlide(prev => ({ ...prev, [projekID]: index }));
+  };
+
+  // Auto-play Carousel Logic
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => {
         const updated = { ...prev };
-        projek.forEach((p) => {
-          const imgs = p.images ? JSON.parse(p.images) : [];
-          if (imgs.length > 0) {
+        projekData.forEach((p) => {
+          let imgs = [];
+          try { imgs = JSON.parse(p.images || "[]"); } catch { imgs = []; }
+          if (imgs.length > 1) {
             updated[p.id] = ((prev[p.id] ?? 0) + 1) % imgs.length;
           }
         });
         return updated;
       });
-    }, 4000);
+    }, 5000);
     return () => clearInterval(interval);
-  }, [projek]);
+  }, []);
 
-  // Scroll Reveal
+  // Intersection Observer for Scroll Animations
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("reveal");
-          }
+          if (entry.isIntersecting) entry.target.classList.add("reveal");
         });
       },
       { threshold: 0.1 }
@@ -149,10 +155,6 @@ export default function ProjekPage() {
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    document.body.style.backgroundColor = isDark ? "#080808" : "#f8fafc";
-  }, [isDark]);
-
   const extractYouTubeID = (url) => {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url?.match(regExp);
@@ -160,9 +162,9 @@ export default function ProjekPage() {
   };
 
   return (
-    <main className={`min-h-screen pt-32 pb-20 px-4 sm:px-8 lg:px-16 transition-colors duration-500 ${isDark ? "text-white" : "text-slate-900"}`}>
+    <main className={`min-h-screen pt-32 pb-20 px-4 sm:px-8 lg:px-16 transition-colors duration-500 ${isDark ? "bg-[#080808] text-white" : "bg-slate-50 text-slate-900"}`}>
       
-      {/* Header */}
+      {/* Header Section */}
       <div className="max-w-4xl mx-auto text-center mb-20">
         <h1 className={`text-5xl md:text-7xl font-black mb-6 tracking-tighter ${isDark ? "neon-glow" : "text-slate-900"}`}>
           MY PROJECTS
@@ -176,21 +178,21 @@ export default function ProjekPage() {
 
       {/* Project Grid */}
       <div className="max-w-6xl mx-auto flex flex-col gap-16">
-        {projek.map((p) => {
+        {projekData.map((p) => {
           const isExpanded = expanded[p.id];
           const textToShow = isExpanded ? p.deskripsi : p.deskripsi?.substring(0, 200) + (p.deskripsi?.length > 200 ? "..." : "");
-          const youtubeID = extractYouTubeID(p.link_demo);
+          const youtubeID = extractYouTubeID(p.link_demo || "");
           let images = [];
           try { images = JSON.parse(p.images || "[]"); } catch { images = []; }
           const slideIdx = currentSlide[p.id] ?? 0;
 
           return (
             <div key={p.id} className="projek-card opacity-0 transform translate-y-12 transition-all duration-1000">
-              <div className={`group relative rounded-[2rem] overflow-hidden border transition-all duration-500 ${isDark ? "bg-white/5 border-white/10 hover:bg-white/10" : "bg-white border-slate-200 shadow-xl hover:shadow-2xl"}`}>
-                
+              <div className={`group relative rounded-[2.5rem] overflow-hidden border transition-all duration-500 ${isDark ? "bg-white/5 border-white/10 hover:bg-white/10" : "bg-white border-slate-200 shadow-xl hover:shadow-2xl"}`}>
                 <div className="flex flex-col lg:flex-row">
-                  {/* Left: Info */}
-                  <div className="p-8 lg:p-12 flex-1">
+                  
+                  {/* Left Column: Text Info */}
+                  <div className="p-8 lg:p-12 flex-1 flex flex-col">
                     <div className="flex items-center gap-3 mb-6">
                        <span className={`w-12 h-1 rounded-full ${isDark ? "bg-blue-500 shadow-[0_0_10px_#3b82f6]" : "bg-blue-600"}`}></span>
                        <span className="text-xs font-black tracking-widest uppercase opacity-60">Featured Project</span>
@@ -200,12 +202,12 @@ export default function ProjekPage() {
                       {p.judul}
                     </h2>
                     
-                    <p className={`text-base leading-relaxed mb-8 opacity-80 whitespace-pre-line`}>
+                    <p className="text-base leading-relaxed mb-6 opacity-80 whitespace-pre-line">
                       {textToShow}
                     </p>
 
                     {p.deskripsi?.length > 200 && (
-                      <button onClick={() => setExpanded(e => ({...e, [p.id]: !isExpanded}))} className="text-sm font-bold text-blue-500 hover:underline mb-8 block">
+                      <button onClick={() => setExpanded(e => ({...e, [p.id]: !isExpanded}))} className="text-sm font-bold text-blue-500 hover:text-blue-400 mb-8 flex items-center gap-2">
                         {isExpanded ? "← Read Less" : "Read Full Case Study →"}
                       </button>
                     )}
@@ -217,46 +219,58 @@ export default function ProjekPage() {
                         </a>
                       )}
                       {p.link_github && (
-                        <a href={p.link_github} target="_blank" rel="noreferrer" className={`px-6 py-3 rounded-full text-sm font-bold border transition-all flex items-center gap-2 ${isDark ? "border-white/20 hover:bg-white/10" : "border-slate-300 hover:bg-slate-50"}`}>
+                        <a href={p.link_github} target="_blank" rel="noreferrer" className={`px-6 py-3 rounded-full text-sm font-bold border transition-all flex items-center gap-2 ${isDark ? "border-white/20 hover:bg-white/10 text-white" : "border-slate-300 hover:bg-slate-50 text-slate-900"}`}>
                           <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" className={`w-4 h-4 ${isDark ? "invert" : ""}`} alt="github" /> Code
                         </a>
                       )}
                       {p.pdf_file && (
-                        <button onClick={() => setModalPDF(p.pdf_file)} className="p-3 rounded-full border border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                        <button onClick={() => setModalPDF(p.pdf_file)} className="px-6 py-3 rounded-full border border-red-500/50 text-red-500 font-bold hover:bg-red-500 hover:text-white transition-all">
                           📄 Documentation
                         </button>
                       )}
                     </div>
                   </div>
 
-                  {/* Right: Media */}
+                  {/* Right Column: Media Display */}
                   <div className="lg:w-1/2 p-4 lg:p-8 bg-black/20 backdrop-blur-sm">
                     {youtubeID ? (
-                      <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl cursor-pointer group/vid" onClick={() => setModalVideoID(youtubeID)}>
-                        <img src={`https://img.youtube.com/vi/${youtubeID}/maxresdefault.jpg`} className="w-full h-full object-cover transition-transform duration-700 group-hover/vid:scale-110" alt="thumb" />
+                      <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl cursor-pointer group/vid" onClick={() => setModalVideoID(youtubeID)}>
+                        <img src={`https://img.youtube.com/vi/${youtubeID}/maxresdefault.jpg`} className="w-full h-full object-cover transition-transform duration-700 group-hover/vid:scale-110" alt="youtube-thumb" />
                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover/vid:bg-black/20 transition-all">
-                          <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center shadow-2xl transition-transform group-hover/vid:scale-125">
-                            <div className="ml-1 border-y-[10px] border-y-transparent border-l-[15px] border-l-white"></div>
+                          <div className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center shadow-2xl transition-transform group-hover/vid:scale-110">
+                            <div className="ml-1 border-y-[12px] border-y-transparent border-l-[18px] border-l-white"></div>
                           </div>
                         </div>
                       </div>
                     ) : images.length > 0 ? (
-                      <div className="relative rounded-2xl overflow-hidden shadow-2xl group/img">
-                        <div className="flex transition-transform duration-700 ease-in-out" style={{ transform: `translateX(-${slideIdx * 100}%)` }}>
+                      <div className="relative rounded-3xl overflow-hidden shadow-2xl group/img aspect-[4/3]">
+                        <div className="flex h-full transition-transform duration-700 cubic-bezier(0.4, 0, 0.2, 1)" style={{ transform: `translateX(-${slideIdx * 100}%)` }}>
                           {images.map((img, i) => (
-                            <img key={i} src={`uploads/${img}`} className="w-full aspect-[4/3] object-cover cursor-zoom-in" alt="preview" onClick={() => openLightbox(p.id, i)} />
+                            <img 
+                              key={i} 
+                              src={`uploads/${img}`} 
+                              className="w-full h-full object-cover cursor-zoom-in shrink-0" 
+                              alt={`Project step ${i}`} 
+                              onClick={() => openLightbox(p.id, i)} 
+                            />
                           ))}
                         </div>
-                        {/* Indicators */}
-                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 p-2 bg-black/20 backdrop-blur-md rounded-full">
+                        
+                        {/* Functional Indicators (Dots) */}
+                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 p-2.5 bg-black/30 backdrop-blur-xl rounded-full z-10">
                           {images.map((_, i) => (
-                            <div key={i} className={`h-1.5 rounded-full transition-all ${i === slideIdx ? "w-6 bg-blue-500" : "w-1.5 bg-white/50"}`} />
+                            <button
+                              key={i}
+                              onClick={() => handleDotClick(p.id, i)}
+                              className={`h-2 rounded-full transition-all duration-300 ${i === slideIdx ? "w-8 bg-blue-500 shadow-[0_0_10px_#3b82f6]" : "w-2 bg-white/40 hover:bg-white/60"}`}
+                              aria-label={`Go to slide ${i + 1}`}
+                            />
                           ))}
                         </div>
                       </div>
                     ) : (
-                      <div className="h-full min-h-[300px] flex items-center justify-center border-2 border-dashed border-white/10 rounded-2xl opacity-30">
-                        <p className="italic">Media Coming Soon</p>
+                      <div className="h-full min-h-[350px] flex items-center justify-center border-2 border-dashed border-white/10 rounded-3xl opacity-30">
+                        <p className="italic text-lg tracking-widest">PROJEK SEDANG DIKEMBANGKAN</p>
                       </div>
                     )}
                   </div>
@@ -267,31 +281,55 @@ export default function ProjekPage() {
         })}
       </div>
 
-      {/* Modals & Overlays */}
-      {/* (Gunakan struktur modal yang sama seperti sebelumnya tapi dengan backdrop-blur-md agar lebih premium) */}
+      {/* LIGHTBOX OVERLAY (Image Popup) */}
+      {lightbox.isOpen && (
+        <div className="fixed inset-0 z-[110] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 sm:p-10 animate-in fade-in zoom-in duration-300" onClick={closeLightbox}>
+          <button className="absolute top-8 right-8 text-white/50 hover:text-white text-4xl z-20">✕</button>
+          
+          <button onClick={(e) => navigateLightbox(e, -1)} className="absolute left-4 sm:left-10 p-4 bg-white/5 hover:bg-white/10 rounded-full text-white transition-all z-20">❮</button>
+          <button onClick={(e) => navigateLightbox(e, 1)} className="absolute right-4 sm:right-10 p-4 bg-white/5 hover:bg-white/10 rounded-full text-white transition-all z-20">❯</button>
+
+          <div className="relative max-w-5xl max-h-[85vh] flex items-center justify-center" onClick={e => e.stopPropagation()}>
+            <img 
+              src={`uploads/${JSON.parse(projekData.find(x => x.id === lightbox.projekID).images)[lightbox.imgIndex]}`} 
+              className="max-w-full max-h-full object-contain rounded-lg shadow-2xl shadow-blue-500/10" 
+              alt="lightbox-preview" 
+            />
+            <p className="absolute -bottom-10 left-0 right-0 text-center text-white/60 font-medium">
+              Image {lightbox.imgIndex + 1} of {JSON.parse(projekData.find(x => x.id === lightbox.projekID).images).length}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* VIDEO MODAL */}
       {modalVideoID && (
-        <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-300" onClick={() => setModalVideoID(null)}>
-           <div className="relative w-full max-w-4xl aspect-video rounded-3xl overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
-             <iframe src={`https://www.youtube.com/embed/${modalVideoID}?autoplay=1`} className="w-full h-full" allowFullScreen></iframe>
-             <button onClick={() => setModalVideoID(null)} className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 p-2 rounded-full text-white">✕</button>
+        <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in slide-in-from-bottom-8 duration-500" onClick={() => setModalVideoID(null)}>
+           <div className="relative w-full max-w-5xl aspect-video rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10" onClick={e => e.stopPropagation()}>
+             <iframe src={`https://www.youtube.com/embed/${modalVideoID}?autoplay=1`} className="w-full h-full" allowFullScreen allow="autoplay"></iframe>
+             <button onClick={() => setModalVideoID(null)} className="absolute top-4 right-4 bg-black/50 hover:bg-red-600 p-3 rounded-full text-white transition-all">✕</button>
            </div>
         </div>
       )}
 
+      {/* PDF MODAL */}
       {modalPDF && (
         <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-6" onClick={() => setModalPDF(null)}>
-           <div className="bg-white w-full h-full rounded-3xl overflow-hidden" onClick={e => e.stopPropagation()}>
-             <iframe src={modalPDF} className="w-full h-full"></iframe>
-             <button onClick={() => setModalPDF(null)} className="fixed top-10 right-10 bg-red-500 text-white w-10 h-10 rounded-full font-bold">✕</button>
+           <div className="bg-white w-full max-w-6xl h-[90vh] rounded-[2rem] overflow-hidden relative shadow-2xl" onClick={e => e.stopPropagation()}>
+             <div className="absolute top-4 right-6 flex gap-4">
+                <a href={modalPDF} download className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">Download PDF</a>
+                <button onClick={() => setModalPDF(null)} className="bg-red-500 text-white w-10 h-10 rounded-full font-bold shadow-lg">✕</button>
+             </div>
+             <iframe src={modalPDF} className="w-full h-full pt-16"></iframe>
            </div>
         </div>
       )}
 
-      {/* Styles */}
+      {/* Custom Styles */}
       <style jsx>{`
         .neon-glow {
-          text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
-          background: linear-gradient(to right, #3b82f6, #06b6d4);
+          text-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+          background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
         }
@@ -305,10 +343,18 @@ export default function ProjekPage() {
           will-change: transform, opacity;
         }
 
-        @keyframes spinNeon {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
+        ::-webkit-scrollbar {
+          width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+          background: #080808;
+        }
+        ::-webkit-scrollbar-thumb {
+          background: #222;
+          border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: #333;
         }
       `}</style>
     </main>
