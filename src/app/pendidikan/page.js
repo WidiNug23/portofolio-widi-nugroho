@@ -149,7 +149,7 @@ export default function PendidikanPage() {
                                 <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
                                   theme === 'dark' ? 'border-yellow-500/50 text-yellow-500' : 'border-yellow-600 text-yellow-700'
                                 }`}>
-                                  Nilai: {p.nilai}
+                                  Nilai/IPK: {p.nilai}
                                 </span>
                               )}
                            </div>

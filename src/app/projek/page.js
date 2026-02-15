@@ -167,10 +167,10 @@ export default function ProjekPage() {
       {/* Header Section */}
       <div className="max-w-4xl mx-auto text-center mb-20">
         <h1 className={`text-5xl md:text-7xl font-black mb-6 tracking-tighter ${isDark ? "neon-glow" : "text-slate-900"}`}>
-          MY PROJECTS
+          PROJECTS
         </h1>
         <p className="text-lg md:text-xl opacity-80 leading-relaxed font-light">
-          Koleksi karya dalam bidang <span className="font-semibold text-blue-500">Web Development</span>, 
+          Berbagai Projek Dalam Bidang <span className="font-semibold text-blue-500">Web Development</span>, 
           <span className="font-semibold text-purple-500"> Videografi</span>, dan 
           <span className="font-semibold text-cyan-500"> Inovasi Digital</span>.
         </p>

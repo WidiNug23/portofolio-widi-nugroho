@@ -223,7 +223,29 @@ export default function Home() {
   //   //   window.removeEventListener("mousemove", handleMouseMove);
   //   // };
   // }, [theme]);
+  
+// Logika Efek Suara Klik Global
+// useEffect(() => {
+//   const playSound = () => {
+//     const audio = new Audio("/uploads/clicksoundeffect.mp3");
+//     audio.volume = 0.5; // Atur volume (0.0 sampai 1.0)
+//     audio.play().catch((err) => {
+//       // Browser kadang memblokir audio sebelum ada interaksi user pertama kali
+//       console.warn("Audio playback delayed until user interaction.");
+//     });
+//   };
 
+//   const handleGlobalClick = (e) => {
+//     // Cek apakah yang diklik adalah BUTTON atau LINK (A) atau elemen di dalam LINK
+//     const target = e.target.closest("button, a");
+//     if (target) {
+//       playSound();
+//     }
+//   };
+
+//   window.addEventListener("click", handleGlobalClick);
+//   return () => window.removeEventListener("click", handleGlobalClick);
+// }, []);
   return (
     <>
       <Head>
@@ -439,7 +461,7 @@ export default function Home() {
 
     // CV tetap khusus wide
     { 
-      href: "https://drive.google.com/file/d/1Kd5D2FGKnzQq7zFAFWd2aksUeG3ENbMA/view?usp=drive_link", 
+      href: "https://drive.google.com/file/d/1sW7Bt4YlodMoGm5FnBj6WFdbw0h94T7W/view?usp=sharing", 
       title: "Curriculum Vitae", 
       desc: "Lihat dan unduh CV", 
       color: "#3b82f6",
