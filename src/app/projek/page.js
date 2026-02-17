@@ -55,8 +55,17 @@ const projekData = [
     pdf_file: "",
     images: JSON.stringify(["filter1.png", "filter2.png", "filter3.png"]),
   },
-  {
+    {
     id: 5,
+    judul: "Hand Gesture",
+    deskripsi: `Sistem ini dibuat untuk mengatur kecerahan layar, volume suara, mengambil scrennshot, dan melakukan play/pause video yang ada di laptop atau PC`,
+    link_demo: "https://drive.google.com/drive/folders/1QSrsBeRIWnj6yDkE9d8FfdyajBcoWwyv?usp=sharing",
+    link_github: "https://github.com/WidiNug23/hand-gesture.git",
+    pdf_file: "https://drive.google.com/file/d/12WEGKDfVF-xH9LfWVl37iLvoDXXCjbZh/view?usp=sharing",
+    images: JSON.stringify(["Screenshot (725).png"]),
+  },
+  {
+    id: 6,
     judul: "Video: Pengenalan CareBot",
     deskripsi: `Projek produksi video pengenalan produk menggunakan CapCut dan Canva, mencakup tahap scripting hingga publikasi.`,
     link_demo: "https://www.youtube.com/watch?v=lJcgUrdF3ws",
@@ -64,7 +73,7 @@ const projekData = [
     images: JSON.stringify([]),
   },
   {
-    id: 6,
+    id: 7,
     judul: "Video: GoMadiun Tourism",
     deskripsi: `Produksi konten video kreatif untuk mempromosikan manajemen data wisata di Kabupaten Madiun.`,
     link_demo: "https://www.youtube.com/watch?v=7_L8LXGKcTI",
@@ -72,7 +81,7 @@ const projekData = [
     images: JSON.stringify([]),
   },
   {
-    id: 7,
+    id: 8,
     judul: "VR: Wonderful Kampung Pesilat",
     deskripsi: `Penyusunan video promosi Virtual Tour berbasis Virtual Reality di Kabupaten Madiun (Recording & Dubbing).`,
     link_demo: "https://www.youtube.com/watch?v=XfP6P09axso",
@@ -80,7 +89,7 @@ const projekData = [
     images: JSON.stringify([]),
   },
   {
-    id: 8,
+    id: 9,
     judul: "Video: Pameran Inovasi 5.0",
     deskripsi: `Dokumentasi cinematik aktivitas Pameran Inovasi Teknologi Era Revolusi Industri 5.0.`,
     link_demo: "https://www.youtube.com/watch?v=nHV9A8DgE8Q",
@@ -88,7 +97,7 @@ const projekData = [
     images: JSON.stringify([]),
   },
   {
-    id: 9,
+    id:10,
     judul: "Upcoming Project",
     deskripsi: `Projek baru sedang dalam tahap pengembangan. Segera hadir!`,
     images: JSON.stringify([]),
