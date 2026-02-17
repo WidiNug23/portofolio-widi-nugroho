@@ -342,15 +342,15 @@ export default function Home() {
   <div className="flex-1 text-center md:text-left relative overflow-hidden">
     <h1
       className="text-2xl sm:text-3xl md:text-5xl font-bold font-poppins relative inline-flex items-center overflow-hidden transition-all duration-700"
-      style={{
-        textShadow: isHovered
-          ? theme === "dark"
-            ? "0 0 10px #3b82f6, 0 0 25px #60a5fa"
-            : "0 0 10px #3b82f6, 0 0 25px #60a5fa"
-          : theme === "dark"
-          ? "0 0 3px rgba(59,130,246,0.3)"
-          : "0 0 3px rgba(59,130,246,0.2)",
-      }}
+      // style={{
+      //   textShadow: isHovered
+      //     ? theme === "dark"
+      //       ? "0 0 10px #3b82f6, 0 0 25px #60a5fa"
+      //       : "0 0 10px #3b82f6, 0 0 25px #60a5fa"
+      //     : theme === "dark"
+      //     ? "0 0 3px rgba(59,130,246,0.3)"
+      //     : "0 0 3px rgba(59,130,246,0.2)",
+      // }}
     >
       <span
         className={`inline-block transition-transform duration-700 ease-in-out ${

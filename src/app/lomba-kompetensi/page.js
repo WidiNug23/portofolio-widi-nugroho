@@ -115,13 +115,13 @@ export default function LombaPage() {
       {/* HEADER SECTION */}
       <header className="max-w-4xl mx-auto mb-20 text-center">
         <h1 className={`text-4xl md:text-6xl font-extrabold mb-4 tracking-tight ${isDark ? "neon-glow text-white" : "text-gray-900"}`}>
-          Lomba & Kompetensi
+          Lomba & Kompetisi
         </h1>
         <div className={`h-1.5 w-24 mx-auto rounded-full ${isDark ? 'bg-purple-600 shadow-[0_0_15px_#a855f7]' : 'bg-purple-500'}`}></div>
       </header>
 
       {lomba.length === 0 ? (
-        <div className="flex justify-center p-10 italic opacity-50">Memuat data kompetensi...</div>
+        <div className="flex justify-center p-10 italic opacity-50">Memuat data kompetisi...</div>
       ) : (
         <div className="max-w-6xl mx-auto flex flex-col gap-16">
           {lomba.map((l) => {
