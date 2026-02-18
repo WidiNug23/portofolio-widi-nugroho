@@ -222,7 +222,6 @@ export default function Home() {
                 <span className={`font-bold transition-all duration-500 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
                   terbuka untuk mempelajari berbagai teknologi baru.
                 </span>
-                {" "}Silakan scroll bagian teks ini ke bawah pada layar HP Anda untuk memunculkan nama lengkap saya.
               </p>
             </div>
             
