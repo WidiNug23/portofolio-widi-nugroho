@@ -109,13 +109,13 @@ export default function Home() {
   
   const scrollRef = useRef(null);
 
-  // Logic: Cek apakah scroll di dalam paragraf sudah sampai paling bawah
-  const handleScrollInside = () => {
+  // Fungsi deteksi scroll sampai bawah yang lebih akurat
+  const checkScrollBottom = () => {
     const element = scrollRef.current;
     if (!element) return;
-
-    // Toleransi 5px untuk memastikan sudah sampai bawah
-    const isAtBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + 5;
+    
+    // Perhitungan: tinggi konten vs posisi scroll + tinggi box yang terlihat
+    const isAtBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + 10;
     
     if (isAtBottom) {
       setIsScrollReachedEnd(true);
@@ -128,29 +128,30 @@ export default function Home() {
     const element = scrollRef.current;
     if (!element) return;
 
+    // Tambahkan event listener scroll biasa untuk handle mobile touch scroll
+    element.addEventListener("scroll", checkScrollBottom);
+
+    // Desktop Wheel Handler
     const handleWheel = (e) => {
       const isScrollable = element.scrollHeight > element.clientHeight;
       if (!isScrollable) return;
 
       const isAtBottom = Math.abs(element.scrollHeight - element.scrollTop - element.clientHeight) < 2;
       const isAtTop = element.scrollTop <= 0;
-      const scrollingDown = e.deltaY > 0;
-      const scrollingUp = e.deltaY < 0;
-
-      if (scrollingDown && !isAtBottom) {
+      
+      // Hanya prevent default jika sedang berada di dalam area scrollable dan belum mentok
+      if ((e.deltaY > 0 && !isAtBottom) || (e.deltaY < 0 && !isAtTop)) {
         element.scrollTop += e.deltaY;
         e.preventDefault();
-        handleScrollInside(); // Update state saat wheel
-      }
-      if (scrollingUp && !isAtTop) {
-        element.scrollTop += e.deltaY;
-        e.preventDefault();
-        handleScrollInside(); // Update state saat wheel
       }
     };
 
     window.addEventListener("wheel", handleWheel, { passive: false });
-    return () => window.removeEventListener("wheel", handleWheel);
+    
+    return () => {
+      element.removeEventListener("scroll", checkScrollBottom);
+      window.removeEventListener("wheel", handleWheel);
+    };
   }, []);
 
   useEffect(() => {
@@ -162,7 +163,6 @@ export default function Home() {
     return () => window.removeEventListener("highlightKontak", handler);
   }, []);
 
-  // "SURYO" muncul JIKA (Hover) ATAU (Scroll Paragraf sampai Mentok Bawah)
   const showSuryo = isHovered || isScrollReachedEnd;
 
   return (
@@ -208,12 +208,11 @@ export default function Home() {
               <span className={`transition-all duration-700 ${!showSuryo && "ml-2 md:ml-3"}`}>NUGROHO</span>
             </h1>
 
-            {/* BOX DESKRIPSI DENGAN DETEKSI SCROLL MENTOK */}
+            {/* BOX DESKRIPSI - Menghapus touch-none atau block agar touch alami jalan */}
             <div 
               ref={scrollRef}
-              onScroll={handleScrollInside}
-              className={`relative pr-3 overflow-y-auto custom-scrollbar transition-all duration-500 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
-              style={{ maxHeight: "140px" }} 
+              className={`relative pr-3 overflow-y-auto custom-scrollbar transition-all duration-500 overscroll-contain touch-auto ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
+              style={{ maxHeight: "140px", WebkitOverflowScrolling: "touch" }} 
             >
               <p className="text-base md:text-lg leading-relaxed font-medium">
                 Saya memiliki ketertarikan mendalam terhadap perancangan dan pengembangan sistem berbasis web. Saya senang memahami
@@ -223,6 +222,7 @@ export default function Home() {
                 <span className={`font-bold transition-all duration-500 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
                   terbuka untuk mempelajari berbagai teknologi baru.
                 </span>
+                {" "}Silakan scroll bagian teks ini ke bawah pada layar HP Anda untuk memunculkan nama lengkap saya.
               </p>
             </div>
             
@@ -267,7 +267,7 @@ export default function Home() {
         {/* KONTAK */}
         <section id="kontak" className="w-full max-w-6xl mx-auto text-center px-4">
           <RevealItem delay={0}>
-            <h2 className={`text-3xl md:text-4xl font-extrabold mb-10 font-poppins ${highlightKontak ? "text-blue-500 neon-glow" : ""}`}>MEDIA SOSIAL & KONTAK</h2>
+            <h2 className={`text-3xl md:text-4xl font-extrabold mb-10 font-poppins ${highlightKontak ? "text-blue-500 neon-glow" : ""}`}>Hubungi Saya</h2>
           </RevealItem>
           <div className="flex flex-wrap justify-center gap-6 md:gap-8">
             {[
@@ -289,7 +289,7 @@ export default function Home() {
         {/* TECH STACK */}
         <section className="w-full max-w-6xl mx-auto text-center px-4">
           <RevealItem delay={0}>
-            <h2 className="text-3xl md:text-4xl font-extrabold mb-10 font-poppins">TOOLS</h2>
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-10 font-poppins">Tech Stack</h2>
           </RevealItem>
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
             {[
