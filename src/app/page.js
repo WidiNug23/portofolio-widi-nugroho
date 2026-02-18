@@ -1,18 +1,15 @@
 "use client";
 
 import {
-  FaPhoneAlt,
   FaEnvelope,
   FaInstagram,
   FaLinkedin,
   FaGithub,
   FaWhatsapp,
-  FaSun,
-  FaMoon,
 } from "react-icons/fa";
 import { useState, useEffect, useRef } from "react";
 import React from "react";
-import { useTheme } from "./ThemeContext"; // pastikan path benar
+import { useTheme } from "./ThemeContext"; 
 import Head from "next/head";
 import Link from "next/link";
 import ProjekPage from "./projek/page";
@@ -84,7 +81,6 @@ function RotatingLabelItem({ item, theme }) {
       <div className="flex-shrink-0 w-8 flex justify-center items-center pointer-events-none">
         {item.icon}
       </div>
-
       <div className="relative flex-1 overflow-hidden h-8 pointer-events-none">
         <span
           className={`absolute left-0 text-lg font-semibold whitespace-nowrap ${
@@ -106,12 +102,56 @@ function RotatingLabelItem({ item, theme }) {
 }
 
 export default function Home() {
-  const { theme, toggleTheme } = useTheme();
-  const [expanded, setExpanded] = useState(false);
+  const { theme } = useTheme();
   const [isHovered, setIsHovered] = useState(false);
-  const [closing, setClosing] = useState(false);
-  const [visible, setVisible] = useState(false);
+  const [isScrollReachedEnd, setIsScrollReachedEnd] = useState(false);
   const [highlightKontak, setHighlightKontak] = useState(false);
+  
+  const scrollRef = useRef(null);
+
+  // Logic: Cek apakah scroll di dalam paragraf sudah sampai paling bawah
+  const handleScrollInside = () => {
+    const element = scrollRef.current;
+    if (!element) return;
+
+    // Toleransi 5px untuk memastikan sudah sampai bawah
+    const isAtBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + 5;
+    
+    if (isAtBottom) {
+      setIsScrollReachedEnd(true);
+    } else {
+      setIsScrollReachedEnd(false);
+    }
+  };
+
+  useEffect(() => {
+    const element = scrollRef.current;
+    if (!element) return;
+
+    const handleWheel = (e) => {
+      const isScrollable = element.scrollHeight > element.clientHeight;
+      if (!isScrollable) return;
+
+      const isAtBottom = Math.abs(element.scrollHeight - element.scrollTop - element.clientHeight) < 2;
+      const isAtTop = element.scrollTop <= 0;
+      const scrollingDown = e.deltaY > 0;
+      const scrollingUp = e.deltaY < 0;
+
+      if (scrollingDown && !isAtBottom) {
+        element.scrollTop += e.deltaY;
+        e.preventDefault();
+        handleScrollInside(); // Update state saat wheel
+      }
+      if (scrollingUp && !isAtTop) {
+        element.scrollTop += e.deltaY;
+        e.preventDefault();
+        handleScrollInside(); // Update state saat wheel
+      }
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    return () => window.removeEventListener("wheel", handleWheel);
+  }, []);
 
   useEffect(() => {
     const handler = () => {
@@ -122,235 +162,184 @@ export default function Home() {
     return () => window.removeEventListener("highlightKontak", handler);
   }, []);
 
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    document.body.style.backgroundColor = theme === "dark" ? "#000000" : "#ffffff";
-  }, [theme]);
-
-  useEffect(() => {
-    if (!expanded && closing) {
-      const timeout = setTimeout(() => {
-        setVisible(false);
-        setClosing(false);
-      }, 700);
-      return () => clearTimeout(timeout);
-    }
-  }, [expanded, closing]);
-
-  const handleToggle = () => {
-    if (expanded) {
-      setClosing(true);
-      setExpanded(false);
-    } else {
-      setVisible(true);
-      setExpanded(true);
-    }
-  };
+  // "SURYO" muncul JIKA (Hover) ATAU (Scroll Paragraf sampai Mentok Bawah)
+  const showSuryo = isHovered || isScrollReachedEnd;
 
   return (
     <>
       <Head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap"
-          rel="stylesheet"
-        />
+        <title>Portofolio - Widi Suryo Nugroho</title>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&display=swap" rel="stylesheet" />
       </Head>
 
       <main
-        className="min-h-screen flex flex-col items-center py-16 px-4 gap-16 font-sans transition-colors duration-500 overflow-x-hidden"
-        style={{
-          backgroundColor: "var(--background)",
-          color: "var(--foreground)",
+        className="min-h-screen flex flex-col items-center py-12 md:py-20 px-4 gap-16 md:gap-24 font-sans transition-colors duration-500 overflow-x-hidden"
+        style={{ 
+          backgroundColor: theme === "dark" ? "#000" : "#fff", 
+          color: theme === "dark" ? "#fff" : "#000" 
         }}
       >
         {/* CARD UTAMA */}
         <div
-          className={`rounded-xl p-8 max-w-4xl w-full mx-auto flex flex-col md:flex-row items-center gap-6 transition-all duration-500 relative z-10
-            ${theme === "dark" ? "bg-gray-800 text-white shadow-lg" : "bg-white text-black shadow-md"}`}
+          className={`rounded-[2rem] p-8 md:p-12 max-w-5xl w-full mx-auto flex flex-col md:flex-row items-center gap-8 md:gap-12 transition-all duration-700 relative z-10
+            ${theme === "dark" ? "bg-gray-900/40 border border-gray-800 shadow-xl" : "bg-white border border-gray-100 shadow-2xl"}`}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          <img
-            src="/profile.png"
-            alt="Widi Nugroho"
-            className={`w-36 h-36 sm:w-40 sm:h-40 rounded-full object-cover shadow-md transition-transform duration-500 ${
-              isHovered ? "scale-110" : "scale-100"
-            }`}
-          />
-          <div className="flex-1 text-center md:text-left relative overflow-hidden">
-            <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold font-poppins relative inline-flex items-center overflow-hidden transition-all duration-700">
-              <span className={`inline-block transition-transform duration-700 ease-in-out ${isHovered ? "translate-x-0" : "translate-x-10 sm:translate-x-14 md:translate-x-16"}`}>WIDI</span>
-              <span className={`inline-block text-blue-400 transition-all duration-700 ease-in-out mx-1 sm:mx-2 ${isHovered ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-3 sm:-translate-x-4"}`}>SURYO</span>
-              <span className={`inline-block transition-transform duration-700 ease-in-out ${isHovered ? "translate-x-0" : "-translate-x-12 sm:-translate-x-20 md:-translate-x-24"}`}>NUGROHO</span>
+          {/* Foto Profil */}
+          <div className="relative group flex-shrink-0">
+            <div className={`absolute -inset-1 rounded-full blur-lg transition-all duration-700 ${showSuryo ? "bg-blue-500 opacity-30 scale-105" : "bg-transparent opacity-0"}`}></div>
+            <img
+              src="/profile.png"
+              alt="Widi Nugroho"
+              className={`relative w-40 h-40 md:w-52 md:h-52 rounded-full object-cover shadow-xl transition-all duration-700 ${
+                showSuryo ? "scale-105" : "scale-100"
+              }`}
+            />
+          </div>
+
+          {/* Konten Teks */}
+          <div className="flex-1 text-center md:text-left w-full overflow-hidden">
+            <h1 className="text-3xl md:text-5xl font-extrabold font-poppins mb-4 tracking-tight flex flex-wrap justify-center md:justify-start items-center">
+              <span>WIDI</span>
+              <span className={`transition-all duration-1000 ease-in-out overflow-hidden flex items-center ${showSuryo ? "max-w-[300px] opacity-100 mx-2 md:mx-3" : "max-w-0 opacity-0 mx-0"}`}>
+                <span className="text-blue-500">SURYO</span>
+              </span>
+              <span className={`transition-all duration-700 ${!showSuryo && "ml-2 md:ml-3"}`}>NUGROHO</span>
             </h1>
 
-            <p
-              className={`mt-4 text-base sm:text-lg md:text-xl leading-relaxed overflow-hidden transition-all duration-700 ease-in-out ${theme === "dark" ? "text-white/80" : "text-black/70"}`}
-              style={{
-                maxHeight: expanded ? "1000px" : "70px",
-                opacity: expanded ? 1 : 0.9,
-                transform: expanded ? "translateY(0)" : "translateY(-5px)",
-              }}
+            {/* BOX DESKRIPSI DENGAN DETEKSI SCROLL MENTOK */}
+            <div 
+              ref={scrollRef}
+              onScroll={handleScrollInside}
+              className={`relative pr-3 overflow-y-auto custom-scrollbar transition-all duration-500 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
+              style={{ maxHeight: "140px" }} 
             >
-              {expanded || closing ? (
-                <>
-                  Saya memiliki ketertarikan mendalam terhadap perancangan dan pengembangan sistem berbasis web. Saya senang memahami
-                  bagaimana sebuah website bekerja mulai dari alur sistem, segmentasi pengguna, perancangan layout dan warna, hingga
-                  pengalaman interaksi pengguna. Dalam pengembangan, saya sering menggunakan React.js untuk frontend dan CodeIgniter 4 untuk
-                  backend. Saya menikmati proses menerjemahkan kebutuhan pengguna menjadi sistem yang fungsional dan efisien. Selain kemampuan
-                  teknis, saya juga memiliki kepekaan visual dari pengalaman di bidang fotografi dan videografi. Saya dapat bekerja baik secara individu maupun dalam tim, serta{" "}
-                  <span className={`font-semibold transition-all duration-500 ${theme === "dark" ? "text-yellow-400" : "text-blue-600"}`}>
-                    terbuka untuk mempelajari berbagai tools dan teknologi baru
-                  </span>{" "}
-                  yang relevan dengan perkembangan digital.
-                </>
-              ) : (
-                <>Saya memiliki ketertarikan mendalam terhadap perancangan dan pengembangan sistem berbasis web. Saya senang memahami ...</>
-              )}
-            </p>
-
-            <button
-              onClick={handleToggle}
-              className="mt-2 font-semibold hover:underline cursor-pointer py-2 touch-manipulation"
-              style={{
-                fontFamily: "Poppins, sans-serif",
-                color: theme === "dark" ? "#3b82f6" : "#1e40af",
-              }}
-            >
-              {expanded ? "Tampilkan Lebih Sedikit" : "Selengkapnya ..."}
-            </button>
+              <p className="text-base md:text-lg leading-relaxed font-medium">
+                Saya memiliki ketertarikan mendalam terhadap perancangan dan pengembangan sistem berbasis web. Saya senang memahami
+                bagaimana sebuah website bekerja mulai dari alur sistem hingga pengalaman interaksi pengguna. Dalam pengembangan, saya sering menggunakan React.js untuk frontend dan CodeIgniter 4 untuk
+                backend. Saya menikmati proses menerjemahkan kebutuhan pengguna menjadi sistem yang fungsional dan efisien. Selain kemampuan
+                teknis, saya memiliki kepekaan visual dari pengalaman di bidang fotografi dan videografi. Saya dapat bekerja baik secara individu maupun dalam tim, serta{" "}
+                <span className={`font-bold transition-all duration-500 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
+                  terbuka untuk mempelajari berbagai teknologi baru.
+                </span>
+              </p>
+            </div>
+            
+            <div className={`mt-5 h-1 bg-blue-500 rounded-full transition-all duration-1000 ${showSuryo ? "w-full opacity-100" : "w-16 opacity-50"}`}></div>
           </div>
         </div>
 
         {/* PORTOFOLIO */}
-        <section className="w-full max-w-4xl mx-auto text-center">
+        <section className="w-full max-w-6xl mx-auto text-center px-4">
           <RevealItem delay={0}>
-            <h2 className={`text-3xl md:text-4xl font-bold mb-6 ${theme === "dark" ? "text-white" : "text-black"}`} style={{ fontFamily: "Poppins, sans-serif" }}>Portofolio</h2>
+            <h2 className="text-3xl md:text-5xl font-extrabold mb-10 font-poppins">Portofolio</h2>
           </RevealItem>
-
-          <div className="flex flex-wrap justify-center gap-6 font-poppins">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {[
               { href: "/#projek", title: "Projek", desc: "Kumpulan projek web & konten video", color: "#3b82f6" },
-              { href: "/#sertifikat", title: "Sertifikat", desc: " Kumpulan Sertifikasi yang telah didapatkan", color: "#22c55e" },
-              { href: "/#lomba", title: "Lomba & Kompetensi", desc: "Prestasi & perlombaan yang diikuti", color: "#a855f7" },
-              { href: "/#organisasi", title: "Pengalaman & Organisasi", desc: "Daftar pengalaman yang pernah dijalani", color: "#eab308" },
-              { href: "/#pendidikan", title: "Pendidikan", desc: "Daftar pendidikan yang ditempuh", color: "#f50bbbff" },
-              { href: "https://drive.google.com/file/d/1sW7Bt4YlodMoGm5FnBj6WFdbw0h94T7W/view?usp=sharing", title: "Curriculum Vitae", desc: "Lihat dan unduh CV", color: "#3b82f6" },
-            ].map((item, index) => {
-              const isExternal = item.href.startsWith("http");
-              const isInternalScroll = item.href.startsWith("/#");
-              return (
-                <RevealItem key={item.title} delay={150 * (index + 1)}>
-                  <Link
-                    href={item.href}
-                    target={isExternal ? "_blank" : undefined}
-                    onClick={(e) => {
-                      if (isInternalScroll) {
-                        e.preventDefault();
-                        const id = item.href.replace("/#", "");
-                        const section = document.getElementById(id);
-                        if (section) section.scrollIntoView({ behavior: "smooth" });
-                      }
-                    }}
-                    className={`flex flex-col items-center justify-center px-6 py-4 w-[300px] rounded-2xl transition-all duration-300 transform md:hover:scale-105 active:scale-95 cursor-pointer touch-manipulation ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}
-                    style={{ boxShadow: `0 0 12px ${item.color}` }}
-                  >
-                    <span className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-black"}`}>{item.title}</span>
-                    <span className={`text-sm mt-1 text-center ${theme === "dark" ? "text-white/80" : "text-black/70"}`}>{item.desc}</span>
-                  </Link>
-                </RevealItem>
-              );
-            })}
+              { href: "/#sertifikat", title: "Sertifikat", desc: "Kumpulan Sertifikasi profesional", color: "#22c55e" },
+              { href: "/#lomba", title: "Lomba & Kompetensi", desc: "Prestasi & perlombaan", color: "#a855f7" },
+              { href: "/#organisasi", title: "Pengalaman & Organisasi", desc: "Daftar pengalaman organisasi", color: "#eab308" },
+              { href: "/#pendidikan", title: "Pendidikan", desc: "Daftar pendidikan resmi", color: "#f50bbb" },
+              { href: "https://drive.google.com/file/d/1sW7Bt4YlodMoGm5FnBj6WFdbw0h94T7W/view?usp=sharing", title: "Curriculum Vitae", desc: "Unduh CV terbaru saya", color: "#ef4444" },
+            ].map((item, index) => (
+              <RevealItem key={item.title} delay={100 * (index + 1)}>
+                <Link
+                  href={item.href}
+                  onClick={(e) => {
+                    if (item.href.startsWith("/#")) {
+                      e.preventDefault();
+                      document.getElementById(item.href.replace("/#", ""))?.scrollIntoView({ behavior: "smooth" });
+                    }
+                  }}
+                  className={`group flex flex-col items-center justify-center p-8 h-full rounded-[1.5rem] transition-all duration-300 border border-transparent md:hover:border-current active:scale-95 ${theme === "dark" ? "bg-gray-800/40" : "bg-white shadow-lg"}`}
+                  style={{ boxShadow: `0 8px 30px -12px ${item.color}44`, color: item.color }}
+                >
+                  <span className={`text-xl font-bold mb-2 ${theme === "dark" ? "text-white" : "text-black"}`}>{item.title}</span>
+                  <span className="text-sm opacity-70 text-center">{item.desc}</span>
+                </Link>
+              </RevealItem>
+            ))}
           </div>
         </section>
 
         {/* KONTAK */}
-        <section id="kontak" className="w-full max-w-4xl mx-auto text-center mt-10">
+        <section id="kontak" className="w-full max-w-6xl mx-auto text-center px-4">
           <RevealItem delay={0}>
-            <h2 className={`text-3xl md:text-4xl font-bold mb-6 transition-all duration-500 ${theme === "dark" ? "text-white" : "text-black"} ${highlightKontak ? "text-[#3b82f6] neon-glow" : ""}`} style={{ fontFamily: "Poppins, sans-serif" }}>Kontak & Media Sosial</h2>
+            <h2 className={`text-3xl md:text-4xl font-extrabold mb-10 font-poppins ${highlightKontak ? "text-blue-500 neon-glow" : ""}`}>MEDIA SOSIAL & KONTAK</h2>
           </RevealItem>
-
-          <div className="flex flex-wrap justify-center gap-9 font-poppins">
+          <div className="flex flex-wrap justify-center gap-6 md:gap-8">
             {[
-              { href: "https://github.com/WidiNug23", icon: <FaGithub className="text-2xl" style={{ color: theme === "light" ? "#111" : "#fff" }} />, labels: ["Explore code", "Github"], color: theme === "dark" ? "#fff" : "#111" },
-              { href: "mailto:collabswithwidi@gmail.com", icon: <FaEnvelope className="text-[#EA4335] text-2xl" />, labels: ["Send mail", "Gmail"], color: "#EA4335" },
-              { href: "https://www.instagram.com/widingr23", icon: <FaInstagram className="text-pink-400 text-2xl" />, labels: ["Follow me", "Instagram"], color: "#ec4899" },
-              { href: "https://www.linkedin.com/in/widi-suryo-nugroho-a607632a2/", icon: <FaLinkedin className="text-blue-300 text-2xl" />, labels: ["Let's connect", "LinkedIn"], color: "#93c5fd" },
-              { href: "https://wa.me/6285727609498", icon: <FaWhatsapp className="text-[#25D366] text-2xl" />, labels: ["Let's chat", "WhatsApp"], color: "#25D366" },
-              { href: "https://www.shutterstock.com/g/widinugroho23?rid=360011507", icon: <SiShutterstock className="text-red-600 text-2xl" />, labels: ["View portfolio", "Shutterstock"], color: "#FF3A00" },
-              { href: "https://lynk.id/widinugroho23", icon: <FiLink className="text-purple-600 text-2xl" />, labels: ["Visit my Lynk", "Lynk"], color: "#14b8a6" },
+              { href: "https://github.com/WidiNug23", icon: <FaGithub className="text-2xl" />, labels: ["Github", "WidiNug23"], color: "#6e7681" },
+              { href: "mailto:collabswithwidi@gmail.com", icon: <FaEnvelope className="text-2xl" />, labels: ["Email", "Gmail"], color: "#EA4335" },
+              { href: "https://www.instagram.com/widingr23", icon: <FaInstagram className="text-2xl" />, labels: ["Follow", "Instagram"], color: "#ec4899" },
+              { href: "https://www.linkedin.com/in/widi-suryo-nugroho-a607632a2/", icon: <FaLinkedin className="text-2xl" />, labels: ["Connect", "LinkedIn"], color: "#0077b5" },
+              { href: "https://wa.me/6285727609498", icon: <FaWhatsapp className="text-2xl" />, labels: ["Chat", "WhatsApp"], color: "#25D366" },
+              { href: "https://www.shutterstock.com/g/widinugroho23?rid=360011507", icon: <SiShutterstock className="text-2xl" />, labels: ["Assets", "Shutterstock"], color: "#FF3A00" },
+              { href: "https://lynk.id/widinugroho23", icon: <FiLink className="text-2xl" />, labels: ["Links", "Lynk"], color: "#14b8a6" },
             ].map((item, index) => (
-              <RevealItem key={index} delay={150 * (index + 1)}>
+              <RevealItem key={index} delay={100 * (index + 1)}>
                 <RotatingLabelItem item={item} theme={theme} />
               </RevealItem>
             ))}
           </div>
         </section>
 
-        {/* TOOLS - LENGKAP 20 TOOLS */}
-        <section className="w-full max-w-4xl mx-auto text-center mt-8">
+        {/* TECH STACK */}
+        <section className="w-full max-w-6xl mx-auto text-center px-4">
           <RevealItem delay={0}>
-            <h2 className={`text-3xl md:text-4xl font-bold mb-6 ${theme === "dark" ? "text-white" : "text-black"}`} style={{ fontFamily: "Poppins, sans-serif" }}>Tools</h2>
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-10 font-poppins">TOOLS</h2>
           </RevealItem>
-
-          <div className="flex flex-wrap justify-center gap-6 font-poppins">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
             {[
-              { name: "Canon M50", shadow: "#3b82f6", logo: "https://image.similarpng.com/file/similarpng/original-picture/2020/06/Logo-canon-transparent-PNG.png" },
-              { name: "CapCut", shadow: theme === "dark" ? "#fff" : "#111", logo: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/capcut-icon.png" },
-              { name: "Canva", shadow: "#187cf6", logo: "https://freelogopng.com/images/all_img/1656733807canva-icon-png.png" },
-              { name: "Lightroom", shadow: "#187cf6", logo: "https://logo.svgcdn.com/logos/adobe-lightroom.png" },
-              { name: "Visual Studio Code", shadow: "#60a5fa", logo: "https://logo.svgcdn.com/logos/visual-studio-code.png" },
-              { name: "HTML", shadow: "#f59e0b", logo: "https://icones.pro/wp-content/uploads/2021/05/icone-html-orange.png" },
-              { name: "CSS", shadow: "#3b82f6", logo: "https://upload.wikimedia.org/wikipedia/commons/d/d5/CSS3_logo_and_wordmark.svg" },
-              { name: "JavaScript", shadow: "#facc15", logo: "https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" },
-              { name: "Python", shadow: "#3b82f6", logo: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" },
-              { name: "PHP", shadow: "#6e41aa", logo: "https://upload.wikimedia.org/wikipedia/commons/2/27/PHP-logo.svg" },
-              { name: "XAMPP", shadow: "#DD4814", logo: "https://logo.svgcdn.com/logos/xampp.png" },
-              { name: "React JS", shadow: "#61dafb", logo: "https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" },
-              { name: "CodeIgniter", shadow: "#DD4814", logo: "https://cdn.iconscout.com/icon/free/png-256/free-codeigniter-logo-icon-svg-download-png-1579761.png?f=webp" },
-              { name: "Laravel", shadow: "#DD4814", logo: "https://logo.svgcdn.com/logos/laravel.png" },
-              { name: "MySQL", shadow: "#2ac3edff", logo: "https://images.icon-icons.com/2699/PNG/512/mysql_logo_icon_169940.png" },
-              { name: "Next JS", shadow: theme === "dark" ? "#fff" : "#111", logo: "https://logo.svgcdn.com/devicon/nextjs-original.png" },
-              { name: "Golang", shadow: "#00ADD8", logo: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/go-programming-language-icon.png" },
-              { name: "Microsoft", shadow: "#facc15", logo: "https://w7.pngwing.com/pngs/719/781/png-transparent-windows-logo-microsoft-windows-scalable-graphics-logo-computer-file-microsoft-logo-icon-angle-text-rectangle.png" },
-              { name: "Android", shadow: "#2bd800ff", logo: "https://www.freepnglogos.com/uploads/android-logo-png/android-logo-powerful-mobile-apps-for-those-with-disabilities-3.png" },
-              { name: "Tools lain segera hadir", shadow:"#ffe600ff", logo: "https://cdn.pixabay.com/photo/2024/01/17/20/03/cartoon-8515557_960_720.png" },
+              { name: "Canon M50", logo: "https://image.similarpng.com/file/similarpng/original-picture/2020/06/Logo-canon-transparent-PNG.png" },
+              { name: "CapCut", logo: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/capcut-icon.png" },
+              { name: "Canva", logo: "https://freelogopng.com/images/all_img/1656733807canva-icon-png.png" },
+              { name: "Lightroom", logo: "https://logo.svgcdn.com/logos/adobe-lightroom.png" },
+              { name: "VS Code", logo: "https://logo.svgcdn.com/logos/visual-studio-code.png" },
+              { name: "HTML", logo: "https://icones.pro/wp-content/uploads/2021/05/icone-html-orange.png" },
+              { name: "CSS", logo: "https://upload.wikimedia.org/wikipedia/commons/d/d5/CSS3_logo_and_wordmark.svg" },
+              { name: "JavaScript", logo: "https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" },
+              { name: "Python", logo: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" },
+              { name: "PHP", logo: "https://upload.wikimedia.org/wikipedia/commons/2/27/PHP-logo.svg" },
+              { name: "XAMPP", logo: "https://logo.svgcdn.com/logos/xampp.png" },
+              { name: "React JS", logo: "https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" },
+              { name: "CodeIgniter", logo: "https://cdn.iconscout.com/icon/free/png-256/free-codeigniter-logo-icon-svg-download-png-1579761.png?f=webp" },
+              { name: "Laravel", logo: "https://logo.svgcdn.com/logos/laravel.png" },
+              { name: "MySQL", logo: "https://images.icon-icons.com/2699/PNG/512/mysql_logo_icon_169940.png" },
+              { name: "Next JS", logo: "https://logo.svgcdn.com/devicon/nextjs-original.png" },
+              { name: "Golang", logo: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/go-programming-language-icon.png" },
+              { name: "Microsoft", logo: "https://w7.pngwing.com/pngs/719/781/png-transparent-windows-logo-microsoft-windows-scalable-graphics-logo-computer-file-microsoft-logo-icon-angle-text-rectangle.png" },
+              { name: "Android", logo: "https://www.freepnglogos.com/uploads/android-logo-png/android-logo-powerful-mobile-apps-for-those-with-disabilities-3.png" },
+              { name: "Lainnya", logo: "https://cdn.pixabay.com/photo/2024/01/17/20/03/cartoon-8515557_960_720.png" },
             ].map((tool, index) => (
-              <RevealItem key={tool.name} delay={150 * (index + 1)}>
+              <RevealItem key={tool.name} delay={50 * index}>
                 <div
-                  className={`flex items-center gap-3 px-6 py-4 rounded-2xl transition-all duration-300 transform md:hover:scale-105 active:scale-95 cursor-pointer touch-manipulation ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}
-                  style={{ boxShadow: `0 0 12px ${tool.shadow}` }}
+                  className={`group flex flex-col items-center gap-3 p-5 rounded-2xl transition-all duration-300 border ${theme === "dark" ? "bg-gray-800/20 border-gray-700 md:hover:bg-gray-800" : "bg-gray-50 border-gray-100 md:hover:bg-white md:hover:shadow-lg"}`}
                 >
-                  <img src={tool.logo} alt={tool.name} className="w-8 h-8 object-contain" style={{ filter: tool.name === "Next JS" && theme === "light" ? "invert(1)" : "none" }} />
-                  <span className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-black"}`}>{tool.name}</span>
+                  <img src={tool.logo} alt={tool.name} className="w-10 h-10 object-contain transition-transform duration-300 group-hover:scale-110" />
+                  <span className="text-xs font-bold opacity-60 group-hover:opacity-100">{tool.name}</span>
                 </div>
               </RevealItem>
             ))}
           </div>
         </section>
 
-        {/* SUB-PAGES */}
-        <section id="projek" className="w-full"><div className="w-full max-w-7xl mx-auto px-1"><ProjekPage /></div></section>
-        <section id="sertifikat" className="w-full"><div className="w-full max-w-7xl mx-auto px-1"><SertifikatPage /></div></section>
-        <section id="lomba" className="w-full"><div className="w-full max-w-7xl mx-auto px-1"><LombaPage /></div></section>
-        <section id="organisasi" className="w-full"><div className="w-full max-w-7xl mx-auto px-1"><OrganisasiPage /></div></section>
-        <section id="pendidikan" className="w-full"><div className="w-full max-w-7xl mx-auto px-1"><PendidikanPage /></div></section>
-
+        <section id="projek" className="w-full"><ProjekPage /></section>
+        <section id="sertifikat" className="w-full"><SertifikatPage /></section>
+        <section id="lomba" className="w-full"><LombaPage /></section>
+        <section id="organisasi" className="w-full"><OrganisasiPage /></section>
+        <section id="pendidikan" className="w-full"><PendidikanPage /></section>
       </main>
 
-      {/* SEMUA GAYA CSS DIGABUNG DISINI (GLOBAL & SCOPED) */}
       <style jsx global>{`
-        html { 
-          scroll-behavior: smooth; 
-          -webkit-tap-highlight-color: transparent; 
-        }
-        .neon-glow {
-          text-shadow: 0 0 8px #3b82f6, 0 0 16px #60a5fa, 0 0 24px #93c5fd, 0 0 32px #3b82f6;
-          transition: all 0.3s ease-in-out;
-        }
-        body {
-          touch-action: manipulation;
-        }
+        html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+        body { touch-action: pan-x pan-y; }
+        .neon-glow { text-shadow: 0 0 15px rgba(59, 130, 246, 0.6); }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
       `}</style>
     </>
   );
