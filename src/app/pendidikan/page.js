@@ -2,6 +2,35 @@
 import { useState, useEffect } from "react";
 import { useTheme } from "../ThemeContext";
 
+// Komponen Jarum Jam Berputar
+const SpinningClock = () => (
+  <div className="flex flex-col items-center justify-center py-10 gap-4 w-full bg-pink-500/5 rounded-2xl border border-dashed border-pink-500/20 my-4">
+    <div className="relative w-14 h-14">
+      <svg 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        strokeWidth="1.5" 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        className="text-pink-500 drop-shadow-[0_0_8px_rgba(245,11,187,0.5)]"
+      >
+        <circle cx="12" cy="12" r="10" />
+        {/* Jarum Jam */}
+        <polyline points="12 6 12 12" className="origin-center animate-[spin_6s_linear_infinite]" />
+        {/* Jarum Menit */}
+        <polyline points="12 12 16 14" className="origin-center animate-[spin_2s_linear_infinite]" />
+      </svg>
+    </div>
+    <div className="text-center">
+      <p className="text-pink-500/60 text-[10px] font-black uppercase tracking-[0.3em] animate-pulse">
+        Future Education
+      </p>
+      <p className="text-[9px] mt-1 text-gray-500 italic">Stay tuned for the next milestone</p>
+    </div>
+  </div>
+);
+
 export default function PendidikanPage() {
   const { theme } = useTheme();
 
@@ -30,7 +59,7 @@ export default function PendidikanPage() {
     },
     {
       id: 3,
-      nama: "[COMING SOON]",
+      nama: "[COMING SOON]", // Tetap di data sebagai identifier, tapi dihilangkan di UI
       logo: null,
     },
   ]);
@@ -96,6 +125,7 @@ export default function PendidikanPage() {
             const textToShow = isExpanded ? p.deskripsi : p.deskripsi?.length > 150 ? p.deskripsi.substring(0, 150) + "..." : p.deskripsi;
             const fileUrl = normalizeFileUrl(p.file_path);
             const type = getFileType(p.file_path);
+            const isComingSoon = p.nama === "[COMING SOON]";
 
             return (
               <div key={p.id} className="pendidikan-card opacity-0 translate-y-10 transition-all duration-1000 relative sm:pl-16 group">
@@ -106,64 +136,69 @@ export default function PendidikanPage() {
                 <div className="neon-border rounded-3xl p-[1px] overflow-hidden relative">
                   <div className={`relative rounded-[23px] p-6 md:p-8 flex flex-col lg:flex-row gap-8 transition-all duration-500 overflow-hidden ${theme === "dark" ? "bg-gray-900/40 backdrop-blur-md group-hover:bg-gray-900/60" : "bg-white shadow-sm border border-gray-100 group-hover:shadow-xl"}`}>
                     
-                    {/* LOGO INSTANSI WATERMARK (WARNA ASLI) */}
-                    {p.logo && (
+                    {/* LOGO INSTANSI WATERMARK */}
+                    {!isComingSoon && p.logo && (
                       <div className="absolute right-[-30px] top-1/2 -translate-y-1/2 pointer-events-none z-0 opacity-15 transition-all duration-500 group-hover:opacity-30 group-hover:scale-110">
                         <img 
                           src={p.logo} 
                           alt="" 
                           className="h-60 w-60 md:h-50 md:w-90 object-contain"
-                          /* Tidak menggunakan filter grayscale/invert agar warna asli muncul */
                         />
                       </div>
                     )}
 
-                    {/* Content Layer (z-index 10 agar di atas logo) */}
+                    {/* Content Layer */}
                     <div className="flex-1 relative z-10">
-                      <div className="flex flex-wrap items-center gap-3 mb-6">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase ${theme === 'dark' ? 'bg-pink-600/20 text-pink-400' : 'bg-pink-100 text-pink-600'}`}>
-                          {p.tahun_masuk || "TBA"} — {p.tahun_lulus || "TBA"}
-                        </span>
-                        {p.nilai && (
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold border ${theme === 'dark' ? 'border-yellow-500/50 text-yellow-500' : 'border-yellow-600 text-yellow-700'}`}>
-                            Nilai/IPK: {p.nilai}
-                          </span>
-                        )}
-                      </div>
+                      {isComingSoon ? (
+                        <SpinningClock />
+                      ) : (
+                        <>
+                          <div className="flex flex-wrap items-center gap-3 mb-6">
+                            <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase ${theme === 'dark' ? 'bg-pink-600/20 text-pink-400' : 'bg-pink-100 text-pink-600'}`}>
+                              {p.tahun_masuk || "TBA"} — {p.tahun_lulus || "TBA"}
+                            </span>
+                            {p.nilai && (
+                              <span className={`px-3 py-1 rounded-full text-xs font-bold border ${theme === 'dark' ? 'border-yellow-500/50 text-yellow-500' : 'border-yellow-600 text-yellow-700'}`}>
+                                Nilai/IPK: {p.nilai}
+                              </span>
+                            )}
+                          </div>
 
-                      <h2 className={`text-2xl md:text-3xl font-bold mb-2 tracking-tight ${theme === "dark" ? "text-white group-hover:text-pink-400" : "text-gray-900"} transition-colors`}>
-                        {p.nama}
-                      </h2>
-                      
-                      <p className={`text-lg font-medium mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                        {p.jurusan || "Jurusan belum ditentukan"}
-                      </p>
-
-                      {p.deskripsi && (
-                        <div className="mb-6 max-w-2xl">
-                          <p className={`leading-relaxed text-sm md:text-base ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                            {textToShow}
+                          <h2 className={`text-2xl md:text-3xl font-bold mb-2 tracking-tight ${theme === "dark" ? "text-white group-hover:text-pink-400" : "text-gray-900"} transition-colors`}>
+                            {p.nama}
+                          </h2>
+                          
+                          <p className={`text-lg font-medium mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                            {p.jurusan || "Jurusan belum ditentukan"}
                           </p>
-                          {p.deskripsi.length > 150 && (
-                            <button
-                              onClick={() => toggleExpand(p.id)}
-                              className={`mt-2 text-xs font-bold uppercase tracking-widest hover:underline ${theme === "dark" ? "text-pink-500" : "text-pink-600"}`}
-                            >
-                              {isExpanded ? "Sembunyikan" : "Selengkapnya"}
-                            </button>
-                          )}
-                        </div>
-                      )}
 
-                      {fileUrl && type === "pdf" && (
-                        <a href={fileUrl} target="_blank" rel="noreferrer" className={`inline-flex items-center gap-2 font-bold px-6 py-3 rounded-xl transition-all ${theme === "dark" ? "bg-pink-600 text-white hover:bg-pink-500" : "bg-pink-500 text-white hover:bg-pink-600 shadow-lg"}`}>
-                          <span>📄</span> Lihat Sertifikat / Ijazah
-                        </a>
+                          {p.deskripsi && (
+                            <div className="mb-6 max-w-2xl">
+                              <p className={`leading-relaxed text-sm md:text-base ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                                {textToShow}
+                              </p>
+                              {p.deskripsi.length > 150 && (
+                                <button
+                                  onClick={() => toggleExpand(p.id)}
+                                  className={`mt-2 text-xs font-bold uppercase tracking-widest hover:underline ${theme === "dark" ? "text-pink-500" : "text-pink-600"}`}
+                                >
+                                  {isExpanded ? "Sembunyikan" : "Selengkapnya"}
+                                </button>
+                              )}
+                            </div>
+                          )}
+
+                          {fileUrl && type === "pdf" && (
+                            <a href={fileUrl} target="_blank" rel="noreferrer" className={`inline-flex items-center gap-2 font-bold px-6 py-3 rounded-xl transition-all ${theme === "dark" ? "bg-pink-600 text-white hover:bg-pink-500" : "bg-pink-500 text-white hover:bg-pink-600 shadow-lg"}`}>
+                              <span>📄</span> Lihat Sertifikat / Ijazah
+                            </a>
+                          )}
+                        </>
                       )}
                     </div>
 
-                    {/* Right Content (Preview File jika ada) */}
-                    {fileUrl && type && (
+                    {/* Right Content */}
+                    {!isComingSoon && fileUrl && type && (
                       <div className={`relative z-10 w-full lg:w-72 rounded-2xl overflow-hidden border transition-all ${theme === 'dark' ? 'border-gray-800' : 'border-gray-200'}`}>
                         {type === "pdf" ? (
                           <object data={fileUrl} type="application/pdf" width="100%" height="200px" className="bg-transparent" />
@@ -197,6 +232,11 @@ export default function PendidikanPage() {
           z-index: -1; opacity: 0; transition: opacity 0.5s;
         }
         .pendidikan-card:hover .neon-border::before { opacity: 0.3; }
+        
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
       `}</style>
     </main>
   );

@@ -20,6 +20,26 @@ import PendidikanPage from "./pendidikan/page";
 import { SiShutterstock } from "react-icons/si";
 import { FiLink } from "react-icons/fi";
 
+// Komponen Custom Jam dengan Jarum Berputar
+const SpinningClockIcon = () => (
+  <svg 
+    width="40" 
+    height="40" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className="text-blue-500"
+  >
+    {/* Bingkai Jam (Diam) */}
+    <circle cx="12" cy="12" r="10" />
+    <polyline points="12 6 12 12" className="origin-center animate-[spin_2s_linear_infinite]" />
+    <polyline points="12 12 16 14" className="origin-center animate-[spin_12s_linear_infinite]" />
+  </svg>
+);
+
 function RevealItem({ children, delay = 0 }) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
@@ -109,14 +129,10 @@ export default function Home() {
   
   const scrollRef = useRef(null);
 
-  // Fungsi deteksi scroll sampai bawah yang lebih akurat
   const checkScrollBottom = () => {
     const element = scrollRef.current;
     if (!element) return;
-    
-    // Perhitungan: tinggi konten vs posisi scroll + tinggi box yang terlihat
     const isAtBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + 10;
-    
     if (isAtBottom) {
       setIsScrollReachedEnd(true);
     } else {
@@ -127,27 +143,18 @@ export default function Home() {
   useEffect(() => {
     const element = scrollRef.current;
     if (!element) return;
-
-    // Tambahkan event listener scroll biasa untuk handle mobile touch scroll
     element.addEventListener("scroll", checkScrollBottom);
-
-    // Desktop Wheel Handler
     const handleWheel = (e) => {
       const isScrollable = element.scrollHeight > element.clientHeight;
       if (!isScrollable) return;
-
       const isAtBottom = Math.abs(element.scrollHeight - element.scrollTop - element.clientHeight) < 2;
       const isAtTop = element.scrollTop <= 0;
-      
-      // Hanya prevent default jika sedang berada di dalam area scrollable dan belum mentok
       if ((e.deltaY > 0 && !isAtBottom) || (e.deltaY < 0 && !isAtTop)) {
         element.scrollTop += e.deltaY;
         e.preventDefault();
       }
     };
-
     window.addEventListener("wheel", handleWheel, { passive: false });
-    
     return () => {
       element.removeEventListener("scroll", checkScrollBottom);
       window.removeEventListener("wheel", handleWheel);
@@ -198,7 +205,6 @@ export default function Home() {
             />
           </div>
 
-          {/* Konten Teks */}
           <div className="flex-1 text-center md:text-left w-full overflow-hidden">
             <h1 className="text-3xl md:text-5xl font-extrabold font-poppins mb-4 tracking-tight flex flex-wrap justify-center md:justify-start items-center">
               <span>WIDI</span>
@@ -208,7 +214,6 @@ export default function Home() {
               <span className={`transition-all duration-700 ${!showSuryo && "ml-2 md:ml-3"}`}>NUGROHO</span>
             </h1>
 
-            {/* BOX DESKRIPSI - Menghapus touch-none atau block agar touch alami jalan */}
             <div 
               ref={scrollRef}
               className={`relative pr-3 overflow-y-auto custom-scrollbar transition-all duration-500 overscroll-contain touch-auto ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
@@ -246,12 +251,6 @@ export default function Home() {
               <RevealItem key={item.title} delay={100 * (index + 1)}>
                 <Link
                   href={item.href}
-                  onClick={(e) => {
-                    if (item.href.startsWith("/#")) {
-                      e.preventDefault();
-                      document.getElementById(item.href.replace("/#", ""))?.scrollIntoView({ behavior: "smooth" });
-                    }
-                  }}
                   className={`group flex flex-col items-center justify-center p-8 h-full rounded-[1.5rem] transition-all duration-300 border border-transparent md:hover:border-current active:scale-95 ${theme === "dark" ? "bg-gray-800/40" : "bg-white shadow-lg"}`}
                   style={{ boxShadow: `0 8px 30px -12px ${item.color}44`, color: item.color }}
                 >
@@ -288,7 +287,7 @@ export default function Home() {
         {/* TECH STACK */}
         <section className="w-full max-w-6xl mx-auto text-center px-4">
           <RevealItem delay={0}>
-            <h2 className="text-3xl md:text-4xl font-extrabold mb-10 font-poppins">Tech Stack</h2>
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-10 font-poppins">Tools</h2>
           </RevealItem>
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
             {[
@@ -311,13 +310,18 @@ export default function Home() {
               { name: "Golang", logo: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/go-programming-language-icon.png" },
               { name: "Microsoft", logo: "https://w7.pngwing.com/pngs/719/781/png-transparent-windows-logo-microsoft-windows-scalable-graphics-logo-computer-file-microsoft-logo-icon-angle-text-rectangle.png" },
               { name: "Android", logo: "https://www.freepnglogos.com/uploads/android-logo-png/android-logo-powerful-mobile-apps-for-those-with-disabilities-3.png" },
-              { name: "Lainnya", logo: "https://cdn.pixabay.com/photo/2024/01/17/20/03/cartoon-8515557_960_720.png" },
+              // PERBAIKAN: Menggunakan komponen SpinningClockIcon
+              { name: "Lainnya", customIcon: <SpinningClockIcon /> }, 
             ].map((tool, index) => (
               <RevealItem key={tool.name} delay={50 * index}>
                 <div
                   className={`group flex flex-col items-center gap-3 p-5 rounded-2xl transition-all duration-300 border ${theme === "dark" ? "bg-gray-800/20 border-gray-700 md:hover:bg-gray-800" : "bg-gray-50 border-gray-100 md:hover:bg-white md:hover:shadow-lg"}`}
                 >
-                  <img src={tool.logo} alt={tool.name} className="w-10 h-10 object-contain transition-transform duration-300 group-hover:scale-110" />
+                  {tool.customIcon ? (
+                    tool.customIcon
+                  ) : (
+                    <img src={tool.logo} alt={tool.name} className="w-10 h-10 object-contain transition-transform duration-300 group-hover:scale-110" />
+                  )}
                   <span className="text-xs font-bold opacity-60 group-hover:opacity-100">{tool.name}</span>
                 </div>
               </RevealItem>
