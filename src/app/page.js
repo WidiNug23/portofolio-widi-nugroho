@@ -11,6 +11,7 @@ import { useState, useEffect, useRef } from "react";
 import React from "react";
 import { useTheme } from "./ThemeContext"; 
 import Head from "next/head";
+import Script from 'next/script';
 import Link from "next/link";
 import ProjekPage from "./projek/page";
 import SertifikatPage from "./sertifikat/page";
@@ -174,11 +175,25 @@ export default function Home() {
 
   return (
     <>
-      <Head>
+<Head>
         <title>Portofolio - Widi Suryo Nugroho</title>
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&display=swap" rel="stylesheet" />
       </Head>
 
+      {/* Google Analytics Global Site Tag */}
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-H9WW8B02DQ"
+        strategy="afterInteractive"
+      />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-H9WW8B02DQ');
+        `}
+      </Script>
       <main
         className="min-h-screen flex flex-col items-center py-12 md:py-20 px-4 gap-16 md:gap-24 font-sans transition-colors duration-500 overflow-x-hidden"
         style={{ 
