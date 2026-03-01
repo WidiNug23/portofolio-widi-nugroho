@@ -55,8 +55,17 @@ const projekData = [
     pdf_file: "",
     images: JSON.stringify(["filter1.png", "filter2.png", "filter3.png"]),
   },
-  {
+    {
     id: 5,
+    judul: "Manajemen Gudang Berbasis Web Menggunakan Next JS & Supabase",
+    deskripsi: `Sistem ini memudahkan penggunannya dalam management dan mengelola barang atau stock yang ada di dalam gudang. User akan diminta untuk mengelola kategori barang dan mengelola ketersediaan barang. Sistem ini menggunakan Next JS untuk Frontend dan Backendnya. Untuk database menggunakan Supabase. Sistem ini akan terus dikembangkan agar pengelolaan barang di gudang akan semakin kompleks.`,
+    link_demo: "https://sistem-gudang-ten.vercel.app/",
+    // link_github: "https://github.com/WidiNug23/sistem-gudang.git",
+    pdf_file: "",
+    images: JSON.stringify(["gudang1.png", "gudang2.png", "gudang3.png", "gudang4.png"]),
+  },
+  {
+    id: 6,
     judul: "Hand Gesture",
     deskripsi: `Sistem ini dibuat untuk mengatur kecerahan layar, volume suara, mengambil scrennshot, dan melakukan play/pause video yang ada di laptop atau PC`,
     link_demo: "https://drive.google.com/drive/folders/1QSrsBeRIWnj6yDkE9d8FfdyajBcoWwyv?usp=sharing",
@@ -65,7 +74,7 @@ const projekData = [
     images: JSON.stringify(["Screenshot (725).png"]),
   },
   {
-    id: 6,
+    id: 7,
     judul: "Video: Pengenalan CareBot",
     deskripsi: `Projek produksi video pengenalan produk menggunakan CapCut dan Canva, mencakup tahap scripting hingga publikasi.`,
     link_demo: "https://www.youtube.com/watch?v=lJcgUrdF3ws",
@@ -73,7 +82,7 @@ const projekData = [
     images: JSON.stringify([]),
   },
   {
-    id: 7,
+    id: 8,
     judul: "Video: GoMadiun Tourism",
     deskripsi: `Produksi konten video kreatif untuk mempromosikan manajemen data wisata di Kabupaten Madiun.`,
     link_demo: "https://www.youtube.com/watch?v=7_L8LXGKcTI",
@@ -81,7 +90,7 @@ const projekData = [
     images: JSON.stringify([]),
   },
   {
-    id: 8,
+    id: 9,
     judul: "VR: Wonderful Kampung Pesilat",
     deskripsi: `Penyusunan video promosi Virtual Tour berbasis Virtual Reality di Kabupaten Madiun (Recording & Dubbing).`,
     link_demo: "https://www.youtube.com/watch?v=XfP6P09axso",
@@ -89,7 +98,7 @@ const projekData = [
     images: JSON.stringify([]),
   },
   {
-    id: 9,
+    id: 10,
     judul: "Video: Pameran Inovasi 5.0",
     deskripsi: `Dokumentasi cinematik aktivitas Pameran Inovasi Teknologi Era Revolusi Industri 5.0.`,
     link_demo: "https://www.youtube.com/watch?v=nHV9A8DgE8Q",
@@ -97,7 +106,7 @@ const projekData = [
     images: JSON.stringify([]),
   },
   {
-    id: 10,
+    id: 11,
     judul: "Upcoming Project",
     deskripsi: `Projek baru sedang dalam tahap pengembangan. Segera hadir!`,
     images: JSON.stringify([]),
