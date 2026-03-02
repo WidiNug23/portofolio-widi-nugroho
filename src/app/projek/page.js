@@ -60,7 +60,7 @@ const projekData = [
     judul: "Manajemen Gudang Berbasis Web Menggunakan Next JS & Supabase",
     deskripsi: `Sistem ini memudahkan penggunannya dalam management dan mengelola barang atau stock yang ada di dalam gudang. User akan diminta untuk mengelola kategori barang dan mengelola ketersediaan barang. Sistem ini menggunakan Next JS untuk Frontend dan Backendnya. Untuk database menggunakan Supabase. Sistem ini akan terus dikembangkan agar pengelolaan barang di gudang akan semakin kompleks.`,
     link_demo: "https://sistem-gudang-ten.vercel.app/",
-    // link_github: "https://github.com/WidiNug23/sistem-gudang.git",
+    link_github: "https://github.com/WidiNug23/sistem-gudang.git",
     pdf_file: "",
     images: JSON.stringify(["gudang1.png", "gudang2.png", "gudang3.png", "gudang4.png"]),
   },
@@ -70,7 +70,7 @@ const projekData = [
     deskripsi: `Sistem ini dibuat untuk mengatur kecerahan layar, volume suara, mengambil scrennshot, dan melakukan play/pause video yang ada di laptop atau PC`,
     link_demo: "https://drive.google.com/drive/folders/1QSrsBeRIWnj6yDkE9d8FfdyajBcoWwyv?usp=sharing",
     link_github: "https://github.com/WidiNug23/hand-gesture.git",
-    pdf_file: "https://drive.google.com/file/d/12WEGKDfVF-xH9LfWVl37iLvoDXXCjbZh/view?usp=sharing",
+    pdf_file: "uploads/Penggunaan hand gesture.pdf",
     images: JSON.stringify(["Screenshot (725).png"]),
   },
   {
@@ -114,27 +114,14 @@ const projekData = [
   },
 ];
 
-// Komponen Jarum Jam Berputar
 const SpinningClockIcon = () => (
-  <div className="flex flex-col items-center justify-center gap-4">
-    <svg 
-      width="80" 
-      height="80" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="1.5" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      className="text-blue-500 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]"
-    >
+  <div className="flex flex-col items-center justify-center gap-4 py-12">
+    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]">
       <circle cx="12" cy="12" r="10" />
       <polyline points="12 6 12 12" className="origin-center animate-[spin_3s_linear_infinite]" />
       <polyline points="12 12 16 14" className="origin-center animate-[spin_12s_linear_infinite]" />
     </svg>
-    <div className="text-blue-400 font-bold tracking-[0.2em] text-xs uppercase animate-pulse">
-      In Development
-    </div>
+    <div className="text-blue-400 font-bold tracking-[0.2em] text-[10px] uppercase animate-pulse">In Development</div>
   </div>
 );
 
@@ -203,111 +190,103 @@ export default function ProjekPage() {
   return (
     <main className={`min-h-screen pt-32 pb-20 px-4 sm:px-8 lg:px-16 transition-colors duration-500 ${isDark ? "bg-[#080808] text-white" : "bg-slate-50 text-slate-900"}`}>
       
-      <div className="max-w-4xl mx-auto text-center mb-20">
-        <h1 className={`text-5xl md:text-7xl font-black mb-6 tracking-tighter ${isDark ? "neon-glow" : "text-slate-900"}`}>
+      <div className="max-w-4xl mx-auto text-center mb-16">
+        <h1 className={`text-5xl md:text-6xl font-black mb-6 tracking-tighter ${isDark ? "neon-glow" : "text-slate-900"}`}>
           PROJECTS
         </h1>
-        <p className="text-lg md:text-xl opacity-80 leading-relaxed font-light">
+        <p className="text-lg opacity-80 leading-relaxed font-light">
           Berbagai Projek Dalam Bidang <span className="font-semibold text-blue-500">Web Development</span>, 
           <span className="font-semibold text-purple-500"> Videografi</span>, dan 
           <span className="font-semibold text-cyan-500"> Inovasi Digital</span>.
         </p>
       </div>
 
-      <div className="max-w-6xl mx-auto flex flex-col gap-16">
+      {/* Grid Layout (Kiri ke Kanan) */}
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {projekData.map((p) => {
           const isExpanded = expanded[p.id];
-          const textToShow = isExpanded ? p.deskripsi : p.deskripsi?.substring(0, 200) + (p.deskripsi?.length > 200 ? "..." : "");
+          const textToShow = isExpanded ? p.deskripsi : p.deskripsi?.substring(0, 150) + (p.deskripsi?.length > 150 ? "..." : "");
           const youtubeID = extractYouTubeID(p.link_demo || "");
           let images = [];
           try { images = JSON.parse(p.images || "[]"); } catch { images = []; }
           const slideIdx = currentSlide[p.id] ?? 0;
 
           return (
-            <div key={p.id} className="projek-card opacity-0 transform translate-y-12 transition-all duration-1000">
-              <div className={`group relative rounded-[2.5rem] overflow-hidden border transition-all duration-500 ${isDark ? "bg-white/5 border-white/10 hover:bg-white/10" : "bg-white border-slate-200 shadow-xl hover:shadow-2xl"}`}>
-                <div className="flex flex-col lg:flex-row">
-                  
-                  {/* Left Column */}
-                  <div className="p-8 lg:p-12 flex-1 flex flex-col">
-                    <div className="flex items-center gap-3 mb-6">
-                       <span className={`w-12 h-1 rounded-full ${isDark ? "bg-blue-500 shadow-[0_0_10px_#3b82f6]" : "bg-blue-600"}`}></span>
-                       <span className="text-xs font-black tracking-widest uppercase opacity-60">Featured Project</span>
+            <div key={p.id} className="projek-card opacity-0 transform translate-y-12 transition-all duration-700 flex">
+              <div className={`group w-full flex flex-col rounded-[2rem] overflow-hidden border transition-all duration-500 ${isDark ? "bg-white/5 border-white/10 hover:bg-white/10" : "bg-white border-slate-200 shadow-lg hover:shadow-2xl"}`}>
+                
+                {/* Media Section */}
+                <div className="relative aspect-video overflow-hidden bg-black/20">
+                  {p.isUpcoming ? (
+                    <SpinningClockIcon />
+                  ) : youtubeID ? (
+                    <div className="w-full h-full relative cursor-pointer group/vid" onClick={() => setModalVideoID(youtubeID)}>
+                      <img src={`https://img.youtube.com/vi/${youtubeID}/mqdefault.jpg`} className="w-full h-full object-cover transition-transform duration-700 group-hover/vid:scale-110" alt="thumb" />
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover/vid:bg-black/20 transition-all">
+                        <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center shadow-2xl">
+                          <div className="ml-1 border-y-[8px] border-y-transparent border-l-[12px] border-l-white"></div>
+                        </div>
+                      </div>
                     </div>
-                    
-                    <h2 className="text-3xl font-bold mb-4 tracking-tight leading-tight group-hover:text-blue-400 transition-colors">
-                      {p.judul}
-                    </h2>
-                    
-                    <p className="text-base leading-relaxed mb-6 opacity-80 whitespace-pre-line">
-                      {textToShow}
-                    </p>
-
-                    {p.deskripsi?.length > 200 && (
-                      <button onClick={() => setExpanded(e => ({...e, [p.id]: !isExpanded}))} className="text-sm font-bold text-blue-500 hover:text-blue-400 mb-8 flex items-center gap-2">
-                        {isExpanded ? "... Sembunyikan" : "Selengkapnya ... "}
-                      </button>
-                    )}
-
-                    <div className="flex flex-wrap gap-4 mt-auto">
-                      {p.link_demo && (
-                        <a href={p.link_demo} target="_blank" rel="noreferrer" className={`px-6 py-3 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${isDark ? "bg-white text-black hover:bg-blue-400" : "bg-slate-900 text-white hover:bg-blue-600"}`}>
-                          <span>🚀</span> Live Demo
-                        </a>
-                      )}
-                      {p.link_github && (
-                        <a href={p.link_github} target="_blank" rel="noreferrer" className={`px-6 py-3 rounded-full text-sm font-bold border transition-all flex items-center gap-2 ${isDark ? "border-white/20 hover:bg-white/10 text-white" : "border-slate-300 hover:bg-slate-50 text-slate-900"}`}>
-                          <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" className={`w-4 h-4 ${isDark ? "invert" : ""}`} alt="github" /> Code
-                        </a>
-                      )}
-                      {p.pdf_file && (
-                        <button onClick={() => setModalPDF(p.pdf_file)} className="px-6 py-3 rounded-full border border-red-500/50 text-red-500 font-bold hover:bg-red-500 hover:text-white transition-all">
-                          📄 Documentation
-                        </button>
-                      )}
+                  ) : images.length > 0 ? (
+                    <div className="w-full h-full relative group/img">
+                      <div className="flex h-full transition-transform duration-700 ease-in-out" style={{ transform: `translateX(-${slideIdx * 100}%)` }}>
+                        {images.map((img, i) => (
+                          <img key={i} src={`uploads/${img}`} className="w-full h-full object-cover cursor-zoom-in shrink-0" alt="step" onClick={() => openLightbox(p.id, i)} />
+                        ))}
+                      </div>
+                      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 p-1.5 bg-black/30 backdrop-blur-md rounded-full">
+                        {images.map((_, i) => (
+                          <button key={i} onClick={() => handleDotClick(p.id, i)} className={`h-1.5 rounded-full transition-all ${i === slideIdx ? "w-4 bg-blue-500" : "w-1.5 bg-white/40"}`} />
+                        ))}
+                      </div>
                     </div>
+                  ) : (
+                    <div className="h-full w-full flex items-center justify-center opacity-30 italic text-xs">No Media</div>
+                  )}
+                </div>
+
+                {/* Content Section */}
+                <div className="p-6 flex-1 flex flex-col">
+                  <div className="flex items-center gap-2 mb-3">
+                     <span className={`w-8 h-0.5 rounded-full ${isDark ? "bg-blue-500 shadow-[0_0_8px_#3b82f6]" : "bg-blue-600"}`}></span>
+                     <span className="text-[10px] font-black tracking-widest uppercase opacity-60">Featured Project</span>
                   </div>
+                  
+                  <h2 className="text-xl font-bold mb-3 tracking-tight leading-tight min-h-[3rem] group-hover:text-blue-400 transition-colors">
+                    {p.judul}
+                  </h2>
+                  
+                  <p className="text-sm leading-relaxed mb-2 opacity-80 whitespace-pre-line">
+                    {textToShow}
+                  </p>
 
-                  {/* Right Column (Media / Clock) */}
-                  <div className="lg:w-1/2 p-4 lg:p-8 bg-black/20 backdrop-blur-sm min-h-[350px] flex items-center justify-center">
-                    {p.isUpcoming ? (
-                      <SpinningClockIcon />
-                    ) : youtubeID ? (
-                      <div className="w-full relative aspect-video rounded-3xl overflow-hidden shadow-2xl cursor-pointer group/vid" onClick={() => setModalVideoID(youtubeID)}>
-                        <img src={`https://img.youtube.com/vi/${youtubeID}/maxresdefault.jpg`} className="w-full h-full object-cover transition-transform duration-700 group-hover/vid:scale-110" alt="youtube-thumb" />
-                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover/vid:bg-black/20 transition-all">
-                          <div className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center shadow-2xl transition-transform group-hover/vid:scale-110">
-                            <div className="ml-1 border-y-[12px] border-y-transparent border-l-[18px] border-l-white"></div>
-                          </div>
-                        </div>
-                      </div>
-                    ) : images.length > 0 ? (
-                      <div className="w-full relative rounded-3xl overflow-hidden shadow-2xl group/img aspect-[4/3]">
-                        <div className="flex h-full transition-transform duration-700 cubic-bezier(0.4, 0, 0.2, 1)" style={{ transform: `translateX(-${slideIdx * 100}%)` }}>
-                          {images.map((img, i) => (
-                            <img 
-                              key={i} 
-                              src={`uploads/${img}`} 
-                              className="w-full h-full object-cover cursor-zoom-in shrink-0" 
-                              alt={`Project step ${i}`} 
-                              onClick={() => openLightbox(p.id, i)} 
-                            />
-                          ))}
-                        </div>
-                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 p-2.5 bg-black/30 backdrop-blur-xl rounded-full z-10">
-                          {images.map((_, i) => (
-                            <button
-                              key={i}
-                              onClick={() => handleDotClick(p.id, i)}
-                              className={`h-2 rounded-full transition-all duration-300 ${i === slideIdx ? "w-8 bg-blue-500 shadow-[0_0_10px_#3b82f6]" : "w-2 bg-white/40 hover:bg-white/60"}`}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="h-full w-full flex items-center justify-center border-2 border-dashed border-white/10 rounded-3xl opacity-30">
-                        <p className="italic text-lg tracking-widest uppercase">No Media Available</p>
-                      </div>
+                  {/* Tombol Selengkapnya */}
+                  {p.deskripsi?.length > 150 && (
+                    <button 
+                      onClick={() => setExpanded(e => ({...e, [p.id]: !isExpanded}))} 
+                      className="text-xs font-bold text-blue-500 hover:text-blue-400 mb-4 text-left"
+                    >
+                      {isExpanded ? "Sembunyikan" : "Selengkapnya..."}
+                    </button>
+                  )}
+
+                  {/* Tombol Navigasi dengan Label Teks */}
+                  <div className="flex flex-wrap gap-2 mt-auto pt-4 border-t border-white/10">
+                    {p.link_demo && (
+                      <a href={p.link_demo} target="_blank" rel="noreferrer" className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${isDark ? "bg-white text-black hover:bg-blue-400" : "bg-slate-900 text-white hover:bg-blue-600"}`}>
+                        {youtubeID ? "Tonton" : "Website"}
+                      </a>
+                    )}
+                    {p.link_github && (
+                      <a href={p.link_github} target="_blank" rel="noreferrer" className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-all ${isDark ? "border-white/20 text-white hover:bg-white/10" : "border-slate-300 text-slate-900 hover:bg-slate-50"}`}>
+                        Github
+                      </a>
+                    )}
+                    {p.pdf_file && (
+                      <button onClick={() => setModalPDF(p.pdf_file)} className="px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                        Dokumen
+                      </button>
                     )}
                   </div>
                 </div>
@@ -317,41 +296,37 @@ export default function ProjekPage() {
         })}
       </div>
 
-      {/* LIGHTBOX */}
+      {/* Lightbox Preview Gambar */}
       {lightbox.isOpen && (
-        <div className="fixed inset-0 z-[110] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in zoom-in duration-300" onClick={closeLightbox}>
+        <div className="fixed inset-0 z-[110] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4" onClick={closeLightbox}>
           <button className="absolute top-8 right-8 text-white/50 hover:text-white text-4xl">✕</button>
-          <button onClick={(e) => navigateLightbox(e, -1)} className="absolute left-4 sm:left-10 p-4 bg-white/5 hover:bg-white/10 rounded-full text-white z-20">❮</button>
-          <button onClick={(e) => navigateLightbox(e, 1)} className="absolute right-4 sm:right-10 p-4 bg-white/5 hover:bg-white/10 rounded-full text-white z-20">❯</button>
-          <div className="relative max-w-5xl max-h-[85vh]" onClick={e => e.stopPropagation()}>
-            <img 
-              src={`uploads/${JSON.parse(projekData.find(x => x.id === lightbox.projekID).images)[lightbox.imgIndex]}`} 
-              className="max-w-full max-h-full object-contain rounded-lg shadow-2xl" 
-              alt="lightbox-preview" 
-            />
-          </div>
+          <button onClick={(e) => navigateLightbox(e, -1)} className="absolute left-4 p-4 text-white text-2xl">❮</button>
+          <button onClick={(e) => navigateLightbox(e, 1)} className="absolute right-4 p-4 text-white text-2xl">❯</button>
+          <img 
+            src={`uploads/${JSON.parse(projekData.find(x => x.id === lightbox.projekID).images)[lightbox.imgIndex]}`} 
+            className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl" 
+            onClick={e => e.stopPropagation()} 
+            alt="preview"
+          />
         </div>
       )}
 
-      {/* VIDEO MODAL */}
+      {/* Modal Video */}
       {modalVideoID && (
         <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4" onClick={() => setModalVideoID(null)}>
-           <div className="relative w-full max-w-5xl aspect-video rounded-3xl overflow-hidden border border-white/10" onClick={e => e.stopPropagation()}>
+           <div className="relative w-full max-w-4xl aspect-video rounded-2xl overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
              <iframe src={`https://www.youtube.com/embed/${modalVideoID}?autoplay=1`} className="w-full h-full" allowFullScreen allow="autoplay"></iframe>
-             <button onClick={() => setModalVideoID(null)} className="absolute top-4 right-4 bg-black/50 hover:bg-red-600 p-3 rounded-full text-white">✕</button>
+             <button onClick={() => setModalVideoID(null)} className="absolute top-4 right-4 bg-black/50 text-white p-2 rounded-full">✕</button>
            </div>
         </div>
       )}
 
-      {/* PDF MODAL */}
+      {/* Modal PDF */}
       {modalPDF && (
-        <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-6" onClick={() => setModalPDF(null)}>
-           <div className="bg-white w-full max-w-6xl h-[90vh] rounded-[2rem] overflow-hidden relative shadow-2xl" onClick={e => e.stopPropagation()}>
-             <div className="absolute top-4 right-6 flex gap-4">
-                <a href={modalPDF} download className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">Download PDF</a>
-                <button onClick={() => setModalPDF(null)} className="bg-red-500 text-white w-10 h-10 rounded-full font-bold">✕</button>
-             </div>
-             <iframe src={modalPDF} className="w-full h-full pt-16"></iframe>
+        <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4" onClick={() => setModalPDF(null)}>
+           <div className="bg-white w-full max-w-5xl h-[85vh] rounded-2xl overflow-hidden relative" onClick={e => e.stopPropagation()}>
+             <iframe src={modalPDF} className="w-full h-full pt-12"></iframe>
+             <button onClick={() => setModalPDF(null)} className="absolute top-4 right-4 bg-red-500 text-white w-8 h-8 rounded-full font-bold">✕</button>
            </div>
         </div>
       )}
