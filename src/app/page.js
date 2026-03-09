@@ -236,9 +236,9 @@ export default function Home() {
             >
               <p className="text-base md:text-lg leading-relaxed font-medium">
                 Saya memiliki ketertarikan mendalam terhadap perancangan dan pengembangan sistem berbasis web. Saya senang memahami
-                bagaimana sebuah website bekerja mulai dari alur sistem hingga pengalaman interaksi pengguna. Dalam pengembangan, saya sering menggunakan React.js untuk frontend dan CodeIgniter 4 untuk
-                backend. Saya menikmati proses menerjemahkan kebutuhan pengguna menjadi sistem yang fungsional dan efisien. Selain kemampuan
-                teknis, saya memiliki kepekaan visual dari pengalaman di bidang fotografi dan videografi. Saya dapat bekerja baik secara individu maupun dalam tim, serta{" "}
+                bagaimana sebuah website bekerja mulai dari alur sistem hingga pengalaman interaksi pengguna. Dalam pengembangan, saya sering menggunakan React.js untuk frontend dan Laravel untuk
+                backend. Saya menikmati proses menerjemahkan kebutuhan pengguna menjadi sistem yang fungsional dan efisien. Selain itu, saya memiliki ketertarikan terhadap visual dari pengalaman di bidang saya fotografi dan videografi. 
+                Saya dapat bekerja baik secara individu maupun dalam tim, serta{" "}
                 <span className={`font-bold transition-all duration-500 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
                   terbuka untuk mempelajari berbagai teknologi baru.
                 </span>

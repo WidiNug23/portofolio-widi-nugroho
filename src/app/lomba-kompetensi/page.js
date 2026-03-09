@@ -37,7 +37,7 @@ export default function LombaPage() {
     {
       id: 1,
       nama: "Olimpiade Vokasi Indonesia X Tahun 2025",
-      deskripsi: "Berkompetisi dalam ajang bergengsi tingkat nasional yang menyatukan mahasiswa vokasi seluruh Indonesia untuk menunjukkan keahlian praktis dan inovasi teknologi.",
+      deskripsi: "Berkompetisi dalam ajang OLIVIA 2025 tingkat nasional dalam bidang web technologies yang diikuti mahasiswa vokasi seluruh Indonesia.",
       tingkat: "Nasional",
       tahun: "2025",
       hasil: "Finalist",
@@ -47,7 +47,7 @@ export default function LombaPage() {
     {
       id: 2,
       nama: "Web Design International Competition Gayatama UNESA 2024",
-      deskripsi: "Kompetisi desain web tingkat internasional yang menantang kreativitas dalam UI/UX dan fungsionalitas front-end dengan standar industri global.",
+      deskripsi: "Kompetisi desain web tingkat internasional yang memacu kreativitas dalam UI/UX dan fungsionalitas frontend.",
       tingkat: "Internasional",
       tahun: "2024",
       hasil: "Juara 1",
@@ -62,7 +62,7 @@ export default function LombaPage() {
     {
       id: 3,
       nama: "Olimpiade Vokasi Indonesia IX Tahun 2024",
-      deskripsi: "Berhasil meraih medali dalam kategori Web Technologies dengan mengembangkan solusi web yang responsif dan efisien sesuai kebutuhan studi kasus.",
+      deskripsi: "Berhasil meraih medali dalam kategori Web Technologies bersama tim yang diikuti seluruh mahasiswa vokasi Indonesia.",
       tingkat: "Nasional",
       tahun: "2024",
       hasil: "Juara 3 - Bidang Web Technologies",
@@ -77,7 +77,7 @@ export default function LombaPage() {
     {
       id: 4,
       nama: "Canter 60th Anniversary Photo Contest",
-      deskripsi: "Ajang kreativitas fotografi nasional dalam merayakan warisan kendaraan niaga legendaris, menekankan pada aspek visual storytelling.",
+      deskripsi: "Ajang kreativitas fotografi nasional yang diselenggarakan oleh Mitsubishi Fuso.",
       tingkat: "Nasional",
       tahun: "2023",
       hasil: "Nominasi Juara Favorit",
@@ -87,7 +87,7 @@ export default function LombaPage() {
     {
       id: 5,
       nama: "[COMING SOON]",
-      deskripsi: "Persiapan untuk kompetisi berikutnya sedang berjalan. Pantau terus untuk pembaruan prestasi mendatang!",
+      deskripsi: "Persiapan untuk kompetisi berikutnya sedang dilakukan.",
       isUpcoming: true,
     },
   ];
