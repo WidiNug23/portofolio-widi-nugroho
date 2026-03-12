@@ -6,6 +6,42 @@ import { useTheme } from "../ThemeContext";
 const projekData = [
   {
     id: 1,
+    tag: "Freelance Project",
+    judul: "Digital Profile of Mejayan Village",
+    deskripsi: `The official web portal for Mejayan Village, serving as a digital bridge between the local administration and its community. It features a comprehensive village profile, a responsive news feed, and a dedicated public reporting system. Crucially, the platform is directly integrated with 'PECELANDAK' a digital administrative service to streamline bureaucracy and accelerate document processing for residents.`,
+    link_demo: "https://desamejayan.com/",
+    images: JSON.stringify([
+      "mejayan1.jpeg",
+      "mejayan2.png",
+      "mejayan3.png",
+      "mejayan4.png",
+      "mejayan5.png",
+      "mejayan6.png",
+      "mejayan7.png",
+    ]),
+  },
+  {
+    id: 11, // Diubah agar ID unik
+    tag: "Freelance Project",
+    judul: "PECELANDAK - Pelayanan Cepat Langsung Digital Akuntabel",
+    deskripsi: `This website is linked to the Mejayan village profile website, providing online letter submission services, which are managed directly by village officials. Developed using Laravel 12 & Mysql Database`,
+    link_demo: "https://pecelandak.desamejayan.com/",
+    images: JSON.stringify([
+      "pecel1.png",
+      "pecel2.png",
+      "pecel3.png",
+      "pecel4.png",
+      "pecel5.png",
+      "pecel6.png",
+      "pecel7.png",
+      "pecel8.png",
+      "pecel9.png",
+      "pecel10.png",
+    ]),
+  },
+  {
+    id: 12, // Diubah agar ID unik
+    tag: "Personal Project",
     judul: "CareBot – Sistem Informasi Kebutuhan Nutrisi yang Dilengkapi Chatbot DialogFlow",
     deskripsi: `Terpenuhinya kebutuhan nutrisi yang optimal sangat penting untuk menjaga kesehatan dan kualitas hidup setiap individu, terutama bagi remaja, lansia, ibu hamil, dan ibu menyusui. Terdapat juga kalkulator perhitungan nutrisi menggunakan rumus Mifflin st Jeor`,
     link_demo: "https://carebot.tifpsdku.com",
@@ -23,6 +59,7 @@ const projekData = [
   },
   {
     id: 2,
+    tag: "Internship Project",
     judul: "SIPBIBU – Sistem Pencegahan dan Penanganan Baby Blues Pada Ibu",
     deskripsi: `SIPBIBU merupakan website yang dibuat sebagai upaya untuk menekan angka baby blues pada Ibu.\n\nFitur-fitur utama:\n• Kuesioner Model Suryani & EPDS\n• Forum Diskusi Ibu\n• Konsultasi Online Psikolog\n• Edukasi Video & Audio`,
     link_demo: "https://sipbibu.tifpsdku.com",
@@ -36,6 +73,7 @@ const projekData = [
   },
   {
     id: 3,
+    tag: "Personal Project",
     judul: "NopolIndo - Cek Plat Nomor Kendaraan dan Kode Wilayah Secara Online",
     deskripsi: `NopolIndo memudahkan pengguna mencari informasi plat nomor kendaraan di Indonesia berdasarkan wilayah, provinsi, atau huruf secara cepat dan fleksibel.`,
     link_demo: "https://nopolindo.vercel.app/",
@@ -48,6 +86,7 @@ const projekData = [
   },
   {
     id: 4,
+    tag: "Personal Project",
     judul: "Filterisasi Lowongan MagangHub",
     deskripsi: `Sistem filterisasi cerdas menggunakan Python & Naive Bayes untuk menyaring lowongan magang berdasarkan kuota, lokasi, dan peluang lolos secara akurat.`,
     link_demo: "https://filterisasi-data-lowongan-magang.streamlit.app/",
@@ -55,8 +94,9 @@ const projekData = [
     pdf_file: "",
     images: JSON.stringify(["filter1.png", "filter2.png", "filter3.png"]),
   },
-    {
+  {
     id: 5,
+    tag: "Personal Project",
     judul: "Manajemen Gudang Berbasis Web Menggunakan Next JS & Supabase",
     deskripsi: `Sistem ini memudahkan penggunannya dalam management dan mengelola barang atau stock yang ada di dalam gudang. User akan diminta untuk mengelola kategori barang dan mengelola ketersediaan barang. Sistem ini menggunakan Next JS untuk Frontend dan Backendnya. Untuk database menggunakan Supabase. Sistem ini akan terus dikembangkan agar pengelolaan barang di gudang akan semakin kompleks.`,
     link_demo: "https://sistem-gudang-ten.vercel.app/",
@@ -66,15 +106,16 @@ const projekData = [
   },
   {
     id: 6,
+    tag: "Personal Project",
     judul: "Hand Gesture",
     deskripsi: `Sistem ini dibuat untuk mengatur kecerahan layar, volume suara, mengambil scrennshot, dan melakukan play/pause video yang ada di laptop atau PC`,
-    // link_demo: "https://drive.google.com/drive/folders/1QSrsBeRIWnj6yDkE9d8FfdyajBcoWwyv?usp=sharing",
     link_github: "https://github.com/WidiNug23/hand-gesture.git",
     pdf_file: "uploads/Penggunaan hand gesture.pdf",
     images: JSON.stringify(["Screenshot (725).png"]),
   },
   {
     id: 7,
+    tag: "Personal Project",
     judul: "Video: Pengenalan CareBot",
     deskripsi: `Projek produksi video pengenalan produk CareBot menggunakan CapCut dan Canva mencakup tahap penyusunan naskah hingga publikasi.`,
     link_demo: "https://www.youtube.com/watch?v=lJcgUrdF3ws",
@@ -83,6 +124,7 @@ const projekData = [
   },
   {
     id: 8,
+    tag: "Freelance Project",
     judul: "Video: PENGAPLIKASIAN VIRTUALTOUR WONDERFUL KAMPUNG PESILAT BERBASIS VIRTUAL REALITY DI KABUPATEN MADIUN",
     deskripsi: `Produksi konten video untuk mempromosikan wisata di Kabupaten Madiun. Pembuatan video dilakukan dengan mengambil footage, mengedit video dan melakukan dubbing.`,
     link_demo: "https://www.youtube.com/watch?v=7_L8LXGKcTI",
@@ -91,6 +133,7 @@ const projekData = [
   },
   {
     id: 9,
+    tag: "Freelance Project",
     judul: "Video: Pameran Inovasi Teknologi di Era Revolusi Industri 5.0",
     deskripsi: `melakukan dokumentasi dan pengeditan video dalam acara Pameran Inovasi Teknologi Era Revolusi Industri 5.0.`,
     link_demo: "https://www.youtube.com/watch?v=nHV9A8DgE8Q",
@@ -99,6 +142,7 @@ const projekData = [
   },
   {
     id: 10,
+    tag: "Internal Project",
     judul: "Upcoming Project",
     deskripsi: `Projek baru sedang dalam tahap pengembangan. Segera hadir!`,
     images: JSON.stringify([]),
@@ -193,7 +237,6 @@ export default function ProjekPage() {
         </p>
       </div>
 
-      {/* Grid Layout (Kiri ke Kanan) */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {projekData.map((p) => {
           const isExpanded = expanded[p.id];
@@ -240,9 +283,12 @@ export default function ProjekPage() {
 
                 {/* Content Section */}
                 <div className="p-6 flex-1 flex flex-col">
+                  {/* Bagian Custom Tag */}
                   <div className="flex items-center gap-2 mb-3">
                      <span className={`w-8 h-0.5 rounded-full ${isDark ? "bg-blue-500 shadow-[0_0_8px_#3b82f6]" : "bg-blue-600"}`}></span>
-                     <span className="text-[10px] font-black tracking-widest uppercase opacity-60">Featured Project</span>
+                     <span className="text-[10px] font-black tracking-widest uppercase opacity-60">
+                       {p.tag || "Project"}
+                     </span>
                   </div>
                   
                   <h2 className="text-xl font-bold mb-3 tracking-tight leading-tight min-h-[3rem] group-hover:text-blue-400 transition-colors">
@@ -263,7 +309,7 @@ export default function ProjekPage() {
                     </button>
                   )}
 
-                  {/* Tombol Navigasi dengan Label Teks */}
+                  {/* Tombol Navigasi */}
                   <div className="flex flex-wrap gap-2 mt-auto pt-4 border-t border-white/10">
                     {p.link_demo && (
                       <a href={p.link_demo} target="_blank" rel="noreferrer" className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${isDark ? "bg-white text-black hover:bg-blue-400" : "bg-slate-900 text-white hover:bg-blue-600"}`}>
