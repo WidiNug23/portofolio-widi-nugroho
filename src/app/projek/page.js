@@ -4,8 +4,18 @@ import { useState, useRef, useEffect } from "react";
 import { useTheme } from "../ThemeContext";
 
 const projekData = [
-  {
+    {
     id: 1,
+    tag: "Freelance Project",
+    judul: "Company Profile Website",
+    deskripsi: `terdapat beberapa role dalam website ini di antaranya yaitu pengunjung, admin, pimpinan, dan superadmin. website ini dibuat untuk memaksimalkan pengenalan profile suatu company kepada khalayak ramai. website ini dibangun menggunakan Laravel dan MySQL. tujuan utama pengunggahan video ini untuk portofolio projek saya.`,
+    link_demo: "https://youtu.be/DxR_KoI5S0Q",
+    images: JSON.stringify([
+      "Screenshot 2026-04-19 195831.png",
+    ]),
+  },
+  {
+    id: 2,
     tag: "Freelance Project",
     judul: "Digital Profile of Mejayan Village",
     deskripsi: `The official web portal for Mejayan Village, serving as a digital bridge between the local administration and its community. It features a comprehensive village profile, a responsive news feed, and a dedicated public reporting system. Crucially, the platform is directly integrated with 'PECELANDAK' a digital administrative service to streamline bureaucracy and accelerate document processing for residents.`,
