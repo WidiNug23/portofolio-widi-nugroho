@@ -6,6 +6,7 @@ import {
   FaLinkedin,
   FaGithub,
   FaWhatsapp,
+  FaTiktok,
 } from "react-icons/fa";
 import { useState, useEffect, useRef } from "react";
 import React from "react";
@@ -186,6 +187,7 @@ export default function Home() {
                 { href: "https://github.com/WidiNug23", icon: <FaGithub className="text-2xl" />, labels: ["Github", "WidiNug23"], color: "#6e7681" },
                 { href: "mailto:collabswithwidi@gmail.com", icon: <FaEnvelope className="text-2xl" />, labels: ["Email", "Gmail"], color: "#EA4335" },
                 { href: "https://www.instagram.com/widingr23", icon: <FaInstagram className="text-2xl" />, labels: ["Follow", "Instagram"], color: "#ec4899" },
+                { href: "https://www.tiktok.com/@widnug23", icon: <FaTiktok className="text-2xl" />, labels: ["Follow", "TikTok"], color: "#6e7681" },
                 { href: "https://www.linkedin.com/in/widi-suryo-nugroho-a607632a2/", icon: <FaLinkedin className="text-2xl" />, labels: ["Connect", "LinkedIn"], color: "#0077b5" },
                 { href: "https://wa.me/6285727609498", icon: <FaWhatsapp className="text-2xl" />, labels: ["Chat", "WhatsApp"], color: "#25D366" },
                 { href: "https://www.shutterstock.com/g/widinugroho23?rid=360011507", icon: <SiShutterstock className="text-2xl" />, labels: ["Assets", "Shutterstock"], color: "#FF3A00" },
