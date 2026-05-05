@@ -31,56 +31,57 @@ function LayoutContent({ children }) {
     { href: "/#organisasi", label: "Pengalaman & Organisasi" },
     { href: "/#pendidikan", label: "Pendidikan" },
     { href: "/#kontak", label: "Kontak" },
-    { href: "/statistic", label: "Statistik" },
+    // { href: "/statistic", label: "Statistik" },
   ];
 
+  // LOGIC: Enhanced Supabase Tracking dengan Multiple Geolocation Fallbacks
   useEffect(() => {
     const trackView = async () => {
       let locationData = {
-        city: 'Unknown City',
-        country: 'Unknown Country',
-        region: 'Unknown Region',
-        country_code: '??',
-        isp: 'Unknown ISP'
+        city: 'Unknown',
+        country: 'Unknown',
+        region: 'Unknown'
       };
 
       try {
-        // Ambil IP Publik terlebih dahulu (Layanan HTTPS)
-        const ipRes = await fetch('https://api.ipify.org?format=json');
-        const { ip } = await ipRes.json();
-
-        // Gunakan ipwho.is (Layanan HTTPS gratis dan akurat untuk Indonesia)
-        const geoRes = await fetch(`https://ipwho.is/${ip}`);
-        const geoData = await geoRes.json();
-        
-        if (geoData.success) {
+        // Coba Layanan 1: ipapi.co
+        const res1 = await fetch('https://ipapi.co/json/');
+        if (res1.ok) {
+          const data1 = await res1.json();
           locationData = {
-            city: geoData.city || 'Unknown City',
-            country: geoData.country || 'Unknown Country',
-            region: geoData.region || 'Unknown Region',
-            country_code: geoData.country_code || '??',
-            isp: geoData.connection?.isp || 'Unknown ISP'
+            city: data1.city || 'Unknown',
+            country: data1.country_name || 'Unknown',
+            region: data1.region || 'Unknown'
           };
+        } else {
+          throw new Error('ipapi.co failed');
         }
       } catch (err) {
-        console.error("Geo-location failed:", err);
+        try {
+          // Coba Layanan 2 (Fallback): ip-api.com
+          const res2 = await fetch('http://ip-api.com/json/');
+          const data2 = await res2.json();
+          if (data2.status === 'success') {
+            locationData = {
+              city: data2.city,
+              country: data2.country,
+              region: data2.regionName
+            };
+          }
+        } catch (err2) {
+          console.error("All geo services failed", err2);
+        }
       }
 
       try {
-        const userAgent = navigator.userAgent;
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(userAgent);
         const currentFullPath = window.location.pathname + window.location.hash;
-
         await supabase.from('page_views').insert([
           { 
             page_path: currentFullPath || "/", 
-            user_agent: userAgent,
+            user_agent: navigator.userAgent,
             city: locationData.city,
             country: locationData.country,
-            region: locationData.region,
-            country_code: locationData.country_code,
-            device_type: isMobile ? "Mobile" : "Desktop",
-            isp: locationData.isp
+            region: locationData.region
           }
         ]);
       } catch (dbError) {
@@ -106,7 +107,6 @@ function LayoutContent({ children }) {
     };
   }, [pathname]);
 
-  // Handle click outside for floating menu
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (floatingRef.current && !floatingRef.current.contains(event.target)) {
@@ -252,7 +252,7 @@ function LayoutContent({ children }) {
             ))}
           </div>
           <div className="text-center">
-            <h2 className="text-lg font-bold mb-2">Widi Suryo Nugroho</h2>
+            <h2 className="text-lg font-bold mb-2">Widi Nugroho</h2>
             <p className={`text-sm ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}>
               © {new Date().getFullYear()} — Portofolio
             </p>
