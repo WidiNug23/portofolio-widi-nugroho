@@ -31,7 +31,7 @@ function LayoutContent({ children }) {
     { href: "/#organisasi", label: "Pengalaman & Organisasi" },
     { href: "/#pendidikan", label: "Pendidikan" },
     { href: "/#kontak", label: "Kontak" },
-    { href: "/statistic", label: "Statistik" }, // Diaktifkan kembali untuk testing
+    // { href: "/statistic", label: "Statistik" }, // Diaktifkan kembali untuk testing
   ];
 
   // LOGIC: Enhanced Supabase Tracking dengan Geolocation yang lebih akurat
