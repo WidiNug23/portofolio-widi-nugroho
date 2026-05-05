@@ -31,10 +31,10 @@ function LayoutContent({ children }) {
     { href: "/#organisasi", label: "Pengalaman & Organisasi" },
     { href: "/#pendidikan", label: "Pendidikan" },
     { href: "/#kontak", label: "Kontak" },
-    // { href: "/statistic", label: "Statistik" },
+    { href: "/statistic", label: "Statistik" }, // Diaktifkan kembali untuk testing
   ];
 
-  // LOGIC: Enhanced Supabase Tracking dengan Multiple Geolocation Fallbacks
+  // LOGIC: Enhanced Supabase Tracking dengan Geolocation yang lebih akurat
   useEffect(() => {
     const trackView = async () => {
       let locationData = {
@@ -44,53 +44,79 @@ function LayoutContent({ children }) {
       };
 
       try {
-        // Coba Layanan 1: ipapi.co
-        const res1 = await fetch('https://ipapi.co/json/');
-        if (res1.ok) {
-          const data1 = await res1.json();
+        // PRIORITAS 1: ipwho.is (Seringkali lebih detail untuk wilayah kecamatan/lokal)
+        const res0 = await fetch('https://ipwho.is/');
+        const data0 = await res0.json();
+        if (data0.success) {
           locationData = {
-            city: data1.city || 'Unknown',
-            country: data1.country_name || 'Unknown',
-            region: data1.region || 'Unknown'
+            city: data0.city || 'Unknown',
+            country: data0.country || 'Unknown',
+            region: data0.region || 'Unknown'
           };
         } else {
-          throw new Error('ipapi.co failed');
+          throw new Error('ipwho.is failed');
         }
-      } catch (err) {
+      } catch (err0) {
         try {
-          // Coba Layanan 2 (Fallback): ip-api.com
-          const res2 = await fetch('http://ip-api.com/json/');
-          const data2 = await res2.json();
-          if (data2.status === 'success') {
+          // FALLBACK 1: ipapi.co
+          const res1 = await fetch('https://ipapi.co/json/');
+          if (res1.ok) {
+            const data1 = await res1.json();
             locationData = {
-              city: data2.city,
-              country: data2.country,
-              region: data2.regionName
+              city: data1.city || 'Unknown',
+              country: data1.country_name || 'Unknown',
+              region: data1.region || 'Unknown'
             };
+          } else {
+            throw new Error('ipapi.co failed');
           }
-        } catch (err2) {
-          console.error("All geo services failed", err2);
+        } catch (err1) {
+          try {
+            // FALLBACK 2: ip-api.com (Gunakan http jika https gagal, namun hati-hati di production)
+            const res2 = await fetch('http://ip-api.com/json/');
+            const data2 = await res2.json();
+            if (data2.status === 'success') {
+              locationData = {
+                city: data2.city,
+                country: data2.country,
+                region: data2.regionName
+              };
+            }
+          } catch (err2) {
+            console.error("Semua layanan Geolocation gagal:", err2);
+          }
         }
       }
 
+      // Kirim ke Supabase
       try {
         const currentFullPath = window.location.pathname + window.location.hash;
+        
+        // Cek jika ini localhost, beri tanda agar mudah dibedakan di statistik
+        const isLocal = window.location.hostname === "localhost";
+        
         await supabase.from('page_views').insert([
           { 
             page_path: currentFullPath || "/", 
             user_agent: navigator.userAgent,
             city: locationData.city,
             country: locationData.country,
-            region: locationData.region
+            region: locationData.region,
+            // Tambahkan flag localhost jika kolom tersedia di DB Anda (Opsional)
+            // is_development: isLocal 
           }
         ]);
+        console.log("View tracked successfully to Supabase");
       } catch (dbError) {
         console.error("Database Insert Error:", dbError);
       }
     };
 
     trackView();
-    window.addEventListener("hashchange", trackView);
+
+    // Listener untuk perpindahan hash (contoh: #projek)
+    const handleHashChange = () => trackView();
+    window.addEventListener("hashchange", handleHashChange);
 
     const handleScroll = () => {
       const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -102,10 +128,10 @@ function LayoutContent({ children }) {
     window.addEventListener("scroll", handleScroll);
     
     return () => {
-      window.removeEventListener("hashchange", trackView);
+      window.removeEventListener("hashchange", handleHashChange);
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [pathname]);
+  }, [pathname]); // Akan trigger setiap kali path utama berubah
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -118,6 +144,12 @@ function LayoutContent({ children }) {
   }, []);
 
   const handleScrollToSection = (e, href) => {
+    // Jika link eksternal atau halaman statistik, biarkan navigasi normal
+    if (href.startsWith("/statistic")) {
+        setMenuOpen(false);
+        return;
+    }
+
     if (!href.includes("#") && href !== "/") return;
 
     e.preventDefault();
@@ -140,7 +172,6 @@ function LayoutContent({ children }) {
         const elementPosition = section.getBoundingClientRect().top + window.scrollY;
         window.scrollTo({ top: elementPosition - offset, behavior: "smooth" });
         window.history.pushState(null, null, `#${cleanId}`);
-        window.dispatchEvent(new Event("hashchange"));
       }
     } else {
       router.push(href);
@@ -152,6 +183,7 @@ function LayoutContent({ children }) {
       theme === "dark" ? "bg-gray-950 text-gray-100" : "bg-white text-gray-900"
     }`}>
       
+      {/* Scroll Progress Bar */}
       <div className="fixed top-0 left-0 w-full h-1 z-[110] bg-transparent">
         <div 
           className="h-full bg-blue-500 transition-all duration-150 ease-out"
@@ -208,6 +240,7 @@ function LayoutContent({ children }) {
           </div>
         </div>
 
+        {/* Mobile Menu */}
         <div className={`absolute top-full left-0 w-full lg:hidden transition-all duration-500 overflow-hidden ${
           menuOpen ? "max-h-[600px] border-b shadow-xl" : "max-h-0"
         } ${theme === "dark" ? "bg-gray-900 border-gray-800" : "bg-white border-gray-100"}`}>
@@ -260,6 +293,7 @@ function LayoutContent({ children }) {
         </div>
       </footer>
 
+      {/* Floating Action Button */}
       <div 
         ref={floatingRef}
         className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[999] flex flex-col items-end"
