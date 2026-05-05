@@ -31,92 +31,71 @@ function LayoutContent({ children }) {
     { href: "/#organisasi", label: "Pengalaman & Organisasi" },
     { href: "/#pendidikan", label: "Pendidikan" },
     { href: "/#kontak", label: "Kontak" },
-    // { href: "/statistic", label: "Statistik" },
+    { href: "/statistic", label: "Statistik" },
   ];
 
   // LOGIC: Enhanced Supabase Tracking dengan Multiple Geolocation Fallbacks
   useEffect(() => {
     const trackView = async () => {
       let locationData = {
-        city: 'Unknown',
-        country: 'Unknown',
-        region: 'Unknown'
+        city: 'Unknown City',
+        country: 'Unknown Country',
+        region: 'Unknown Region',
+        country_code: '??',
+        isp: 'Unknown ISP'
       };
 
       try {
-        // Coba Layanan 1: ipapi.co
-        const res1 = await fetch('https://ipapi.co/json/');
-        if (res1.ok) {
-          const data1 = await res1.json();
+        // Lapis 1: ip-api.com (Sangat stabil untuk deployment cloud di Indonesia)
+        const res = await fetch('http://ip-api.com/json/');
+        const data = await res.json();
+        
+        if (data.status === 'success') {
           locationData = {
-            city: data1.city || 'Unknown',
-            country: data1.country_name || 'Unknown',
-            region: data1.region || 'Unknown'
+            city: data.city,
+            country: data.country,
+            region: data.regionName,
+            country_code: data.countryCode,
+            isp: data.as
           };
         } else {
-          throw new Error('ipapi.co failed');
+          // Lapis 2: ipapi.co (Jika lapis 1 gagal)
+          const res2 = await fetch('https://ipapi.co/json/');
+          const data2 = await res2.json();
+          locationData = {
+            city: data2.city || 'Unknown City',
+            country: data2.country_name || 'Unknown Country',
+            region: data2.region || 'Unknown Region',
+            country_code: data2.country_code || '??',
+            isp: data2.org || 'Unknown ISP'
+          };
         }
       } catch (err) {
-        try {
-          // Coba Layanan 2 (Fallback): ip-api.com
-          const res2 = await fetch('http://ip-api.com/json/');
-          const data2 = await res2.json();
-          if (data2.status === 'success') {
-            locationData = {
-              city: data2.city,
-              country: data2.country,
-              region: data2.regionName
-            };
-          }
-        } catch (err2) {
-          console.error("All geo services failed", err2);
-        }
+        console.error("Geo-location failed, using default values", err);
       }
 
       try {
+        const userAgent = navigator.userAgent;
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(userAgent);
         const currentFullPath = window.location.pathname + window.location.hash;
+
         await supabase.from('page_views').insert([
           { 
             page_path: currentFullPath || "/", 
-            user_agent: navigator.userAgent,
+            user_agent: userAgent,
             city: locationData.city,
             country: locationData.country,
-            region: locationData.region
+            region: locationData.region,
+            country_code: locationData.country_code,
+            device_type: isMobile ? "Mobile" : "Desktop",
+            isp: locationData.isp
           }
         ]);
       } catch (dbError) {
         console.error("Database Insert Error:", dbError);
       }
     };
-const trackVisitor = async () => {
-  try {
-    // 1. Coba ambil data dari API eksternal (Fallback)
-    const ipRes = await fetch("https://ipapi.co/json/");
-    const ipData = await ipRes.json();
 
-    // 2. Deteksi Device
-    const userAgent = navigator.userAgent;
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(userAgent);
-    
-    // 3. Kirim ke Supabase
-    // Gunakan data dari API, namun jika "Unknown", biarkan Supabase 
-    // atau sistem analitikmu tahu ini adalah traffic production.
-    const logData = {
-      page_path: window.location.pathname + window.location.hash,
-      user_agent: userAgent,
-      city: ipData.city || "Unknown City",
-      region: ipData.region || "Unknown Region",
-      country: ipData.country_name || "Unknown Country",
-      country_code: ipData.country_code || "??",
-      device_type: isMobile ? "Mobile" : "Desktop",
-      isp: ipData.org || "Unknown ISP"
-    };
-
-    await supabase.from('page_views').insert([logData]);
-  } catch (error) {
-    console.error("Tracking Error:", error);
-  }
-};
     trackView();
     window.addEventListener("hashchange", trackView);
 
@@ -280,7 +259,7 @@ const trackVisitor = async () => {
             ))}
           </div>
           <div className="text-center">
-            <h2 className="text-lg font-bold mb-2">Widi Nugroho</h2>
+            <h2 className="text-lg font-bold mb-2">Widi Suryo Nugroho</h2>
             <p className={`text-sm ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}>
               © {new Date().getFullYear()} — Portofolio
             </p>
