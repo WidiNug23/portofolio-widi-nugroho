@@ -34,7 +34,6 @@ function LayoutContent({ children }) {
     { href: "/statistic", label: "Statistik" },
   ];
 
-  // LOGIC: Enhanced Supabase Tracking dengan Multiple Geolocation Fallbacks
   useEffect(() => {
     const trackView = async () => {
       let locationData = {
@@ -46,32 +45,25 @@ function LayoutContent({ children }) {
       };
 
       try {
-        // Lapis 1: ip-api.com (Sangat stabil untuk deployment cloud di Indonesia)
-        const res = await fetch('http://ip-api.com/json/');
-        const data = await res.json();
+        // Ambil IP Publik terlebih dahulu (Layanan HTTPS)
+        const ipRes = await fetch('https://api.ipify.org?format=json');
+        const { ip } = await ipRes.json();
+
+        // Gunakan ipwho.is (Layanan HTTPS gratis dan akurat untuk Indonesia)
+        const geoRes = await fetch(`https://ipwho.is/${ip}`);
+        const geoData = await geoRes.json();
         
-        if (data.status === 'success') {
+        if (geoData.success) {
           locationData = {
-            city: data.city,
-            country: data.country,
-            region: data.regionName,
-            country_code: data.countryCode,
-            isp: data.as
-          };
-        } else {
-          // Lapis 2: ipapi.co (Jika lapis 1 gagal)
-          const res2 = await fetch('https://ipapi.co/json/');
-          const data2 = await res2.json();
-          locationData = {
-            city: data2.city || 'Unknown City',
-            country: data2.country_name || 'Unknown Country',
-            region: data2.region || 'Unknown Region',
-            country_code: data2.country_code || '??',
-            isp: data2.org || 'Unknown ISP'
+            city: geoData.city || 'Unknown City',
+            country: geoData.country || 'Unknown Country',
+            region: geoData.region || 'Unknown Region',
+            country_code: geoData.country_code || '??',
+            isp: geoData.connection?.isp || 'Unknown ISP'
           };
         }
       } catch (err) {
-        console.error("Geo-location failed, using default values", err);
+        console.error("Geo-location failed:", err);
       }
 
       try {
@@ -114,6 +106,7 @@ function LayoutContent({ children }) {
     };
   }, [pathname]);
 
+  // Handle click outside for floating menu
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (floatingRef.current && !floatingRef.current.contains(event.target)) {
