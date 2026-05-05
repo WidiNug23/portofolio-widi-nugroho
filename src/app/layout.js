@@ -9,6 +9,7 @@ import {
 } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { ThemeProvider, useTheme } from "./ThemeContext";
+import { supabase } from "../lib/supabase";
 import "./globals.css";
 
 function LayoutContent({ children }) {
@@ -30,22 +31,82 @@ function LayoutContent({ children }) {
     { href: "/#organisasi", label: "Pengalaman & Organisasi" },
     { href: "/#pendidikan", label: "Pendidikan" },
     { href: "/#kontak", label: "Kontak" },
+    // { href: "/statistic", label: "Statistik" },
   ];
 
-  // Logic Scroll: Progress Bar & Navbar Shadow
+  // LOGIC: Enhanced Supabase Tracking dengan Multiple Geolocation Fallbacks
   useEffect(() => {
+    const trackView = async () => {
+      let locationData = {
+        city: 'Unknown',
+        country: 'Unknown',
+        region: 'Unknown'
+      };
+
+      try {
+        // Coba Layanan 1: ipapi.co
+        const res1 = await fetch('https://ipapi.co/json/');
+        if (res1.ok) {
+          const data1 = await res1.json();
+          locationData = {
+            city: data1.city || 'Unknown',
+            country: data1.country_name || 'Unknown',
+            region: data1.region || 'Unknown'
+          };
+        } else {
+          throw new Error('ipapi.co failed');
+        }
+      } catch (err) {
+        try {
+          // Coba Layanan 2 (Fallback): ip-api.com
+          const res2 = await fetch('http://ip-api.com/json/');
+          const data2 = await res2.json();
+          if (data2.status === 'success') {
+            locationData = {
+              city: data2.city,
+              country: data2.country,
+              region: data2.regionName
+            };
+          }
+        } catch (err2) {
+          console.error("All geo services failed", err2);
+        }
+      }
+
+      try {
+        const currentFullPath = window.location.pathname + window.location.hash;
+        await supabase.from('page_views').insert([
+          { 
+            page_path: currentFullPath || "/", 
+            user_agent: navigator.userAgent,
+            city: locationData.city,
+            country: locationData.country,
+            region: locationData.region
+          }
+        ]);
+      } catch (dbError) {
+        console.error("Database Insert Error:", dbError);
+      }
+    };
+
+    trackView();
+    window.addEventListener("hashchange", trackView);
+
     const handleScroll = () => {
       const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const currentProgress = (window.scrollY / totalHeight) * 100;
+      const currentProgress = totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0;
       setScrollProgress(currentProgress);
       setScrolled(window.scrollY > 20);
     };
 
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    
+    return () => {
+      window.removeEventListener("hashchange", trackView);
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [pathname]);
 
-  // Close floating menu on click outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (floatingRef.current && !floatingRef.current.contains(event.target)) {
@@ -56,7 +117,9 @@ function LayoutContent({ children }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleScrollToSection = (e, targetId, href) => {
+  const handleScrollToSection = (e, href) => {
+    if (!href.includes("#") && href !== "/") return;
+
     e.preventDefault();
     setMenuOpen(false);
 
@@ -69,25 +132,18 @@ function LayoutContent({ children }) {
       return;
     }
 
-    const cleanId = targetId.replace(/^\/?#?/, "");
-    const isKontak = cleanId === "kontak";
-
-    if (isKontak) sessionStorage.setItem("triggerHighlightKontak", "true");
-
+    const cleanId = href.split("#")[1];
     if (pathname === "/") {
       const section = document.getElementById(cleanId);
       if (section) {
         const offset = 80;
-        const bodyRect = document.body.getBoundingClientRect().top;
-        const elementRect = section.getBoundingClientRect().top;
-        window.scrollTo({ top: (elementRect - bodyRect) - offset, behavior: "smooth" });
-        if (isKontak) {
-          setTimeout(() => window.dispatchEvent(new Event("highlightKontak")), 800);
-        }
+        const elementPosition = section.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({ top: elementPosition - offset, behavior: "smooth" });
+        window.history.pushState(null, null, `#${cleanId}`);
+        window.dispatchEvent(new Event("hashchange"));
       }
     } else {
-      sessionStorage.setItem("scrollToTarget", `#${cleanId}`);
-      router.push("/");
+      router.push(href);
     }
   };
 
@@ -96,7 +152,6 @@ function LayoutContent({ children }) {
       theme === "dark" ? "bg-gray-950 text-gray-100" : "bg-white text-gray-900"
     }`}>
       
-      {/* SCROLL PROGRESS BAR */}
       <div className="fixed top-0 left-0 w-full h-1 z-[110] bg-transparent">
         <div 
           className="h-full bg-blue-500 transition-all duration-150 ease-out"
@@ -104,7 +159,6 @@ function LayoutContent({ children }) {
         />
       </div>
 
-      {/* NAVBAR */}
       <nav className={`fixed w-full top-0 z-[100] transition-all duration-300 ${
         scrolled 
           ? (theme === "dark" ? "bg-black/80 backdrop-blur-md py-3 shadow-2xl" : "bg-white/80 backdrop-blur-md py-3 shadow-lg")
@@ -122,14 +176,14 @@ function LayoutContent({ children }) {
           <ul className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
               <li key={link.href}>
-                <a
+                <Link
                   href={link.href}
-                  onClick={(e) => handleScrollToSection(e, link.href, link.href)}
+                  onClick={(e) => handleScrollToSection(e, link.href)}
                   className="relative px-4 py-2 text-sm font-medium transition-all duration-300 hover:text-blue-500 group"
                 >
                   {link.label}
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                </a>
+                </Link>
               </li>
             ))}
             <li className="ml-4 pl-4 border-l border-gray-500/30">
@@ -154,20 +208,19 @@ function LayoutContent({ children }) {
           </div>
         </div>
 
-        {/* MOBILE MENU */}
         <div className={`absolute top-full left-0 w-full lg:hidden transition-all duration-500 overflow-hidden ${
-          menuOpen ? "max-h-[500px] border-b shadow-xl" : "max-h-0"
+          menuOpen ? "max-h-[600px] border-b shadow-xl" : "max-h-0"
         } ${theme === "dark" ? "bg-gray-900 border-gray-800" : "bg-white border-gray-100"}`}>
           <ul className="flex flex-col p-4">
             {navLinks.map((link) => (
               <li key={link.href}>
-                <a
+                <Link
                   href={link.href}
-                  onClick={(e) => handleScrollToSection(e, link.href, link.href)}
+                  onClick={(e) => handleScrollToSection(e, link.href)}
                   className="block px-4 py-4 text-base font-semibold border-b border-gray-500/10 last:border-0 hover:text-blue-500"
                 >
                   {link.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -207,43 +260,31 @@ function LayoutContent({ children }) {
         </div>
       </footer>
 
-      {/* FLOATING CONTACT SECTION */}
       <div 
         ref={floatingRef}
         className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[999] flex flex-col items-end"
       >
-        {/* Card Panel (Glassmorphism) */}
         <div className={`mb-4 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] origin-bottom-right ${
-          isFloatingOpen 
-          ? "opacity-100 scale-100 translate-y-0" 
-          : "opacity-0 scale-50 translate-y-10 pointer-events-none"
+          isFloatingOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-50 translate-y-10 pointer-events-none"
         }`}>
           <div className={`p-6 rounded-[2.5rem] shadow-2xl border min-w-[250px] flex flex-col gap-5 ${
-            theme === "dark" 
-              ? "bg-gray-900/90 border-gray-700/50 backdrop-blur-xl" 
-              : "bg-white/90 border-gray-200/50 backdrop-blur-xl"
+            theme === "dark" ? "bg-gray-900/90 border-gray-700/50 backdrop-blur-xl" : "bg-white/90 border-gray-200/50 backdrop-blur-xl"
           }`}>
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 px-2 opacity-70">Hubungi Saya</span>
-            
             <div className="flex flex-col gap-4">
-              {/* Instagram */}
-              <a href="https://www.instagram.com/widingr23" target="_blank" rel="noopener noreferrer" className={`flex items-center group/item gap-4 transition-all duration-300 ${isFloatingOpen ? "translate-x-0 opacity-100 delay-[100ms]" : "translate-x-4 opacity-0"}`}>
+              <a href="https://www.instagram.com/widingr23" target="_blank" rel="noopener noreferrer" className="flex items-center group/item gap-4">
                 <div className="w-11 h-11 flex items-center justify-center bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 text-white rounded-2xl shadow-lg group-hover/item:scale-110 transition-transform">
                   <FaInstagram size={20} />
                 </div>
                 <span className="text-sm font-bold tracking-tight">Instagram</span>
               </a>
-
-              {/* Email */}
-              <a href="mailto:collabswithwidi@gmail.com" className={`flex items-center group/item gap-4 transition-all duration-300 ${isFloatingOpen ? "translate-x-0 opacity-100 delay-[200ms]" : "translate-x-4 opacity-0"}`}>
+              <a href="mailto:collabswithwidi@gmail.com" className="flex items-center group/item gap-4">
                 <div className="w-11 h-11 flex items-center justify-center bg-red-500 text-white rounded-2xl shadow-lg group-hover/item:scale-110 transition-transform">
                   <MdEmail size={20} />
                 </div>
                 <span className="text-sm font-bold tracking-tight">Email</span>
               </a>
-
-              {/* WhatsApp */}
-              <a href="https://wa.me/6285727609498" target="_blank" rel="noopener noreferrer" className={`flex items-center group/item gap-4 transition-all duration-300 ${isFloatingOpen ? "translate-x-0 opacity-100 delay-[300ms]" : "translate-x-4 opacity-0"}`}>
+              <a href="https://wa.me/6285727609498" target="_blank" rel="noopener noreferrer" className="flex items-center group/item gap-4">
                 <div className="w-11 h-11 flex items-center justify-center bg-green-500 text-white rounded-2xl shadow-lg group-hover/item:scale-110 transition-transform">
                   <FaWhatsapp size={20} />
                 </div>
@@ -253,29 +294,17 @@ function LayoutContent({ children }) {
           </div>
         </div>
 
-        {/* Trigger Button with Your Specific Colors */}
         <div className="relative group">
-          {/* Hover-Only Ping Effect */}
-          <span className={`absolute inset-0 rounded-full opacity-0 group-hover:animate-ping group-hover:opacity-30 transition-opacity duration-300 ${
-            theme === "dark" ? "bg-white" : "bg-blue-500"
-          }`}></span>
-          
           <button 
             onClick={() => setIsFloatingOpen(!isFloatingOpen)}
-            aria-label="Toggle Contact Menu"
             className={`w-14 h-14 flex items-center justify-center rounded-full shadow-2xl transition-all duration-500 relative z-10 ${
               isFloatingOpen ? "rotate-90 scale-90" : "rotate-0 scale-100"
-            } ${
-              theme === "dark" 
-              ? "bg-white text-blue-500 hover:bg-white shadow-white-900/40" 
-              : "bg-blue-600 text-white hover:bg-blue-700 shadow-blue-500/40"
-            }`}
+            } ${theme === "dark" ? "bg-white text-blue-500" : "bg-blue-600 text-white"}`}
           >
             {isFloatingOpen ? <FaTimes className="text-2xl" /> : <FaComments className="text-2xl" />}
           </button>
         </div>
       </div>
-
     </body>
   );
 }
