@@ -88,7 +88,35 @@ function LayoutContent({ children }) {
         console.error("Database Insert Error:", dbError);
       }
     };
+const trackVisitor = async () => {
+  try {
+    // 1. Coba ambil data dari API eksternal (Fallback)
+    const ipRes = await fetch("https://ipapi.co/json/");
+    const ipData = await ipRes.json();
 
+    // 2. Deteksi Device
+    const userAgent = navigator.userAgent;
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(userAgent);
+    
+    // 3. Kirim ke Supabase
+    // Gunakan data dari API, namun jika "Unknown", biarkan Supabase 
+    // atau sistem analitikmu tahu ini adalah traffic production.
+    const logData = {
+      page_path: window.location.pathname + window.location.hash,
+      user_agent: userAgent,
+      city: ipData.city || "Unknown City",
+      region: ipData.region || "Unknown Region",
+      country: ipData.country_name || "Unknown Country",
+      country_code: ipData.country_code || "??",
+      device_type: isMobile ? "Mobile" : "Desktop",
+      isp: ipData.org || "Unknown ISP"
+    };
+
+    await supabase.from('page_views').insert([logData]);
+  } catch (error) {
+    console.error("Tracking Error:", error);
+  }
+};
     trackView();
     window.addEventListener("hashchange", trackView);
 
