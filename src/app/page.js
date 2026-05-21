@@ -167,7 +167,7 @@ export default function Home() {
                 { href: "/#lomba", title: "Lomba & Kompetensi", desc: "Prestasi & perlombaan", color: "#a855f7" },
                 { href: "/#organisasi", title: "Pengalaman & Organisasi", desc: "Daftar pengalaman organisasi", color: "#eab308" },
                 { href: "/#pendidikan", title: "Pendidikan", desc: "Daftar pendidikan resmi", color: "#f50bbb" },
-                { href: "https://drive.google.com/file/d/1LL6os9qulvStkktLdEZvEyZyfDMBtJim/view?usp=sharing", title: "Curriculum Vitae", desc: "Unduh CV terbaru saya", color: "#ef4444" },
+                { href: "https://drive.google.com/file/d/1TJvEKgIe9WlaGTnrsqymGzXlEIg1t_7Y/view?usp=sharing", title: "Curriculum Vitae", desc: "Unduh CV terbaru saya", color: "#ef4444" },
               ].map((item, index) => (
                 <RevealItem key={item.title} delay={100 * index}>
                   <Link href={item.href} className={`group flex flex-col items-center justify-center p-8 md:p-10 h-full rounded-[2rem] transition-all duration-300 border border-transparent md:hover:border-current active:scale-95 ${theme === "dark" ? "bg-gray-800/40" : "bg-white shadow-xl"}`} style={{ color: item.color }}>
