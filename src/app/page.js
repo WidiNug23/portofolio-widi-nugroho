@@ -138,9 +138,10 @@ export default function Home() {
 
               <div className={`transition-all duration-500 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
                 <p className="text-sm sm:text-base md:text-lg leading-relaxed font-medium">
-                  Saya memiliki ketertarikan mendalam terhadap perancangan dan pengembangan sistem berbasis web. Saya senang memahami
-                  bagaimana sebuah website bekerja mulai dari alur sistem hingga pengalaman interaksi pengguna. Dalam pengembangan, saya sering menggunakan React.js untuk frontend dan Laravel untuk
-                  backend. Saya menikmati proses menerjemahkan kebutuhan pengguna menjadi sistem yang fungsional dan efisien. Selain itu, saya memiliki ketertarikan terhadap visual dari pengalaman di bidang saya fotografi dan videografi. 
+Lulusan D3 Teknik Informatika Universitas Sebelas Maret (IPK 3.81) dengan fokus dan ketertarikan mendalam pada
+pengembangan perangkat lunak serta ekosistem bisnis digital. Berpengalaman dalam proyek magang dan freelance yang
+memperkuat keahlian praktis sebagai Full Stack Developer, Front End Developer, dan System Analyst. Saya adalah
+seorang problem solver yang dedikatif dalam menciptakan solusi teknologi yang efisien, inovatif, dan berdampak.
                   Saya dapat bekerja baik secara individu maupun dalam tim, serta{" "}
                   <span className={`font-bold transition-all duration-500 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
                     terbuka untuk mempelajari berbagai teknologi baru.
