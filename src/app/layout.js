@@ -294,19 +294,21 @@ function LayoutContent({ children }) {
       </footer>
 
       {/* Floating Action Button */}
-      <div 
-        ref={floatingRef}
-        className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[999] flex flex-col items-end"
-      >
-        <div className={`mb-4 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] origin-bottom-right ${
-          isFloatingOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-50 translate-y-10 pointer-events-none"
-        }`}>
-          <div className={`p-6 rounded-[2.5rem] shadow-2xl border min-w-[250px] flex flex-col gap-5 ${
-            theme === "dark" ? "bg-gray-900/90 border-gray-700/50 backdrop-blur-xl" : "bg-white/90 border-gray-200/50 backdrop-blur-xl"
-          }`}>
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 px-2 opacity-70">Hubungi Saya</span>
-            <div className="flex flex-col gap-4">
-              <a href="https://www.instagram.com/widingr23" target="_blank" rel="noopener noreferrer" className="flex items-center group/item gap-4">
+<div 
+  ref={floatingRef}
+  /* Tambahkan pointer-events-none di sini agar tidak menghalangi klik */
+  className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[999] flex flex-col items-end pointer-events-none"
+>
+  <div className={`mb-4 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] origin-bottom-right pointer-events-auto ${
+    isFloatingOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-50 translate-y-10 pointer-events-none"
+  }`}>
+    <div className={`p-6 rounded-[2.5rem] shadow-2xl border min-w-[250px] flex flex-col gap-5 ${
+      theme === "dark" ? "bg-gray-900/90 border-gray-700/50 backdrop-blur-xl" : "bg-white/90 border-gray-200/50 backdrop-blur-xl"
+    }`}>
+      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 px-2 opacity-70">Hubungi Saya</span>
+      <div className="flex flex-col gap-4">
+        {/* Konten menu tetap sama */}
+               <a href="https://www.instagram.com/widingr23" target="_blank" rel="noopener noreferrer" className="flex items-center group/item gap-4">
                 <div className="w-11 h-11 flex items-center justify-center bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 text-white rounded-2xl shadow-lg group-hover/item:scale-110 transition-transform">
                   <FaInstagram size={20} />
                 </div>
@@ -324,21 +326,21 @@ function LayoutContent({ children }) {
                 </div>
                 <span className="text-sm font-bold tracking-tight">WhatsApp</span>
               </a>
-            </div>
-          </div>
-        </div>
-
-        <div className="relative group">
-          <button 
-            onClick={() => setIsFloatingOpen(!isFloatingOpen)}
-            className={`w-14 h-14 flex items-center justify-center rounded-full shadow-2xl transition-all duration-500 relative z-10 ${
-              isFloatingOpen ? "rotate-90 scale-90" : "rotate-0 scale-100"
-            } ${theme === "dark" ? "bg-white text-blue-500" : "bg-blue-600 text-white"}`}
-          >
-            {isFloatingOpen ? <FaTimes className="text-2xl" /> : <FaComments className="text-2xl" />}
-          </button>
-        </div>
       </div>
+    </div>
+  </div>
+
+  <div className="relative group pointer-events-auto">
+    <button 
+      onClick={() => setIsFloatingOpen(!isFloatingOpen)}
+      className={`w-14 h-14 flex items-center justify-center rounded-full shadow-2xl transition-all duration-500 relative z-10 ${
+        isFloatingOpen ? "rotate-90 scale-90" : "rotate-0 scale-100"
+      } ${theme === "dark" ? "bg-white text-blue-500" : "bg-blue-600 text-white"}`}
+    >
+      {isFloatingOpen ? <FaTimes className="text-2xl" /> : <FaComments className="text-2xl" />}
+    </button>
+  </div>
+</div>
     </body>
   );
 }
