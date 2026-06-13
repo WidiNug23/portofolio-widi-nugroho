@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useTheme } from "../ThemeContext";
 
 const projekData = [
-    {
+  {
     id: 1,
     tag: "Freelance Project",
     judul: "Company Profile Website",
@@ -31,7 +31,7 @@ const projekData = [
     ]),
   },
   {
-    id: 11, // Diubah agar ID unik
+    id: 11,
     tag: "Freelance Project",
     judul: "PECELANDAK - Pelayanan Cepat Langsung Digital Akuntabel",
     deskripsi: `This website is linked to the Mejayan village profile website, providing online letter submission services, which are managed directly by village officials. Developed using Laravel 12 & Mysql Database`,
@@ -50,7 +50,7 @@ const projekData = [
     ]),
   },
   {
-    id: 12, // Diubah agar ID unik
+    id: 12,
     tag: "Personal Project",
     judul: "CareBot – Sistem Informasi Kebutuhan Nutrisi yang Dilengkapi Chatbot DialogFlow",
     deskripsi: `Terpenuhinya kebutuhan nutrisi yang optimal sangat penting untuk menjaga kesehatan dan kualitas hidup setiap individu, terutama bagi remaja, lansia, ibu hamil, dan ibu menyusui. Terdapat juga kalkulator perhitungan nutrisi menggunakan rumus Mifflin st Jeor`,
@@ -68,7 +68,7 @@ const projekData = [
     ]),
   },
   {
-    id: 2,
+    id: 22,
     tag: "Internship Project",
     judul: "SIPBIBU – Sistem Pencegahan dan Penanganan Baby Blues Pada Ibu",
     deskripsi: `SIPBIBU merupakan website yang dibuat sebagai upaya untuk menekan angka baby blues pada Ibu.\n\nFitur-fitur utama:\n• Kuesioner Model Suryani & EPDS\n• Forum Diskusi Ibu\n• Konsultasi Online Psikolog\n• Edukasi Video & Audio`,
@@ -233,6 +233,13 @@ export default function ProjekPage() {
     return match && match[2].length === 11 ? match[2] : null;
   };
 
+  // Membagi data projek secara merata ke dalam 3 kolom utama secara bergantian (Masonry Grid Alternatif)
+  // Cara ini menjamin efek kartu di bawah mengalir mengikuti kartu atas, tanpa glitch tata letak browser.
+  const columnsData = [[], [], []];
+  projekData.forEach((project, index) => {
+    columnsData[index % 3].push(project);
+  });
+
   return (
     <main className={`min-h-screen pt-32 pb-20 px-4 sm:px-8 lg:px-16 transition-colors duration-500 ${isDark ? "bg-[#080808] text-white" : "bg-slate-50 text-slate-900"}`}>
       
@@ -247,101 +254,123 @@ export default function ProjekPage() {
         </p>
       </div>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {projekData.map((p) => {
-          const isExpanded = expanded[p.id];
-          const textToShow = isExpanded ? p.deskripsi : p.deskripsi?.substring(0, 150) + (p.deskripsi?.length > 150 ? "..." : "");
-          const youtubeID = extractYouTubeID(p.link_demo || "");
-          let images = [];
-          try { images = JSON.parse(p.images || "[]"); } catch { images = []; }
-          const slideIdx = currentSlide[p.id] ?? 0;
+      {/* PERBAIKAN UTAMA: Menggunakan Multi-Flexbox Columns Layout */}
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8 items-start">
+        {columnsData.map((col, colIdx) => (
+          <div 
+            key={colIdx} 
+            className={`flex-1 flex flex-col gap-8 w-full ${
+              colIdx === 1 ? "hidden md:flex" : colIdx === 2 ? "hidden lg:flex" : ""
+            }`}
+          >
+            {col.map((p) => {
+              const isExpanded = expanded[p.id];
+              const youtubeID = extractYouTubeID(p.link_demo || "");
+              let images = [];
+              try { images = JSON.parse(p.images || "[]"); } catch { images = []; }
+              const slideIdx = currentSlide[p.id] ?? 0;
 
-          return (
-            <div key={p.id} className="projek-card opacity-0 transform translate-y-12 transition-all duration-700 flex">
-              <div className={`group w-full flex flex-col rounded-[2rem] overflow-hidden border transition-all duration-500 ${isDark ? "bg-white/5 border-white/10 hover:bg-white/10" : "bg-white border-slate-200 shadow-lg hover:shadow-2xl"}`}>
-                
-                {/* Media Section */}
-                <div className="relative aspect-video overflow-hidden bg-black/20">
-                  {p.isUpcoming ? (
-                    <SpinningClockIcon />
-                  ) : youtubeID ? (
-                    <div className="w-full h-full relative cursor-pointer group/vid" onClick={() => setModalVideoID(youtubeID)}>
-                      <img src={`https://img.youtube.com/vi/${youtubeID}/mqdefault.jpg`} className="w-full h-full object-cover transition-transform duration-700 group-hover/vid:scale-110" alt="thumb" />
-                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover/vid:bg-black/20 transition-all">
-                        <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center shadow-2xl">
-                          <div className="ml-1 border-y-[8px] border-y-transparent border-l-[12px] border-l-white"></div>
+              return (
+                <div 
+                  key={p.id} 
+                  className="projek-card opacity-0 transform translate-y-12 transition-all duration-700 w-full"
+                >
+                  <div className={`group w-full flex flex-col rounded-[2rem] overflow-hidden border transition-all duration-500 ${isDark ? "bg-white/5 border-white/10 hover:bg-white/10" : "bg-white border-slate-200 shadow-lg hover:shadow-2xl"}`}>
+                    
+                    {/* Media Section */}
+                    <div className="relative aspect-video overflow-hidden bg-black/20 shrink-0">
+                      {p.isUpcoming ? (
+                        <SpinningClockIcon />
+                      ) : youtubeID ? (
+                        <div className="w-full h-full relative cursor-pointer group/vid" onClick={() => setModalVideoID(youtubeID)}>
+                          <img src={`https://img.youtube.com/vi/${youtubeID}/mqdefault.jpg`} className="w-full h-full object-cover transition-transform duration-700 group-hover/vid:scale-110" alt="thumb" />
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover/vid:bg-black/20 transition-all">
+                            <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center shadow-2xl">
+                              <div className="ml-1 border-y-[8px] border-y-transparent border-l-[12px] border-l-white"></div>
+                            </div>
+                          </div>
                         </div>
+                      ) : images.length > 0 ? (
+                        <div className="w-full h-full relative group/img">
+                          <div className="flex h-full transition-transform duration-700 ease-in-out" style={{ transform: `translateX(-${slideIdx * 100}%)` }}>
+                            {images.map((img, i) => (
+                              <img key={i} src={`uploads/${img}`} className="w-full h-full object-cover cursor-zoom-in shrink-0" alt="step" onClick={() => openLightbox(p.id, i)} />
+                            ))}
+                          </div>
+                          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 p-1.5 bg-black/30 backdrop-blur-md rounded-full">
+                            {images.map((_, i) => (
+                              <button key={i} onClick={() => handleDotClick(p.id, i)} className={`h-1.5 rounded-full transition-all ${i === slideIdx ? "w-4 bg-blue-500" : "w-1.5 bg-white/40"}`} />
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center opacity-30 italic text-xs">No Media</div>
+                      )}
+                    </div>
+
+                    {/* Content Section */}
+                    <div className="p-6 flex-1 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                           <span className={`w-8 h-0.5 rounded-full ${isDark ? "bg-blue-500 shadow-[0_0_8px_#3b82f6]" : "bg-blue-600"}`}></span>
+                           <span className="text-[10px] font-black tracking-widest uppercase opacity-60">
+                             {p.tag || "Project"}
+                           </span>
+                        </div>
+                        
+                        <h2 className="text-xl font-bold mb-3 tracking-tight leading-tight group-hover:text-blue-400 transition-colors">
+                          {p.judul}
+                        </h2>
+                        
+                        {/* Pembungkus Animasi Deskripsi yang Mulus */}
+                        <div className={`grid transition-[grid-template-rows,opacity,margin] duration-500 ease-in-out will-change-[grid-template-rows,opacity] ${
+                          isExpanded 
+                            ? "grid-rows-[1fr] opacity-100 mb-4" 
+                            : "grid-rows-[0fr] lg:group-hover:grid-rows-[1fr] opacity-0 lg:group-hover:opacity-100 lg:group-hover:mb-4"
+                        }`}>
+                          <div className="overflow-hidden">
+                            <p className="text-sm leading-relaxed opacity-90 whitespace-pre-line">
+                              {p.deskripsi}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Navigasi Clickable khusus Mobile Device */}
+                        {p.deskripsi?.length > 0 && (
+                          <button 
+                            onClick={() => setExpanded(e => ({...e, [p.id]: !isExpanded}))} 
+                            className="text-xs font-bold text-blue-500 hover:text-blue-400 mb-4 text-left lg:hidden"
+                          >
+                            {isExpanded ? "Sembunyikan Detail" : "Lihat Detail..."}
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Tombol Navigasi Selalu Rata Bawah */}
+                      <div className="flex flex-wrap gap-2 pt-4 border-t border-white/10 mt-4">
+                        {p.link_demo && (
+                          <a href={p.link_demo} target="_blank" rel="noreferrer" className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${isDark ? "bg-white text-black hover:bg-blue-400" : "bg-slate-900 text-white hover:bg-blue-600"}`}>
+                            {youtubeID ? "Tonton" : "Website"}
+                          </a>
+                        )}
+                        {p.link_github && (
+                          <a href={p.link_github} target="_blank" rel="noreferrer" className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-all ${isDark ? "border-white/20 text-white hover:bg-white/10" : "border-slate-300 text-slate-900 hover:bg-slate-50"}`}>
+                            Github
+                          </a>
+                        )}
+                        {p.pdf_file && (
+                          <button onClick={() => setModalPDF(p.pdf_file)} className="px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                            Dokumen
+                          </button>
+                        )}
                       </div>
                     </div>
-                  ) : images.length > 0 ? (
-                    <div className="w-full h-full relative group/img">
-                      <div className="flex h-full transition-transform duration-700 ease-in-out" style={{ transform: `translateX(-${slideIdx * 100}%)` }}>
-                        {images.map((img, i) => (
-                          <img key={i} src={`uploads/${img}`} className="w-full h-full object-cover cursor-zoom-in shrink-0" alt="step" onClick={() => openLightbox(p.id, i)} />
-                        ))}
-                      </div>
-                      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 p-1.5 bg-black/30 backdrop-blur-md rounded-full">
-                        {images.map((_, i) => (
-                          <button key={i} onClick={() => handleDotClick(p.id, i)} className={`h-1.5 rounded-full transition-all ${i === slideIdx ? "w-4 bg-blue-500" : "w-1.5 bg-white/40"}`} />
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="h-full w-full flex items-center justify-center opacity-30 italic text-xs">No Media</div>
-                  )}
-                </div>
-
-                {/* Content Section */}
-                <div className="p-6 flex-1 flex flex-col">
-                  {/* Bagian Custom Tag */}
-                  <div className="flex items-center gap-2 mb-3">
-                     <span className={`w-8 h-0.5 rounded-full ${isDark ? "bg-blue-500 shadow-[0_0_8px_#3b82f6]" : "bg-blue-600"}`}></span>
-                     <span className="text-[10px] font-black tracking-widest uppercase opacity-60">
-                       {p.tag || "Project"}
-                     </span>
-                  </div>
-                  
-                  <h2 className="text-xl font-bold mb-3 tracking-tight leading-tight min-h-[3rem] group-hover:text-blue-400 transition-colors">
-                    {p.judul}
-                  </h2>
-                  
-                  <p className="text-sm leading-relaxed mb-2 opacity-80 whitespace-pre-line">
-                    {textToShow}
-                  </p>
-
-                  {/* Tombol Selengkapnya */}
-                  {p.deskripsi?.length > 150 && (
-                    <button 
-                      onClick={() => setExpanded(e => ({...e, [p.id]: !isExpanded}))} 
-                      className="text-xs font-bold text-blue-500 hover:text-blue-400 mb-4 text-left"
-                    >
-                      {isExpanded ? "Sembunyikan" : "Selengkapnya..."}
-                    </button>
-                  )}
-
-                  {/* Tombol Navigasi */}
-                  <div className="flex flex-wrap gap-2 mt-auto pt-4 border-t border-white/10">
-                    {p.link_demo && (
-                      <a href={p.link_demo} target="_blank" rel="noreferrer" className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${isDark ? "bg-white text-black hover:bg-blue-400" : "bg-slate-900 text-white hover:bg-blue-600"}`}>
-                        {youtubeID ? "Tonton" : "Website"}
-                      </a>
-                    )}
-                    {p.link_github && (
-                      <a href={p.link_github} target="_blank" rel="noreferrer" className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-all ${isDark ? "border-white/20 text-white hover:bg-white/10" : "border-slate-300 text-slate-900 hover:bg-slate-50"}`}>
-                        Github
-                      </a>
-                    )}
-                    {p.pdf_file && (
-                      <button onClick={() => setModalPDF(p.pdf_file)} className="px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-all">
-                        Dokumen
-                      </button>
-                    )}
                   </div>
                 </div>
-              </div>
-            </div>
-          );
-        })}
+              );
+            })}
+          </div>
+        ))}
       </div>
 
       {/* Lightbox Preview Gambar */}

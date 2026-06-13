@@ -2,9 +2,9 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "../ThemeContext";
 
-// Komponen Animasi Jarum Jam Berputar (Lime Variant)
+// Komponen Animasi Jarum Jam Berputar (Lime Variant) - Dioptimalkan untuk Grid Layout
 const SpinningClockIcon = () => (
-  <div className="flex flex-col items-center justify-center py-12 gap-5 w-full bg-[#9be414]/5 rounded-3xl border-2 border-dashed border-[#9be414]/20">
+  <div className="flex flex-col items-center justify-center py-16 px-6 gap-5 h-full w-full bg-[#9be414]/5 rounded-3xl border-2 border-dashed border-[#9be414]/20 min-h-[250px]">
     <div className="relative w-16 h-16">
       <svg 
         viewBox="0 0 24 24" 
@@ -23,10 +23,10 @@ const SpinningClockIcon = () => (
       </svg>
     </div>
     <div className="text-center">
-      <p className="text-[#9be414]/70 text-[10px] font-black uppercase tracking-[0.3em] animate-pulse">
+      <p className="text-[#9be414]/70 text-[11px] font-black uppercase tracking-[0.3em] animate-pulse">
         Incoming Certificate
       </p>
-      <p className="text-[9px] mt-1 text-gray-500 italic">Verifying achievements...</p>
+      <p className="text-[10px] mt-1 text-gray-500 italic">Verifying achievements...</p>
     </div>
   </div>
 );
@@ -114,7 +114,7 @@ export default function SertifikatPage() {
   }, [sertifikat]);
 
   return (
-    <main className={`min-h-screen font-poppins transition-colors duration-500 pt-32 pb-20 px-4 sm:px-8 md:px-16 lg:px-24 ${isDark ? "text-gray-100" : "text-gray-900"}`}>
+    <main className={`min-h-screen font-poppins transition-colors duration-500 pt-32 pb-20 px-4 sm:px-8 md:px-12 lg:px-16 ${isDark ? "text-gray-100" : "text-gray-900"}`}>
       
       {/* HEADER SECTION */}
       <header className="max-w-4xl mx-auto mb-20 text-center">
@@ -130,87 +130,80 @@ export default function SertifikatPage() {
            <p className="opacity-50 italic animate-pulse">Memuat data sertifikat...</p>
         </div>
       ) : (
-        <div className="max-w-6xl mx-auto flex flex-col gap-12">
+        /* Menggunakan layout columns agar card di bawah otomatis naik mengisi ruang kosong di atasnya (True Masonry) */
+        <div className="max-w-6xl mx-auto columns-1 md:columns-2 gap-8 space-y-8">
           {sertifikat.map((s) => {
             const isExpanded = expanded[s.id];
-            const textToShow = isExpanded || s.deskripsi?.length <= 180 ? s.deskripsi : s.deskripsi?.substring(0, 180) + "...";
+            const textToShow = isExpanded || s.deskripsi?.length <= 140 ? s.deskripsi : s.deskripsi?.substring(0, 140) + "...";
             const pdfUrl = normalizePdfUrl(s.pdf_file);
 
             return (
-              <div key={s.id} className="sertifikat-card opacity-0 translate-y-10 transition-all duration-1000 group">
-                <div className="neon-border rounded-[2.5rem] p-[1px] relative">
-                  <div className={`relative rounded-[2.4rem] p-8 md:p-10 flex flex-col lg:flex-row gap-10 transition-all duration-500 ${isDark ? "bg-gray-900/40 backdrop-blur-xl border border-white/5" : "bg-white shadow-xl border border-gray-100 group-hover:shadow-2xl"}`}>
+              /* break-inside-avoid mencegah card terpotong di tengah saat berganti kolom */
+              <div key={s.id} className="sertifikat-card opacity-0 translate-y-10 transition-all duration-1000 group w-full inline-block break-inside-avoid">
+                <div className="neon-border rounded-[2.5rem] p-[1px] relative w-full">
+                  <div className={`relative rounded-[2.4rem] p-6 md:p-8 flex flex-col transition-all duration-500 ${isDark ? "bg-gray-900/40 backdrop-blur-xl border border-white/5" : "bg-white shadow-lg border border-gray-100 group-hover:shadow-2xl"}`}>
                     
                     {s.isComingSoon ? (
                       <SpinningClockIcon />
                     ) : (
                       <>
-                        {/* LEFT CONTENT */}
-                        <div className="flex-1 flex flex-col">
-                          <div className="flex flex-wrap gap-2 mb-6">
+                        {/* MAIN CONTENT AREA */}
+                        <div className="flex flex-col">
+                          {/* TAGS */}
+                          <div className="flex flex-wrap gap-2 mb-4">
                             {s.tingkat && (
-                              <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${isDark ? 'bg-[#9be414]/10 text-[#9be414] border border-[#9be414]/20' : 'bg-lime-50 text-lime-700 border border-lime-100'}`}>
+                              <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${isDark ? 'bg-[#9be414]/10 text-[#9be414] border border-[#9be414]/20' : 'bg-lime-50 text-lime-700 border border-lime-100'}`}>
                                 {s.tingkat}
                               </span>
                             )}
-                            <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${isDark ? 'bg-gray-800/50 text-gray-400 border border-white/5' : 'bg-gray-100 text-gray-600'}`}>
+                            <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${isDark ? 'bg-gray-800/50 text-gray-400 border border-white/5' : 'bg-gray-100 text-gray-600'}`}>
                               {s.tahun || "TBA"}
                             </span>
                           </div>
 
-                          <h2 className={`text-2xl md:text-3xl font-bold mb-4 leading-tight tracking-tight transition-colors ${isDark ? "text-white group-hover:text-[#9be414]" : "text-gray-900"}`}>
+                          {/* TITLE */}
+                          <h2 className={`text-xl md:text-2xl font-bold mb-3 leading-tight tracking-tight transition-colors ${isDark ? "text-white group-hover:text-[#9be414]" : "text-gray-900"}`}>
                             {s.nama}
                           </h2>
 
-                          <div className="mb-8 space-y-4">
-                            <p className={`text-sm md:text-base leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                          {/* DESKRIPSI */}
+                          <div className="mb-6">
+                            <p className={`text-xs md:text-sm leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                               {textToShow}
                             </p>
-                            {s.deskripsi?.length > 180 && (
-                              <button onClick={() => toggleExpand(s.id)} className="text-[10px] font-black text-[#9be414] uppercase tracking-widest hover:underline transition-all">
+                            {s.deskripsi?.length > 140 && (
+                              <button onClick={() => toggleExpand(s.id)} className="text-[9px] font-black text-[#9be414] uppercase tracking-widest hover:underline mt-2 block transition-all">
                                 {isExpanded ? "Sembunyikan" : "Detail Deskripsi"}
                               </button>
                             )}
                           </div>
 
-                          <div className={`grid grid-cols-1 sm:grid-cols-2 gap-6 pt-8 border-t ${isDark ? 'border-white/5' : 'border-gray-100'} mt-auto`}>
-                            <div>
-                              <p className={`text-[10px] uppercase tracking-widest font-black mb-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Penerbit Instansi</p>
-                              <p className={`text-sm font-bold ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{s.penerbit || "-"}</p>
-                            </div>
-                            {s.hasil && (
+                          {/* FOOTER AREA INSIDE CARD */}
+                          <div>
+                            {/* METADATA INFO */}
+                            <div className={`grid grid-cols-2 gap-4 pt-4 border-t ${isDark ? 'border-white/5' : 'border-gray-100'} mb-6`}>
                               <div>
-                                <p className={`text-[10px] uppercase tracking-widest font-black mb-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Status / Hasil</p>
-                                <p className={`text-sm font-bold text-[#9be414] italic`}>{s.hasil}</p>
+                                <p className={`text-[9px] uppercase tracking-widest font-black mb-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Penerbit</p>
+                                <p className={`text-xs font-bold line-clamp-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{s.penerbit || "-"}</p>
+                              </div>
+                              {s.hasil && (
+                                <div>
+                                  <p className={`text-[9px] uppercase tracking-widest font-black mb-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Hasil</p>
+                                  <p className={`text-xs font-bold text-[#9be414] italic`}>{s.hasil}</p>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* ACTION BUTTON */}
+                            {pdfUrl && (
+                              <div className="flex justify-start">
+                                <button onClick={() => setModalPDF(pdfUrl)} className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-black text-[10px] tracking-widest uppercase transition-all transform active:scale-95 shadow-md group/btn w-full justify-center sm:w-auto ${isDark ? 'bg-[#9be414] text-black hover:bg-[#b0f524] shadow-[#9be414]/10' : 'bg-black text-white hover:bg-gray-800 shadow-black/5'}`}>
+                                  Buka Dokumen
+                                </button>
                               </div>
                             )}
                           </div>
-
-                          {pdfUrl && (
-                            <div className="mt-10">
-                              <button onClick={() => setModalPDF(pdfUrl)} className={`inline-flex items-center gap-3 px-10 py-4 rounded-2xl font-black text-[10px] tracking-widest uppercase transition-all transform active:scale-95 shadow-xl group/btn ${isDark ? 'bg-[#9be414] text-black hover:bg-[#b0f524] shadow-[#9be414]/20' : 'bg-black text-white hover:bg-gray-800 shadow-black/10'}`}>
-                                <span className="text-lg group-hover/btn:rotate-12 transition-transform">📄</span> 
-                                Buka Dokumen
-                              </button>
-                            </div>
-                          )}
                         </div>
-
-                        {/* RIGHT PREVIEW */}
-                        {pdfUrl && (
-                          <div className="w-full lg:w-[450px]">
-                            <div className={`relative h-64 lg:h-full min-h-[350px] rounded-3xl overflow-hidden border-2 transition-all duration-700 group-hover:border-[#9be414]/40 ${isDark ? 'border-white/5 bg-black/40' : 'border-gray-100 bg-gray-50 shadow-inner'}`}>
-                              <object data={pdfUrl} type="application/pdf" width="100%" height="100%" className="opacity-70 group-hover:opacity-100 transition-all duration-500 scale-[1.01]">
-                                <div className="p-8 text-center flex flex-col items-center justify-center h-full gap-4">
-                                   <div className="text-4xl opacity-20 text-[#9be414]">📄</div>
-                                   <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Preview not supported</p>
-                                   <a href={pdfUrl} target="_blank" rel="noreferrer" className="text-[10px] px-4 py-2 border border-[#9be414] text-[#9be414] font-black uppercase tracking-widest rounded-lg hover:bg-[#9be414] hover:text-black transition-all">Open Externally</a>
-                                </div>
-                              </object>
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            </div>
-                          </div>
-                        )}
                       </>
                     )}
                   </div>
@@ -223,10 +216,28 @@ export default function SertifikatPage() {
 
       {/* MODAL VIEW */}
       {modalPDF && (
-        <div className="fixed inset-0 z-[1000] flex justify-center items-center bg-black/95 backdrop-blur-xl p-4 md:p-10 animate-fade-in" onClick={() => setModalPDF(null)}>
-          <button onClick={() => setModalPDF(null)} className="absolute top-8 right-8 text-white/50 hover:text-[#9be414] text-4xl transition-all z-10">&times;</button>
-          <div className="relative w-full h-full max-w-6xl max-h-[90vh] bg-white rounded-[2rem] overflow-hidden shadow-2xl scale-in-center" onClick={(e) => e.stopPropagation()}>
-            <iframe src={modalPDF} className="w-full h-full" title="PDF Preview"></iframe>
+        /* z-[9999] dinaikkan agar mutlak berada di atas komponen navigasi luar */
+        <div className="fixed inset-0 z-[9999] flex flex-col justify-center items-center bg-black/95 backdrop-blur-xl p-4 md:p-10 animate-fade-in" onClick={() => setModalPDF(null)}>
+          
+          {/* md:pt-24 ditambahkan agar tombol X turun ke bawah jika ada navbar besar di desktop */}
+          <div className="w-full max-w-5xl flex justify-end mb-3 pt-20 md:pt-24">
+            <button 
+              onClick={() => setModalPDF(null)} 
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-[#9be414] text-white hover:text-black transition-all group duration-300 shadow-lg"
+              title="Tutup Dokumen"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="relative w-full h-[75vh] md:h-[80vh] max-w-5xl bg-black rounded-[2rem] overflow-hidden shadow-2xl scale-in-center border border-white/10" onClick={(e) => e.stopPropagation()}>
+            <iframe 
+              src={`${modalPDF}#toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0`} 
+              className="w-full h-full bg-neutral-900 border-none" 
+              title="PDF Preview"
+            ></iframe>
           </div>
         </div>
       )}
@@ -266,12 +277,12 @@ export default function SertifikatPage() {
         }
 
         @keyframes scaleIn {
-          from { transform: scale(0.95); opacity: 0; }
+          from { transform: scale(0.97); opacity: 0; }
           to { transform: scale(1); opacity: 1; }
         }
 
         .scale-in-center {
-          animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         @keyframes spin {
