@@ -373,20 +373,49 @@ export default function ProjekPage() {
         ))}
       </div>
 
-      {/* Lightbox Preview Gambar */}
-      {lightbox.isOpen && (
-        <div className="fixed inset-0 z-[110] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4" onClick={closeLightbox}>
-          <button className="absolute top-8 right-8 text-white/50 hover:text-white text-4xl">✕</button>
-          <button onClick={(e) => navigateLightbox(e, -1)} className="absolute left-4 p-4 text-white text-2xl">❮</button>
-          <button onClick={(e) => navigateLightbox(e, 1)} className="absolute right-4 p-4 text-white text-2xl">❯</button>
-          <img 
-            src={`uploads/${JSON.parse(projekData.find(x => x.id === lightbox.projekID).images)[lightbox.imgIndex]}`} 
-            className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl" 
-            onClick={e => e.stopPropagation()} 
-            alt="preview"
-          />
-        </div>
-      )}
+{/* Lightbox Preview Gambar */}
+{lightbox.isOpen && (
+  <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
+    {/* Background Blur dengan overlay gelap */}
+    <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" onClick={closeLightbox}></div>
+
+    {/* Background Image Blur (Estetik) */}
+    <div className="absolute inset-0 overflow-hidden opacity-30">
+       <img 
+        src={`uploads/${JSON.parse(projekData.find(x => x.id === lightbox.projekID).images)[lightbox.imgIndex]}`} 
+        className="w-full h-full object-cover blur-3xl scale-110"
+        alt="background-blur"
+      />
+    </div>
+
+    {/* PERBAIKAN: Tombol Close - Diposisikan dengan margin-top cukup agar tidak tertutup navbar */}
+    <button 
+      onClick={closeLightbox} 
+      className="absolute top-20 right-6 z-[2010] p-3 bg-black/50 hover:bg-black/70 rounded-full text-white backdrop-blur-md transition-all border border-white/20"
+    >
+      <span className="text-2xl font-bold">✕</span>
+    </button>
+    
+    {/* Tombol Navigasi */}
+    <button onClick={(e) => navigateLightbox(e, -1)} className="absolute left-4 z-[2010] p-4 text-white/70 hover:text-white transition-all text-4xl">❮</button>
+    <button onClick={(e) => navigateLightbox(e, 1)} className="absolute right-4 z-[2010] p-4 text-white/70 hover:text-white transition-all text-4xl">❯</button>
+
+    {/* Main Image Container dengan margin agar tidak mentok atas bawah */}
+    <div className="relative z-[2005] max-w-5xl w-full max-h-[80vh] mt-16 flex items-center justify-center">
+      <img 
+        src={`uploads/${JSON.parse(projekData.find(x => x.id === lightbox.projekID).images)[lightbox.imgIndex]}`} 
+        className="max-w-full max-h-[80vh] object-contain rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10" 
+        onClick={e => e.stopPropagation()} 
+        alt="preview"
+      />
+      
+      {/* Indikator Gambar */}
+      <div className="absolute -bottom-12 text-white/50 text-sm font-light">
+        {lightbox.imgIndex + 1} / {JSON.parse(projekData.find(x => x.id === lightbox.projekID).images).length}
+      </div>
+    </div>
+  </div>
+)}
 
       {/* Modal Video */}
       {modalVideoID && (
