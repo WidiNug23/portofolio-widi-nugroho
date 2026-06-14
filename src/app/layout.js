@@ -17,6 +17,7 @@ function LayoutContent({ children }) {
   const [scrolled, setScrolled] = useState(false);
   const [isFloatingOpen, setIsFloatingOpen] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const floatingRef = useRef(null);
   
   const { theme, toggleTheme } = useTheme();
@@ -31,12 +32,12 @@ function LayoutContent({ children }) {
     { href: "/#organisasi", label: "Pengalaman & Organisasi" },
     { href: "/#pendidikan", label: "Pendidikan" },
     { href: "/#kontak", label: "Kontak" },
-    // { href: "/statistic", label: "Statistik" }, // Diaktifkan kembali untuk testing
   ];
 
-  // LOGIC: Enhanced Supabase Tracking dengan Geolocation yang lebih akurat
+  // LOGIC: Enhanced Supabase Tracking dengan Geolocation + Loading Control
   useEffect(() => {
     const trackView = async () => {
+      setIsLoading(true); // Aktifkan loading saat inisialisasi / ganti page
       let locationData = {
         city: 'Unknown',
         country: 'Unknown',
@@ -44,7 +45,7 @@ function LayoutContent({ children }) {
       };
 
       try {
-        // PRIORITAS 1: ipwho.is (Seringkali lebih detail untuk wilayah kecamatan/lokal)
+        // PRIORITAS 1: ipwho.is
         const res0 = await fetch('https://ipwho.is/');
         const data0 = await res0.json();
         if (data0.success) {
@@ -72,7 +73,7 @@ function LayoutContent({ children }) {
           }
         } catch (err1) {
           try {
-            // FALLBACK 2: ip-api.com (Gunakan http jika https gagal, namun hati-hati di production)
+            // FALLBACK 2: ip-api.com
             const res2 = await fetch('http://ip-api.com/json/');
             const data2 = await res2.json();
             if (data2.status === 'success') {
@@ -91,10 +92,6 @@ function LayoutContent({ children }) {
       // Kirim ke Supabase
       try {
         const currentFullPath = window.location.pathname + window.location.hash;
-        
-        // Cek jika ini localhost, beri tanda agar mudah dibedakan di statistik
-        const isLocal = window.location.hostname === "localhost";
-        
         await supabase.from('page_views').insert([
           { 
             page_path: currentFullPath || "/", 
@@ -102,19 +99,19 @@ function LayoutContent({ children }) {
             city: locationData.city,
             country: locationData.country,
             region: locationData.region,
-            // Tambahkan flag localhost jika kolom tersedia di DB Anda (Opsional)
-            // is_development: isLocal 
           }
         ]);
         console.log("View tracked successfully to Supabase");
       } catch (dbError) {
         console.error("Database Insert Error:", dbError);
+      } finally {
+        // Proses selesai, matikan loading di navbar
+        setIsLoading(false);
       }
     };
 
     trackView();
 
-    // Listener untuk perpindahan hash (contoh: #projek)
     const handleHashChange = () => trackView();
     window.addEventListener("hashchange", handleHashChange);
 
@@ -131,7 +128,7 @@ function LayoutContent({ children }) {
       window.removeEventListener("hashchange", handleHashChange);
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [pathname]); // Akan trigger setiap kali path utama berubah
+  }, [pathname]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -144,7 +141,6 @@ function LayoutContent({ children }) {
   }, []);
 
   const handleScrollToSection = (e, href) => {
-    // Jika link eksternal atau halaman statistik, biarkan navigasi normal
     if (href.startsWith("/statistic")) {
         setMenuOpen(false);
         return;
@@ -179,7 +175,7 @@ function LayoutContent({ children }) {
   };
 
   return (
-    <body className={`min-h-screen flex flex-col transition-colors duration-500 font-poppins ${
+    <body className={`min-h-screen flex flex-col transition-colors duration-500 font-poppins relative ${
       theme === "dark" ? "bg-gray-950 text-gray-100" : "bg-white text-gray-900"
     }`}>
       
@@ -197,13 +193,27 @@ function LayoutContent({ children }) {
           : "bg-transparent py-5"
       }`}>
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6">
-          <Link href="/" className="group">
-            <h1 className={`text-2xl font-black tracking-tighter transition-all duration-300 ${
-              theme === "dark" ? "text-white group-hover:text-blue-400" : "text-gray-900 group-hover:text-blue-600"
+          
+          {/* LOGO & NAVBAR MICRO-LOADING CONTAINER */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            <Link href="/" className="group">
+              <h1 className={`text-2xl font-black tracking-tighter transition-all duration-300 ${
+                theme === "dark" ? "text-white group-hover:text-blue-400" : "text-gray-900 group-hover:text-blue-600"
+              }`}>
+                WIDI<span className="text-blue-500">.</span>
+              </h1>
+            </Link>
+
+            {/* Spinner Loading Ring Inline (Selalu memuat teks di mobile & desktop) */}
+            <div className={`flex items-center gap-1.5 sm:gap-2 transition-all duration-500 transform ${
+              isLoading ? "opacity-100 scale-100 w-auto" : "opacity-0 scale-0 w-0 overflow-hidden"
             }`}>
-              WIDI<span className="text-blue-500">.</span>
-            </h1>
-          </Link>
+              <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full border-2 border-blue-500/20 border-t-blue-500 animate-spin"></div>
+              <span className="text-[9px] sm:text-[10px] font-bold tracking-widest text-blue-500 uppercase animate-pulse inline">
+                Loading
+              </span>
+            </div>
+          </div>
 
           <ul className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
@@ -294,21 +304,19 @@ function LayoutContent({ children }) {
       </footer>
 
       {/* Floating Action Button */}
-<div 
-  ref={floatingRef}
-  /* Tambahkan pointer-events-none di sini agar tidak menghalangi klik */
-  className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[999] flex flex-col items-end pointer-events-none"
->
-  <div className={`mb-4 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] origin-bottom-right pointer-events-auto ${
-    isFloatingOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-50 translate-y-10 pointer-events-none"
-  }`}>
-    <div className={`p-6 rounded-[2.5rem] shadow-2xl border min-w-[250px] flex flex-col gap-5 ${
-      theme === "dark" ? "bg-gray-900/90 border-gray-700/50 backdrop-blur-xl" : "bg-white/90 border-gray-200/50 backdrop-blur-xl"
-    }`}>
-      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 px-2 opacity-70">Hubungi Saya</span>
-      <div className="flex flex-col gap-4">
-        {/* Konten menu tetap sama */}
-               <a href="https://www.instagram.com/widingr23" target="_blank" rel="noopener noreferrer" className="flex items-center group/item gap-4">
+      <div 
+        ref={floatingRef}
+        className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[999] flex flex-col items-end pointer-events-none"
+      >
+        <div className={`mb-4 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] origin-bottom-right pointer-events-auto ${
+          isFloatingOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-50 translate-y-10 pointer-events-none"
+        }`}>
+          <div className={`p-6 rounded-[2.5rem] shadow-2xl border min-w-[250px] flex flex-col gap-5 ${
+            theme === "dark" ? "bg-gray-900/90 border-gray-700/50 backdrop-blur-xl" : "bg-white/90 border-gray-200/50 backdrop-blur-xl"
+          }`}>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 px-2 opacity-70">Hubungi Saya</span>
+            <div className="flex flex-col gap-4">
+              <a href="https://www.instagram.com/widingr23" target="_blank" rel="noopener noreferrer" className="flex items-center group/item gap-4">
                 <div className="w-11 h-11 flex items-center justify-center bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 text-white rounded-2xl shadow-lg group-hover/item:scale-110 transition-transform">
                   <FaInstagram size={20} />
                 </div>
@@ -326,21 +334,21 @@ function LayoutContent({ children }) {
                 </div>
                 <span className="text-sm font-bold tracking-tight">WhatsApp</span>
               </a>
-      </div>
-    </div>
-  </div>
+            </div>
+          </div>
+        </div>
 
-  <div className="relative group pointer-events-auto">
-    <button 
-      onClick={() => setIsFloatingOpen(!isFloatingOpen)}
-      className={`w-14 h-14 flex items-center justify-center rounded-full shadow-2xl transition-all duration-500 relative z-10 ${
-        isFloatingOpen ? "rotate-90 scale-90" : "rotate-0 scale-100"
-      } ${theme === "dark" ? "bg-white text-blue-500" : "bg-blue-600 text-white"}`}
-    >
-      {isFloatingOpen ? <FaTimes className="text-2xl" /> : <FaComments className="text-2xl" />}
-    </button>
-  </div>
-</div>
+        <div className="relative group pointer-events-auto">
+          <button 
+            onClick={() => setIsFloatingOpen(!isFloatingOpen)}
+            className={`w-14 h-14 flex items-center justify-center rounded-full shadow-2xl transition-all duration-500 relative z-10 ${
+              isFloatingOpen ? "rotate-90 scale-90" : "rotate-0 scale-100"
+            } ${theme === "dark" ? "bg-white text-blue-500" : "bg-blue-600 text-white"}`}
+          >
+            {isFloatingOpen ? <FaTimes className="text-2xl" /> : <FaComments className="text-2xl" />}
+          </button>
+        </div>
+      </div>
     </body>
   );
 }

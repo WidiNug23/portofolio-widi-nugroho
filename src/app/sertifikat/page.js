@@ -199,7 +199,7 @@ return (
                     href={pdfUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`block w-full py-4 rounded-xl font-black text-[10px] tracking-widest uppercase text-center transition-all ${
+                    className={`block w-full py-4 rounded-xl font-black text-[12px] tracking-widest uppercase text-center transition-all ${
                       isDark 
                         ? 'bg-[#9be414] text-black hover:bg-[#b0f524]' 
                         : 'bg-black text-white hover:bg-gray-800'
@@ -220,14 +220,31 @@ return (
         </div>
       )}
 
-      <style jsx>{`
+<style jsx>{`
         .neon-glow {
-          text-shadow: 0 0 20px rgba(155, 228, 20, 0.3);
+          text-shadow: 0 0 20px rgba(155, 228, 20, 0.4);
         }
         
         .sertifikat-card.reveal {
           opacity: 1 !important;
           transform: translateY(0) !important;
+        }
+
+        /* Perbaikan Bayangan Neon */
+        .neon-border {
+          transition: all 0.5s ease;
+        }
+
+        .neon-border::before {
+          content: "";
+          position: absolute;
+          inset: -2px; /* Dibuat sedikit lebih luas agar glow lebih menyebar */
+          background: linear-gradient(135deg, #9be414, #00c6ff);
+          z-index: -1;
+          border-radius: 2.6rem; /* Sedikit lebih besar dari radius card */
+          opacity: 0;
+          filter: blur(15px); /* Menambahkan efek blur untuk hasil glow yang nyata */
+          transition: opacity 0.5s ease;
         }
 
         .neon-border::before {
@@ -242,7 +259,16 @@ return (
         }
 
         .sertifikat-card:hover .neon-border::before {
-          opacity: 0.2;
+          opacity: 0.4; /* Intensitas glow saat di-hover */
+        }
+
+        .sertifikat-card:hover {
+          transform: translateY(-5px) !important; /* Efek angkat saat di-hover */
+        }
+        
+        /* Opsional: Tambahkan bayangan lembut pada card agar lebih 'timbul' */
+        .sertifikat-card {
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
 
         @keyframes spin {

@@ -18,7 +18,6 @@ import dynamic from "next/dynamic";
 import { SiShutterstock } from "react-icons/si";
 import { FiLink } from "react-icons/fi";
 
-// Lazy load sub-halaman mumpung filenya banyak agar bundle size halaman utama kecil
 const ProjekPage = dynamic(() => import("./projek/page"), { ssr: false });
 const SertifikatPage = dynamic(() => import("./sertifikat/page"), { ssr: false });
 const LombaPage = dynamic(() => import("./lomba-kompetensi/page"), { ssr: false });
@@ -64,16 +63,11 @@ function RotatingLabelItem({ item, theme }) {
     <a href={item.href} 
        target="_blank" 
        rel="noopener noreferrer" 
-       /* - Mobile (default): w-14 h-14 rounded-full justify-center (jadi lingkaran & hanya logo)
-          - Desktop (md): md:w-full md:h-auto md:rounded-2xl md:justify-start (kembali memanjang)
-       */
        className={`flex items-center justify-center md:justify-start gap-4 p-3 md:px-5 md:py-3.5 w-14 h-14 md:w-full md:h-auto rounded-full md:rounded-2xl transition-all duration-300 transform md:hover:scale-105 active:scale-95 cursor-pointer relative z-10 ${theme === "dark" ? "bg-gray-800" : "bg-white"}`} 
        style={{ boxShadow: `0 0 12px ${item.color}` }}>
       
-      {/* Icon pembungkus tetap rata tengah */}
       <div className="flex-shrink-0 flex justify-center items-center text-center">{item.icon}</div>
       
-      {/* Teks hanya muncul di layar desktop (md:flex) dan tersembunyi di mobile (hidden) */}
       <div className="relative flex-1 overflow-hidden h-8 hidden md:flex items-center">
         <span className={`absolute left-0 text-base md:text-lg font-semibold whitespace-nowrap ${theme === "dark" ? "text-white" : "text-black"}`}
           style={{ 
@@ -185,7 +179,6 @@ export default function Home() {
 
   return (
     <>
-      {/* Google Fonts Poppins di-load secara non-blocking melalui tag link global standar */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&display=swap" rel="stylesheet" media="print" onLoad="this.media='all'" />
@@ -197,7 +190,6 @@ export default function Home() {
 
       <div className="relative w-full transition-colors duration-500" style={{ backgroundColor: theme === "dark" ? "#000" : "#fff" }}>
         
-        {/* --- SECTION 1: STICKY CARD --- */}
         <section className="md:sticky md:top-0 min-h-screen w-full flex items-center justify-center px-4 py-12 md:py-0 z-0">
           <div className={`rounded-[2rem] p-6 md:p-12 max-w-5xl w-full mx-auto flex flex-col md:flex-row items-center gap-8 md:gap-12 transition-all duration-1000 
             ${theme === "dark" ? "bg-gray-900/40 border-gray-800" : "bg-white border-gray-100"} border shadow-2xl backdrop-blur-sm`}>
@@ -234,46 +226,72 @@ export default function Home() {
                     terbuka untuk mempelajari berbagai teknologi baru.
                   </span>
                 </p>
+                
+                <div className="mt-6">
+                  <a 
+                    href="https://drive.google.com/file/d/1Csizb5mlVzvNT1ZqfNY2WfktF3iFWPwq/view?usp=sharing"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative inline-block px-8 py-3 font-bold text-white rounded-full transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg overflow-hidden group"
+                    style={{ backgroundColor: "#ef4444" }}
+                  >
+                    <span className="relative z-10">Lihat Curriculum Vitae</span>
+                    <div className="absolute inset-0 bg-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+                  </a>
+                </div>
               </div>
               <div className={`mt-5 h-1 bg-blue-500 rounded-full transition-all duration-1000 mx-auto md:mx-0 ${showSuryo ? "w-full opacity-100" : "w-16 opacity-50"}`}></div>
             </div>
           </div>
         </section>
 
-        {/* --- SECTION 2: CONTENT LAYER --- */}
         <section className="relative z-10 w-full rounded-t-[2.5rem] md:rounded-t-[5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.1)] py-12 md:py-20 px-4 md:px-10"
           style={{ backgroundColor: theme === "dark" ? "#0a0a0a" : "#f8fafc", color: theme === "dark" ? "#fff" : "#000" }}>
           
-          {/* PORTOFOLIO */}
-          <div className="max-w-6xl mx-auto mb-20 md:mb-24">
+          <div className="max-w-6xl mx-auto mb-20 md:mb-24 px-4">
             <RevealContainer>
-              <h2 className="text-3xl md:text-5xl font-extrabold mb-8 md:mb-12 text-center font-poppins">Portofolio</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+              <h2 className="text-3xl md:text-5xl font-extrabold mb-12 text-center font-poppins">Portofolio</h2>
+              
+              <div className="flex flex-wrap justify-center gap-4">
                 {[
-                  { href: "/#projek", title: "Projek", desc: "Kumpulan projek web & konten video", color: "#3b82f6" },
-                  { href: "/#sertifikat", title: "Sertifikat", desc: "Kumpulan Sertifikasi profesional", color: "#22c55e" },
-                  { href: "/#lomba", title: "Lomba & Kompetensi", desc: "Prestasi & perlombaan", color: "#a855f7" },
-                  { href: "/#organisasi", title: "Pengalaman & Organisasi", desc: "Daftar pengalaman organisasi", color: "#eab308" },
-                  { href: "/#pendidikan", title: "Pendidikan", desc: "Daftar pendidikan resmi", color: "#f50bbb" },
-                  { href: "https://drive.google.com/file/d/1Csizb5mlVzvNT1ZqfNY2WfktF3iFWPwq/view?usp=sharing", title: "Curriculum Vitae", desc: "Unduh CV terbaru saya", color: "#ef4444" },
-                ].map((item) => (
-                  <Link key={item.title} href={item.href} className={`group flex flex-col items-center justify-center p-8 md:p-10 h-full rounded-[2rem] transition-all duration-300 border border-transparent md:hover:border-current active:scale-95 ${theme === "dark" ? "bg-gray-800/40" : "bg-white shadow-xl"}`} style={{ color: item.color }}>
-                    <span className={`text-lg md:text-xl font-bold mb-2 ${theme === "dark" ? "text-white" : "text-black"}`}>{item.title}</span>
-                    <span className="text-xs md:text-sm opacity-70 text-center">{item.desc}</span>
+                  { title: "Projek", desc: "Kumpulan projek web & video", color: "#3b82f6" },
+                  { title: "Sertifikat", desc: "Kumpulan sertifikasi profesional", color: "#22c55e" },
+                  { title: "Lomba", desc: "Prestasi & perlombaan", color: "#a855f7" },
+                  { title: "Organisasi", desc: "Daftar pengalaman organisasi", color: "#eab308" },
+                  { title: "Pendidikan", desc: "Daftar pendidikan resmi", color: "#f50bbb" },
+                ].map((item, idx) => (
+                  <Link 
+                    key={idx} 
+                    href={`/#${item.title.toLowerCase()}`} 
+                    className="group relative block p-[1px] rounded-xl overflow-hidden transition-all duration-500 hover:scale-[1.02]"
+                  >
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" 
+                         style={{ background: `linear-gradient(90deg, ${item.color}, transparent)` }}></div>
+                    
+                    <div className={`relative flex items-center justify-center px-6 py-3 rounded-xl transition-all duration-500 min-h-[48px] ${theme === "dark" ? "bg-gray-900" : "bg-white"} border ${theme === "dark" ? "border-gray-800" : "border-gray-100"}`}>
+                      
+                      <span className="font-bold whitespace-nowrap transition-all duration-500 ease-in-out group-hover:opacity-0 group-hover:max-w-0 group-hover:p-0 opacity-100 max-w-[100px] p-0">
+                        {item.title}
+                      </span>
+
+                      <span 
+                        className="font-medium whitespace-nowrap overflow-hidden transition-all duration-500 ease-in-out opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-[250px] text-sm"
+                        style={{ color: item.color }}
+                      >
+                        {item.desc}
+                      </span>
+                    </div>
                   </Link>
                 ))}
               </div>
             </RevealContainer>
           </div>
 
-          {/* HUBUNGI SAYA */}
           <div id="kontak" className="max-w-4xl mx-auto mb-20 md:mb-24 px-4">
             <RevealContainer>
               <h2 className={`text-3xl md:text-4xl font-extrabold mb-10 md:mb-12 text-center font-poppins transition-all duration-300 ${highlightKontak ? "text-blue-500 scale-110" : ""}`}>Hubungi Saya</h2>
               
-              {/* - Mobile: grid-cols-2 dengan item rata tengah (justify-items-center). 
-                  - Desktop (md): otomatis menyesuaikan grid layout yang memanjang (md:grid-cols-2 lg:grid-cols-3)
-              */}
               <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center justify-center max-w-md md:max-w-none mx-auto w-full">
                 {[
                   { href: "https://github.com/WidiNug23", icon: <FaGithub className="text-2xl" />, labels: ["Github", "WidiNug23"], color: "#6e7681" },
@@ -291,11 +309,11 @@ export default function Home() {
             </RevealContainer>
           </div>
 
-          {/* AREA INTERACTIVE PIE CHART TOOLS SYSTEM */}
-          <div ref={chartRef} className="max-w-6xl mx-auto mb-28 md:mb-36 text-center px-4 overflow-hidden min-h-[400px]">
+          {/* Pie Chart Section - Diperbaiki posisinya */}
+          <div ref={chartRef} className="min-h-screen w-full flex items-center justify-center py-12 px-4">
             {chartRendered && (
-              <div className="relative flex items-center justify-center min-h-[350px] sm:min-h-[520px] md:min-h-[640px] lg:min-h-[700px] w-full max-w-[750px] mx-auto select-none content-visibility-auto">
-                <svg viewBox="0 0 500 500" className="w-full h-auto max-h-[90vw] overflow-visible animate-[pieRotateIn_1s_ease-out]">
+              <div className="relative flex items-center justify-center w-full max-w-[750px] mx-auto select-none">
+                <svg viewBox="0 0 500 500" className="w-full h-auto overflow-visible animate-[pieRotateIn_1s_ease-out]">
                   <g>
                     {toolsData.map((tool, index) => {
                       const isHovered = hoveredIndex === index;
@@ -344,7 +362,6 @@ export default function Home() {
                   </g>
                 </svg>
 
-                {/* AREA PUSAT LINGKARAN */}
                 <div className={`absolute z-30 w-[38%] h-[38%] rounded-full flex flex-col items-center justify-center p-3 text-center border pointer-events-none backdrop-blur-md shadow-inner ${
                     theme === "dark" ? "bg-black/90 border-gray-800 shadow-black" : "bg-white/95 border-gray-200/60 shadow-gray-200"
                   }`}
@@ -368,7 +385,6 @@ export default function Home() {
             )}
           </div>
 
-          {/* PAGES IMPORT */}
           <div id="projek" className="pt-16 md:pt-24"><ProjekPage /></div>
           <div id="sertifikat" className="pt-16 md:pt-24"><SertifikatPage /></div>
           <div id="lomba" className="pt-16 md:pt-24"><LombaPage /></div>
@@ -389,6 +405,10 @@ export default function Home() {
         @keyframes pieRotateIn {
           from { opacity: 0; transform: scale(0.8) rotate(-90deg); }
           to { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+        
+        @keyframes shimmer {
+          100% { transform: translateX(100%); }
         }
       `}</style>
     </>
