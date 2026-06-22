@@ -1,204 +1,160 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useTheme } from '../ThemeContext';
 
 export default function StatisticPage() {
-  const [totalViews, setTotalViews] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [recentViews, setRecentViews] = useState([]);
-  const [pageStats, setPageStats] = useState([]);
-  const [locationStats, setLocationStats] = useState([]);
+  const [rawData, setRawData] = useState([]);
+  const [displayMode, setDisplayMode] = useState('paginated'); 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortConfig, setSortConfig] = useState({ key: 'viewed_at', direction: 'desc' });
   const { theme } = useTheme();
+
+  const ITEMS_PER_PAGE = 100;
 
   useEffect(() => {
     fetchStatistics();
   }, []);
 
-  const formatDeviceName = (ua) => {
-    if (!ua) return 'Perangkat Tidak Dikenal';
-    if (ua.includes('iPhone')) return 'iPhone / iOS';
-    if (ua.includes('Android')) return 'Android Mobile';
-    if (ua.includes('Windows')) return 'Windows Desktop';
-    if (ua.includes('Macintosh')) return 'MacOS Desktop';
-    if (ua.includes('Linux')) return 'Linux Desktop';
-    return 'Browser Desktop';
-  };
-
-  const formatDateNoPukul = (dateString) => {
-    const date = new Date(dateString);
-    const day = date.toLocaleDateString('id-ID', { day: '2-digit' });
-    const month = date.toLocaleDateString('id-ID', { month: 'long' });
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    
-    return `${day} ${month} ${hours}:${minutes}`;
-  };
-
   async function fetchStatistics() {
     setLoading(true);
     try {
-      const { count } = await supabase
-        .from('page_views')
-        .select('*', { count: 'exact', head: true });
-
-      const { data: allData, error } = await supabase
+      const { data, error } = await supabase
         .from('page_views')
         .select('*')
         .order('viewed_at', { ascending: false });
-
       if (error) throw error;
-
-      if (count) setTotalViews(count);
-      if (allData) {
-        setRecentViews(allData.slice(0, 10));
-
-        const pageMap = {};
-        allData.forEach(item => {
-          const path = item.page_path || '/';
-          pageMap[path] = (pageMap[path] || 0) + 1;
-        });
-        const sortedPages = Object.entries(pageMap)
-          .map(([path, count]) => ({ path, count }))
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 5);
-        setPageStats(sortedPages);
-
-        const locMap = {};
-        allData.forEach(item => {
-          const loc = item.city && item.city !== 'Unknown City' 
-                      ? `${item.city}, ${item.country_code}` 
-                      : 'Lokasi Tidak Terdeteksi';
-          locMap[loc] = (locMap[loc] || 0) + 1;
-        });
-        const sortedLocs = Object.entries(locMap)
-          .map(([name, count]) => ({ name, count }))
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 5);
-        setLocationStats(sortedLocs);
-      }
+      setRawData(data || []);
     } catch (err) {
-      console.error("Error mengambil statistik:", err);
+      console.error("Error:", err);
     } finally {
       setLoading(false);
     }
   }
 
+  // Helper untuk format nama perangkat
+  const formatDeviceName = (ua) => {
+    if (!ua) return 'Tidak Dikenal';
+    if (ua.includes('iPhone')) return 'iPhone / iOS';
+    if (ua.includes('Android')) return 'Android';
+    if (ua.includes('Windows')) return 'Windows';
+    if (ua.includes('Macintosh')) return 'MacOS';
+    return 'Desktop/Lainnya';
+  };
+
+  const handleSort = (key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
+
+  const sortedData = useMemo(() => {
+    return [...rawData].sort((a, b) => {
+      // Khusus untuk sorting user_agent, kita ambil versi formatnya
+      const valA = sortConfig.key === 'user_agent' ? formatDeviceName(a.user_agent) : (a[sortConfig.key] || "");
+      const valB = sortConfig.key === 'user_agent' ? formatDeviceName(b.user_agent) : (b[sortConfig.key] || "");
+      
+      return sortConfig.direction === 'asc' 
+        ? (valA > valB ? 1 : -1) 
+        : (valA < valB ? 1 : -1);
+    });
+  }, [rawData, sortConfig]);
+
+  const paginatedData = useMemo(() => {
+    if (displayMode === 'all') return sortedData;
+    return sortedData.slice(0, currentPage * ITEMS_PER_PAGE);
+  }, [sortedData, displayMode, currentPage]);
+
+  const pageStats = useMemo(() => {
+    const map = {};
+    rawData.forEach(item => { const p = item.page_path || '/'; map[p] = (map[p] || 0) + 1; });
+    return Object.entries(map).map(([path, count]) => ({ path, count })).sort((a, b) => b.count - a.count);
+  }, [rawData]);
+
+  const locStats = useMemo(() => {
+    const map = {};
+    rawData.forEach(item => { const l = item.city || 'Tidak Terdeteksi'; map[l] = (map[l] || 0) + 1; });
+    return Object.entries(map).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
+  }, [rawData]);
+
   return (
-    <div className={`min-h-screen py-12 px-6 transition-colors duration-500 ${
-      theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'
-    }`}>
+    <div className={`min-h-screen py-12 px-4 md:px-6 transition-colors duration-300 ${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'}`}>
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { 
+          background-color: ${theme === 'dark' ? '#333' : '#ccc'}; 
+          border-radius: 20px; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #3b82f6; }
+      `}</style>
+
       <div className="max-w-7xl mx-auto">
+        <h1 className="text-4xl md:text-6xl font-black uppercase mb-10 tracking-tight">Analitik Website</h1>
         
-        <div className="mb-16">
-          <h1 className="text-6xl font-black uppercase tracking-tighter mb-4">
-            Analitik <span className="text-blue-600">Website</span>
-          </h1>
-          <div className="h-1 w-24 bg-blue-600 mb-4"></div>
-          <p className="text-lg font-medium opacity-50 uppercase tracking-widest">Data Kunjungan Portofolio</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {[{title: 'Total Tayangan', val: rawData.length}, {title: 'Halaman Teratas', list: pageStats}, {title: 'Lokasi Teratas', list: locStats}].map((box, i) => (
+            <div key={i} className={`p-8 rounded-[2rem] border ${theme === 'dark' ? 'bg-neutral-900 border-neutral-800' : 'bg-gray-50 border-gray-100'}`}>
+              <h3 className="text-xs font-black opacity-40 mb-4 tracking-widest uppercase">{box.title}</h3>
+              {box.val !== undefined ? <p className="text-6xl font-black">{box.val.toLocaleString()}</p> : 
+                <div className="max-h-[300px] overflow-y-auto pr-2 space-y-3 custom-scrollbar">
+                  {box.list.map((item, j) => <div key={j} className="flex justify-between text-sm font-bold border-b border-gray-500/10 pb-2">
+                    <span className="truncate mr-2">{item.path || item.name}</span> 
+                    <span className="text-blue-600 shrink-0">{item.count}</span>
+                  </div>)}
+                </div>
+              }
+            </div>
+          ))}
         </div>
 
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-40 border-2 border-dashed border-gray-800 rounded-[3rem]">
-            <p className="text-2xl font-black uppercase tracking-[0.3em] animate-pulse">Memuat Data</p>
+        <div className="flex flex-wrap gap-4 mb-8">
+          <button onClick={() => setDisplayMode(displayMode === 'all' ? 'paginated' : 'all')} className="px-8 py-3 bg-blue-600 text-white rounded-full font-black uppercase text-sm tracking-widest hover:bg-blue-700 transition-all">
+            {displayMode === 'all' ? 'Tampilkan 100 Data Saja' : 'Tampilkan Semua Data'}
+          </button>
+        </div>
+
+        <div className={`rounded-[2rem] border overflow-hidden ${theme === 'dark' ? 'border-neutral-800' : 'border-gray-200'}`}>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead className={theme === 'dark' ? 'bg-neutral-900' : 'bg-gray-50'}>
+                <tr>
+                  {[
+                    {key: 'viewed_at', label: 'Waktu'}, 
+                    {key: 'city', label: 'Wilayah'}, 
+                    {key: 'page_path', label: 'Path'},
+                    {key: 'user_agent', label: 'Perangkat'}
+                  ].map((col) => (
+                    <th key={col.key} className="p-6 cursor-pointer hover:text-blue-600 transition-colors uppercase text-xs tracking-widest font-black" onClick={() => handleSort(col.key)}>
+                      {col.label} {sortConfig.key === col.key ? (sortConfig.direction === 'asc' ? '▲' : '▼') : '↕'}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-500/10">
+                {paginatedData.map((v) => (
+                  <tr key={v.id} className="hover:bg-blue-600/5 transition-colors">
+                    <td className="p-6 text-sm">{new Date(v.viewed_at).toLocaleString('id-ID')}</td>
+                    <td className="p-6 text-sm font-bold">{v.city || 'N/A'}</td>
+                    <td className="p-6 text-sm font-mono opacity-70">{v.page_path}</td>
+                    <td className="p-6 text-sm font-bold text-blue-600">{formatDeviceName(v.user_agent)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-20">
-              <div className={`p-10 rounded-[3rem] border-2 transition-all ${
-                theme === 'dark' ? 'bg-neutral-900 border-neutral-800' : 'bg-gray-50 border-gray-100'
-              }`}>
-                <h3 className="font-black text-sm uppercase tracking-widest mb-6 opacity-40">Total Tayangan</h3>
-                <p className="text-7xl font-black tracking-tighter">{totalViews.toLocaleString()}</p>
-              </div>
-
-              <div className={`p-10 rounded-[3rem] border-2 transition-all ${
-                theme === 'dark' ? 'bg-neutral-900 border-neutral-800' : 'bg-gray-50 border-gray-100'
-              }`}>
-                <h3 className="font-black text-sm uppercase tracking-widest mb-6 opacity-40">Halaman Teratas</h3>
-                <div className="flex flex-col gap-4">
-                  {pageStats.map((p, i) => (
-                    <div key={i} className="flex justify-between items-center border-b border-gray-500/10 pb-2">
-                      <span className="font-bold text-sm truncate max-w-[150px]">{p.path}</span>
-                      <span className="font-black text-blue-600">{p.count}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className={`p-10 rounded-[3rem] border-2 transition-all ${
-                theme === 'dark' ? 'bg-neutral-900 border-neutral-800' : 'bg-gray-50 border-gray-100'
-              }`}>
-                <h3 className="font-black text-sm uppercase tracking-widest mb-6 opacity-40">Lokasi Teratas</h3>
-                <div className="flex flex-col gap-4">
-                  {locationStats.map((l, i) => (
-                    <div key={i} className="flex justify-between items-center border-b border-gray-500/10 pb-2">
-                      <span className="font-bold text-sm truncate">{l.name}</span>
-                      <span className="font-black text-blue-600">{l.count}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+          
+          {displayMode === 'paginated' && paginatedData.length < sortedData.length && (
+            <div className="p-8 text-center border-t border-gray-500/10">
+              <button onClick={() => setCurrentPage(p => p + 1)} className="px-6 py-2 border-2 border-blue-600 text-blue-600 rounded-full font-bold hover:bg-blue-600 hover:text-white transition-all">
+                Muat 100 Data Berikutnya
+              </button>
             </div>
-
-            <div className={`rounded-[3rem] border-2 overflow-hidden ${
-              theme === 'dark' ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-100'
-            }`}>
-              <div className="p-12 border-b border-gray-500/10 bg-neutral-500/5">
-                <h2 className="text-3xl font-black uppercase tracking-tighter">Log Aktivitas Pengunjung</h2>
-              </div>
-
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead>
-                    <tr className={`text-xs uppercase tracking-[0.25em] font-black ${
-                      theme === 'dark' ? 'bg-black text-neutral-500' : 'bg-gray-50 text-gray-400'
-                    }`}>
-                      <th className="py-8 px-12">Waktu & Path</th>
-                      <th className="py-8 px-12">Wilayah</th>
-                      <th className="py-8 px-12">Detail Perangkat</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-500/10">
-                    {recentViews.map((view) => (
-                      <tr key={view.id} className="hover:bg-blue-600/[0.03] transition-colors group">
-                        <td className="py-10 px-12">
-                          <div className="flex flex-col gap-2">
-                            <span className="text-lg font-black tracking-tight leading-none">
-                              {formatDateNoPukul(view.viewed_at)}
-                            </span>
-                            <span className="text-xs font-bold opacity-40 uppercase tracking-widest">
-                              {view.page_path}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="py-10 px-12">
-                          <div className="flex flex-col">
-                            <span className="text-lg font-black">{view.city || 'Privat'}</span>
-                            <span className="text-xs font-bold uppercase opacity-40 tracking-widest">{view.country || 'Unknown'}</span>
-                          </div>
-                        </td>
-                        <td className="py-10 px-12">
-                          <div className="flex flex-col gap-2">
-                            <span className="text-lg font-black text-blue-600 tracking-tight uppercase">
-                              {formatDeviceName(view.user_agent)}
-                            </span>
-                            <div className="max-w-md">
-                              <span className="text-[11px] font-mono opacity-30 block break-words leading-tight">
-                                {view.user_agent}
-                              </span>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
