@@ -145,6 +145,7 @@ export default function Home() {
     { name: "MySQL", logo: "https://images.icon-icons.com/2699/PNG/512/mysql_logo_icon_169940.png" },
     { name: "Next JS", logo: "https://logo.svgcdn.com/devicon/nextjs-original.png" },
     { name: "Golang", logo: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/go-programming-language-icon.png" },
+    { name: "GIT", logo: "https://upload.wikimedia.org/wikipedia/commons/3/3f/Git_icon.svg" },
     { name: "Google Analytics", logo: "https://www.vectorlogo.zone/logos/google_analytics/google_analytics-icon.svg" },
     { name: "Search Console", logo: "/uploads/google_search_console_icon-vector_brandlogos.net_hxtfr.png" },
     { name: "Supabase", logo: "https://www.vectorlogo.zone/logos/supabase/supabase-icon.svg" },
@@ -229,7 +230,7 @@ export default function Home() {
                 
                 <div className="mt-6">
                   <a 
-                    href="https://drive.google.com/file/d/1Csizb5mlVzvNT1ZqfNY2WfktF3iFWPwq/view?usp=sharing"
+                    href="https://drive.google.com/file/d/1e5XQP07c6kBt4iDQx-SeB6GiPWVKgETg/view?usp=sharing"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="relative inline-block px-8 py-3 font-bold text-white rounded-full transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg overflow-hidden group"
