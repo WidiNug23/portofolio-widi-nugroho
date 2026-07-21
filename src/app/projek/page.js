@@ -4,6 +4,17 @@ import { useState, useEffect } from "react";
 import { useTheme } from "../ThemeContext";
 
 const projekData = [
+    {
+    id: 5,
+    tag: "Personal Project",
+    judul: "UPDATE V.2.0 - Manajemen Gudang Berbasis Web Menggunakan Next JS & Supabase",
+    deskripsi: `Sistem ini memudahkan penggunannya dalam management dan mengelola barang atau stock yang ada di dalam gudang. User akan diminta untuk mengelola kategori barang dan mengelola ketersediaan barang yang digunakan untuk produksi. Sistem ini menggunakan Next JS untuk Frontend and Backendnya. Untuk database menggunakan Supabase. Sistem ini akan terus dikembangkan agar pengelolaan barang di gudang akan semakin kompleks.`,
+    link_demo: "https://sistem-gudang-ten.vercel.app/",
+    link_github: "https://github.com/WidiNug23/sistem-gudang.git",
+    pdf_file: "",
+    images: JSON.stringify(["gudang1.1.png", "gudang1.2.png", "gudang1.3.png", "gudang1.4.png"]),
+  },
+
   {
     id: 1,
     tag: "Freelance Project",
@@ -104,16 +115,7 @@ const projekData = [
     pdf_file: "",
     images: JSON.stringify(["filter1.png", "filter2.png", "filter3.png"]),
   },
-  {
-    id: 5,
-    tag: "Personal Project",
-    judul: "Manajemen Gudang Berbasis Web Menggunakan Next JS & Supabase",
-    deskripsi: `Sistem ini memudahkan penggunannya dalam management dan mengelola barang atau stock yang ada di dalam gudang. User akan diminta untuk mengelola kategori barang dan mengelola ketersediaan barang. Sistem ini menggunakan Next JS untuk Frontend and Backendnya. Untuk database menggunakan Supabase. Sistem ini akan terus dikembangkan agar pengelolaan barang di gudang akan semakin kompleks.`,
-    link_demo: "https://sistem-gudang-ten.vercel.app/",
-    link_github: "https://github.com/WidiNug23/sistem-gudang.git",
-    pdf_file: "",
-    images: JSON.stringify(["gudang1.png", "gudang2.png", "gudang3.png", "gudang4.png"]),
-  },
+
   {
     id: 6,
     tag: "Personal Project",
