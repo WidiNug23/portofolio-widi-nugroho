@@ -239,11 +239,6 @@ export default function ProjekPage() {
     return match && match[2].length === 11 ? match[2] : null;
   };
 
-  const columnsData = [[], [], []];
-  projekData.forEach((project, index) => {
-    columnsData[index % 3].push(project);
-  });
-
   return (
     <main className={`min-h-screen pt-32 pb-20 px-4 sm:px-8 lg:px-16 transition-colors duration-500 ${isDark ? "bg-[#080808] text-white" : "bg-slate-50 text-slate-900"}`}>
       
@@ -258,127 +253,120 @@ export default function ProjekPage() {
         </p>
       </div>
 
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8 items-start">
-        {columnsData.map((col, colIdx) => (
-          <div 
-            key={colIdx} 
-            className={`flex-1 flex flex-col gap-8 w-full ${
-              colIdx === 1 ? "hidden md:flex" : colIdx === 2 ? "hidden lg:flex" : ""
-            }`}
-          >
-            {col.map((p) => {
-              const isExpanded = expanded[p.id];
-              const youtubeID = extractYouTubeID(p.link_demo || "");
-              let images = [];
-              try { images = JSON.parse(p.images || "[]"); } catch { images = []; }
+      {/* Menggunakan layout CSS Columns (Masonry-like layout) agar urutan array dari kiri ke kanan (baris per baris) 
+          tetap berurutan secara natural sekaligus menjaga card bawah tidak merusak layout kolom lainnya */}
+      <div className="max-w-7xl mx-auto columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
+        {projekData.map((p) => {
+          const isExpanded = expanded[p.id];
+          const youtubeID = extractYouTubeID(p.link_demo || "");
+          let images = [];
+          try { images = JSON.parse(p.images || "[]"); } catch { images = []; }
 
-              return (
+          return (
+            <div 
+              key={p.id} 
+              className="projek-card opacity-0 transform translate-y-12 transition-all duration-700 w-full break-inside-avoid"
+            >
+              <div className={`group w-full flex flex-col rounded-[2rem] overflow-hidden border transition-all duration-500 ${isDark ? "bg-white/5 border-white/10 hover:bg-white/10" : "bg-white border-slate-200 shadow-lg hover:shadow-2xl"}`}>
+                
+                {/* Media Section */}
                 <div 
-                  key={p.id} 
-                  className="projek-card opacity-0 transform translate-y-12 transition-all duration-700 w-full h-auto"
+                  className="overflow-hidden transition-all duration-500 ease-in-out w-full"
+                  style={{
+                    maxHeight: isExpanded ? "400px" : "0px",
+                    opacity: isExpanded ? 1 : 0,
+                  }}
                 >
-                  <div className={`group w-full flex flex-col rounded-[2rem] overflow-hidden border transition-all duration-500 h-full ${isDark ? "bg-white/5 border-white/10 hover:bg-white/10" : "bg-white border-slate-200 shadow-lg hover:shadow-2xl"}`}>
-                    
-                    {/* Media Section: Diperbaiki transisi tinggi maksimum agar tetap rapi */}
-                    <div 
-                      className="overflow-hidden transition-all duration-500 ease-in-out w-full"
-                      style={{
-                        maxHeight: isExpanded ? "400px" : "0px",
-                        opacity: isExpanded ? 1 : 0,
-                      }}
-                    >
-                      <div className="relative aspect-video bg-black/20 w-full">
-                        {p.isUpcoming ? (
-                          <SpinningClockIcon />
-                        ) : youtubeID ? (
-                          <div className="w-full h-full relative cursor-pointer group/vid" onClick={() => setModalVideoID(youtubeID)}>
-                            <img src={`https://img.youtube.com/vi/${youtubeID}/mqdefault.jpg`} className="w-full h-full object-cover transition-transform duration-700 group-hover/vid:scale-110" alt="thumb" />
-                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover/vid:bg-black/20 transition-all">
-                              <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center shadow-2xl">
-                                <div className="ml-1 border-y-[8px] border-y-transparent border-l-[12px] border-l-white"></div>
-                              </div>
-                            </div>
+                  <div className="relative aspect-video bg-black/20 w-full">
+                    {p.isUpcoming ? (
+                      <SpinningClockIcon />
+                    ) : youtubeID ? (
+                      <div className="w-full h-full relative cursor-pointer group/vid" onClick={() => setModalVideoID(youtubeID)}>
+                        <img src={`https://img.youtube.com/vi/${youtubeID}/mqdefault.jpg`} className="w-full h-full object-cover transition-transform duration-700 group-hover/vid:scale-110" alt="thumb" />
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover/vid:bg-black/20 transition-all">
+                          <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center shadow-2xl">
+                            <div className="ml-1 border-y-[8px] border-y-transparent border-l-[12px] border-l-white"></div>
                           </div>
-                        ) : images.length > 0 ? (
-                          <div className="w-full h-full relative group/img">
-                            <div className="flex h-full">
-                              <img 
-                                src={`uploads/${images[0]}`} 
-                                className="w-full h-full object-cover cursor-zoom-in shrink-0" 
-                                alt="preview" 
-                                onClick={() => openLightbox(p.id, 0)} 
-                              />
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="h-full w-full flex items-center justify-center opacity-30 italic text-xs py-12">No Media</div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Content Section: Menggunakan flexbox stretch agar tombol selalu rapi di bawah */}
-                    <div className="p-6 flex-1 flex flex-col justify-between min-h-[180px]">
-                      <div className="flex-1 flex flex-col">
-                        <div className="flex items-center gap-2 mb-3">
-                           <span className={`w-8 h-0.5 rounded-full ${isDark ? "bg-blue-500 shadow-[0_0_8px_#3b82f6]" : "bg-blue-600"}`}></span>
-                           <span className="text-[10px] font-black tracking-widest uppercase opacity-60">
-                             {p.tag || "Project"}
-                           </span>
                         </div>
-                        
-                        <h2 className="text-xl font-bold mb-3 tracking-tight leading-tight group-hover:text-blue-400 transition-colors">
-                          {p.judul}
-                        </h2>
-                        
-                        {/* Deskripsi Section: Ditangani dengan transisi CSS murni agar tidak merusak layout masonry */}
-                        <div 
-                          className="overflow-hidden transition-all duration-500 ease-in-out"
-                          style={{
-                            maxHeight: isExpanded ? "1000px" : "0px",
-                            opacity: isExpanded ? 1 : 0,
-                            marginBottom: isExpanded ? "1rem" : "0px"
-                          }}
-                        >
-                          <p className="text-sm leading-relaxed opacity-90 whitespace-pre-line">
-                            {p.deskripsi}
-                          </p>
+                      </div>
+                    ) : images.length > 0 ? (
+                      <div className="w-full h-full relative group/img">
+                        <div className="flex h-full">
+                          <img 
+                            src={`uploads/${images[0]}`} 
+                            className="w-full h-full object-cover cursor-zoom-in shrink-0" 
+                            alt="preview" 
+                            onClick={() => openLightbox(p.id, 0)} 
+                          />
                         </div>
-
-                        {p.deskripsi?.length > 0 && (
-                          <button 
-                            onClick={() => setExpanded(e => ({...e, [p.id]: !isExpanded}))} 
-                            className="text-xs font-bold text-blue-500 hover:text-blue-400 mb-4 text-left self-start"
-                          >
-                            {isExpanded ? "Sembunyikan Detail" : "Lihat Detail..."}
-                          </button>
-                        )}
                       </div>
-
-                      {/* Bagian Tombol Aksi: Selari & Tetap Rapi di Bagian Bawah */}
-                      <div className="flex flex-wrap gap-2 pt-4 border-t border-white/10 mt-auto">
-                        {p.link_demo && (
-                          <a href={p.link_demo} target="_blank" rel="noreferrer" className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${isDark ? "bg-white text-black hover:bg-blue-400" : "bg-slate-900 text-white hover:bg-blue-600"}`}>
-                            {youtubeID ? "Tonton" : "Website"}
-                          </a>
-                        )}
-                        {p.link_github && (
-                          <a href={p.link_github} target="_blank" rel="noreferrer" className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-all ${isDark ? "border-white/20 text-white hover:bg-white/10" : "border-slate-300 text-slate-900 hover:bg-slate-50"}`}>
-                            Github
-                          </a>
-                        )}
-                        {p.pdf_file && (
-                          <button onClick={() => setModalPDF(p.pdf_file)} className="px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-all">
-                            Dokumen
-                          </button>
-                        )}
-                      </div>
-                    </div>
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center opacity-30 italic text-xs py-12">No Media</div>
+                    )}
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        ))}
+
+                {/* Content Section */}
+                <div className="p-6 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                       <span className={`w-8 h-0.5 rounded-full ${isDark ? "bg-blue-500 shadow-[0_0_8px_#3b82f6]" : "bg-blue-600"}`}></span>
+                       <span className="text-[10px] font-black tracking-widest uppercase opacity-60">
+                         {p.tag || "Project"}
+                       </span>
+                    </div>
+                    
+                    <h2 className="text-xl font-bold mb-3 tracking-tight leading-tight group-hover:text-blue-400 transition-colors">
+                      {p.judul}
+                    </h2>
+                    
+                    {/* Deskripsi Section */}
+                    <div 
+                      className="overflow-hidden transition-all duration-500 ease-in-out"
+                      style={{
+                        maxHeight: isExpanded ? "1000px" : "0px",
+                        opacity: isExpanded ? 1 : 0,
+                        marginBottom: isExpanded ? "1rem" : "0px"
+                      }}
+                    >
+                      <p className="text-sm leading-relaxed opacity-90 whitespace-pre-line">
+                        {p.deskripsi}
+                      </p>
+                    </div>
+
+                    {p.deskripsi?.length > 0 && (
+                      <button 
+                        onClick={() => setExpanded(e => ({...e, [p.id]: !isExpanded}))} 
+                        className="text-xs font-bold text-blue-500 hover:text-blue-400 mb-4 text-left self-start"
+                      >
+                        {isExpanded ? "Sembunyikan Detail" : "Lihat Detail..."}
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Bagian Tombol Aksi */}
+                  <div className="flex flex-wrap gap-2 pt-4 border-t border-white/10 mt-auto">
+                    {p.link_demo && (
+                      <a href={p.link_demo} target="_blank" rel="noreferrer" className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${isDark ? "bg-white text-black hover:bg-blue-400" : "bg-slate-900 text-white hover:bg-blue-600"}`}>
+                        {youtubeID ? "Tonton" : "Website"}
+                      </a>
+                    )}
+                    {p.link_github && (
+                      <a href={p.link_github} target="_blank" rel="noreferrer" className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-all ${isDark ? "border-white/20 text-white hover:bg-white/10" : "border-slate-300 text-slate-900 hover:bg-slate-50"}`}>
+                        Github
+                      </a>
+                    )}
+                    {p.pdf_file && (
+                      <button onClick={() => setModalPDF(p.pdf_file)} className="px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                        Dokumen
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Lightbox Preview Gambar */}
