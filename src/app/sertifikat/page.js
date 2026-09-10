@@ -49,6 +49,16 @@ export default function SertifikatPage() {
     },
     {
       id: 2,
+      nama: "TOEIC",
+      deskripsi: "Listening And Reading Official Institutional Score Report",
+      penerbit: "Educational Testing Service.",
+      tahun: "2025-2027",
+      tingkat: "Internasional",
+      hasil: "485",
+      pdf_file: "/uploads/toeic widi.pdf",
+    },
+    {
+      id: 3,
       nama: "Certificate of Appreciation 1st Place Web Design International Competition GAYATAMA 2024",
       deskripsi: "Bersama dengan Tim Pokpokji berhasil memperoleh juara 1 Web desain International Competition GAYATAMA 2024 UNESA pada 9 Dokumenter 2024",
       penerbit: "Universitas Negeri Surabaya (UNESA)",
@@ -58,7 +68,7 @@ export default function SertifikatPage() {
       pdf_file: "/uploads/130_Winner_GAYATAMA_compressed.pdf",
     },
     {
-      id: 3,
+      id: 4,
       nama: "Juara 3 - Olimpiade Vokasi Indonesia IX Tahun 2024 Bidang Web Technologies",
       deskripsi: "Bersama dengan tim memperoleh juara 3 dalam gelaran OLIVIA IX Tahun 2024 di Makassar, Sulawesi Selatan pada bidang Web Technologies",
       penerbit: "Forum Pendidikan Tinggi Vokasi Indonesia",
@@ -68,7 +78,7 @@ export default function SertifikatPage() {
       pdf_file: "/uploads/Sertifikat Juara (Emas, Perak dan Perunggu) OLIVIA IX_page-0069 (1).pdf",
     },
     {
-      id: 4,
+      id: 5,
       nama: "[COMING SOON]",
       deskripsi: "Sertifikat mendatang sedang dalam proses verifikasi atau pelaksanaan kompetisi.",
       isComingSoon: true,

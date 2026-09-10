@@ -7,7 +7,7 @@ const projekData = [
     {
     id: 5,
     tag: "Personal Project",
-    judul: "UPDATE V.2.0 - Manajemen Gudang Berbasis Web Menggunakan Next JS & Supabase",
+    judul: "UPDATE V.1.2 - Manajemen Gudang Berbasis Web Menggunakan Next JS & Supabase",
     deskripsi: `Sistem ini memudahkan penggunannya dalam management dan mengelola barang atau stock yang ada di dalam gudang. User akan diminta untuk mengelola kategori barang dan mengelola ketersediaan barang yang digunakan untuk produksi. Sistem ini menggunakan Next JS untuk Frontend and Backendnya. Untuk database menggunakan Supabase. Sistem ini akan terus dikembangkan agar pengelolaan barang di gudang akan semakin kompleks.`,
     link_demo: "https://sistem-gudang-ten.vercel.app/",
     link_github: "https://github.com/WidiNug23/sistem-gudang.git",

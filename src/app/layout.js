@@ -282,7 +282,7 @@ function LayoutContent({ children }) {
               { icon: <FaLinkedin />, href: "https://www.linkedin.com/in/widi-suryo-nugroho-a607632a2/", color: "hover:text-blue-500" },
               { icon: <FaGithub />, href: "https://github.com/WidiNug23", color: "hover:text-gray-400" },
               { icon: <MdEmail />, href: "mailto:collabswithwidi@gmail.com", color: "hover:text-red-500" },
-              { icon: <FaWhatsapp />, href: "https://wa.me/6285727609498", color: "hover:text-green-500" },
+              // { icon: <FaWhatsapp />, href: "https://wa.me/", color: "hover:text-green-500" },
             ].map((soc, i) => (
               <a 
                 key={i} href={soc.href} target="_blank" rel="noopener noreferrer"
@@ -328,12 +328,12 @@ function LayoutContent({ children }) {
                 </div>
                 <span className="text-sm font-bold tracking-tight">Email</span>
               </a>
-              <a href="https://wa.me/6285727609498" target="_blank" rel="noopener noreferrer" className="flex items-center group/item gap-4">
+              {/* <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" className="flex items-center group/item gap-4">
                 <div className="w-11 h-11 flex items-center justify-center bg-green-500 text-white rounded-2xl shadow-lg group-hover/item:scale-110 transition-transform">
                   <FaWhatsapp size={20} />
                 </div>
                 <span className="text-sm font-bold tracking-tight">WhatsApp</span>
-              </a>
+              </a> */}
             </div>
           </div>
         </div>
