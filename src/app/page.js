@@ -13,7 +13,6 @@ import React from "react";
 import { useTheme } from "./ThemeContext"; 
 import Script from 'next/script';
 import Link from "next/link";
-import Image from "next/image";
 import dynamic from "next/dynamic";
 import { SiShutterstock } from "react-icons/si";
 import { FiLink } from "react-icons/fi";
@@ -44,64 +43,72 @@ function RevealContainer({ children }) {
   );
 }
 
-function RotatingLabelItem({ item, theme }) {
-  const [currentLabel, setCurrentLabel] = useState(0);
-  const [fade, setFade] = useState(true);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setFade(false);
-      setTimeout(() => {
-        setCurrentLabel((prev) => (prev + 1) % item.labels.length);
-        setFade(true);
-      }, 350); 
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [item.labels.length]);
-
-  return (
-    <a href={item.href} 
-       target="_blank" 
-       rel="noopener noreferrer" 
-       className={`flex items-center justify-center md:justify-start gap-4 p-3 md:px-5 md:py-3.5 w-14 h-14 md:w-full md:h-auto rounded-full md:rounded-2xl transition-all duration-300 transform md:hover:scale-105 active:scale-95 cursor-pointer relative z-10 ${theme === "dark" ? "bg-gray-800" : "bg-white"}`} 
-       style={{ boxShadow: `0 0 12px ${item.color}` }}>
-      
-      <div className="flex-shrink-0 flex justify-center items-center text-center">{item.icon}</div>
-      
-      <div className="relative flex-1 overflow-hidden h-8 hidden md:flex items-center">
-        <span className={`absolute left-0 text-base md:text-lg font-semibold whitespace-nowrap ${theme === "dark" ? "text-white" : "text-black"}`}
-          style={{ 
-            opacity: fade ? 1 : 0, 
-            transform: fade ? "translateX(0)" : "translateX(20px)", 
-            transition: "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease"
-          }}>
-          {item.labels[currentLabel]}
-        </span>
-      </div>
-    </a>
-  );
-}
-
 export default function Home() {
   const { theme } = useTheme();
-  const [showSuryo, setShowSuryo] = useState(false);
   const [highlightKontak, setHighlightKontak] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [chartRendered, setChartRendered] = useState(false);
+  const [scrollPos, setScrollPos] = useState(0);
+  const [chartProgress, setChartProgress] = useState(0);
+  
   const chartRef = useRef(null);
 
+  // Perbaikan Total untuk Refresh dengan Hash (Mengatasi bug lompat ke posisi salah pada komponen dinamis)
   useEffect(() => {
-    let ticking = false;
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
+    if (window.location.hash) {
+      const cleanId = window.location.hash.substring(1);
+      window.scrollTo(0, 0);
+
+      const scrollToTarget = () => {
+        const section = document.getElementById(cleanId);
+        if (section) {
+          const offset = 90; // Tinggi offset navbar
+          const elementPosition = section.getBoundingClientRect().top + window.scrollY;
+          window.scrollTo({ top: elementPosition - offset, behavior: "smooth" });
+        }
+      };
+
+      // Berikan beberapa tahap jeda waktu karena komponen halaman dimuat secara dinamis (ssr: false)
+      const timer1 = setTimeout(scrollToTarget, 200);
+      const timer2 = setTimeout(scrollToTarget, 600);
+      const timer3 = setTimeout(scrollToTarget, 1200);
+
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+        clearTimeout(timer3);
+      };
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, []);
+
+  useEffect(() => {
     const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setShowSuryo(window.scrollY > 50);
-          ticking = false;
-        });
-        ticking = true;
+      setScrollPos(window.scrollY);
+
+      if (chartRef.current) {
+        const rect = chartRef.current.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        
+        const elementCenter = rect.top + rect.height / 2;
+        const screenCenter = windowHeight / 2;
+        const distanceFromCenter = elementCenter - screenCenter;
+        
+        const maxDistance = windowHeight * 0.7;
+        let progress = 1 - Math.abs(distanceFromCenter) / maxDistance;
+        progress = Math.max(0, Math.min(1, progress));
+        
+        setChartProgress(progress);
       }
     };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -131,19 +138,19 @@ export default function Home() {
     { name: "Canon M50", logo: "https://image.similarpng.com/file/similarpng/original-picture/2020/06/Logo-canon-transparent-PNG.png" },
     { name: "CapCut", logo: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/capcut-icon.png" },
     { name: "Canva", logo: "https://freelogopng.com/images/all_img/1656733807canva-icon-png.png" },
-    { name: "Lightroom", logo: "https://logo.svgcdn.com/logos/adobe-lightroom.png" },
-    { name: "VS Code", logo: "https://logo.svgcdn.com/logos/visual-studio-code.png" },
+    { name: "Lightroom", logo: "https://upload.wikimedia.org/wikipedia/commons/b/b6/Adobe_Photoshop_Lightroom_CC_logo.svg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "VS Code", logo: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
     { name: "HTML", logo: "https://icones.pro/wp-content/uploads/2021/05/icone-html-orange.png" },
     { name: "CSS", logo: "https://upload.wikimedia.org/wikipedia/commons/d/d5/CSS3_logo_and_wordmark.svg" },
     { name: "JavaScript", logo: "https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" },
     { name: "Python", logo: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" },
     { name: "PHP", logo: "https://upload.wikimedia.org/wikipedia/commons/2/27/PHP-logo.svg" },
-    { name: "XAMPP", logo: "https://logo.svgcdn.com/logos/xampp.png" },
+    { name: "XAMPP", logo: "https://upload.wikimedia.org/wikipedia/commons/d/dc/XAMPP_Logo.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
     { name: "React JS", logo: "https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" },
     { name: "CodeIgniter", logo: "https://cdn.iconscout.com/icon/free/png-256/free-codeigniter-logo-icon-svg-download-png-1579761.png?f=webp" },
-    { name: "Laravel", logo: "https://logo.svgcdn.com/logos/laravel.png" },
+    { name: "Laravel", logo: "https://static.cdnlogo.com/logos/l/23/laravel.svg" },
     { name: "MySQL", logo: "https://images.icon-icons.com/2699/PNG/512/mysql_logo_icon_169940.png" },
-    { name: "Next JS", logo: "https://logo.svgcdn.com/devicon/nextjs-original.png" },
+    { name: "Next JS", logo: "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/nextjs.svg" },
     { name: "Golang", logo: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/go-programming-language-icon.png" },
     { name: "GIT", logo: "https://upload.wikimedia.org/wikipedia/commons/3/3f/Git_icon.svg" },
     { name: "Google Analytics", logo: "https://www.vectorlogo.zone/logos/google_analytics/google_analytics-icon.svg" },
@@ -160,23 +167,35 @@ export default function Home() {
     const startAngle = index * anglePerSlice - 90; 
     const endAngle = startAngle + anglePerSlice;
     const rad = Math.PI / 180;
-    const x1 = 250 + outerRadius * Math.cos(startAngle * rad);
-    const y1 = 250 + outerRadius * Math.sin(startAngle * rad);
-    const x2 = 250 + outerRadius * Math.cos(endAngle * rad);
-    const y2 = 250 + outerRadius * Math.sin(endAngle * rad);
-    const x3 = 250 + innerRadius * Math.cos(endAngle * rad);
-    const y3 = 250 + innerRadius * Math.sin(endAngle * rad);
-    const x4 = 250 + innerRadius * Math.cos(startAngle * rad);
-    const y4 = 250 + innerRadius * Math.sin(startAngle * rad);
+    const cx = 350;
+    const cy = 350;
+    const x1 = cx + outerRadius * Math.cos(startAngle * rad);
+    const y1 = cy + outerRadius * Math.sin(startAngle * rad);
+    const x2 = cx + outerRadius * Math.cos(endAngle * rad);
+    const y2 = cy + outerRadius * Math.sin(endAngle * rad);
+    const x3 = cx + innerRadius * Math.cos(endAngle * rad);
+    const y3 = cy + innerRadius * Math.sin(endAngle * rad);
+    const x4 = cx + innerRadius * Math.cos(startAngle * rad);
+    const y4 = cy + innerRadius * Math.sin(startAngle * rad);
     const midAngle = startAngle + anglePerSlice / 2;
     const moveX = Math.cos(midAngle * rad) * 12; 
     const moveY = Math.sin(midAngle * rad) * 12;
     const logoRadius = (innerRadius + outerRadius) / 2;
-    const logoX = 250 + logoRadius * Math.cos(midAngle * rad);
-    const logoY = 250 + logoRadius * Math.sin(midAngle * rad);
+    const logoX = cx + logoRadius * Math.cos(midAngle * rad);
+    const logoY = cy + logoRadius * Math.sin(midAngle * rad);
     const pathData = `M ${x1} ${y1} A ${outerRadius} ${outerRadius} 0 0 1 ${x2} ${y2} L ${x3} ${y3} A ${innerRadius} ${innerRadius} 0 0 0 ${x4} ${y4} Z`;
-    return { pathData, logoX, logoY, moveX, moveY };
+    return { pathData, logoX, logoY, moveX, moveY, midAngle };
   };
+
+  const services = [
+    "Development Website",
+    "Videografi",
+    "Fotografi",
+    "Pembuatan Dokumen",
+    "Pengumpulan Data",
+  ];
+
+  const scrollCardProgress = Math.min(Math.max((scrollPos - 20) / 300, 0), 1);
 
   return (
     <>
@@ -191,140 +210,147 @@ export default function Home() {
 
       <div className="relative w-full transition-colors duration-500" style={{ backgroundColor: theme === "dark" ? "#000" : "#fff" }}>
         
-        <section className="md:sticky md:top-0 min-h-screen w-full flex items-center justify-center px-4 py-12 md:py-0 z-0">
-          <div className={`rounded-[2rem] p-6 md:p-12 max-w-5xl w-full mx-auto flex flex-col md:flex-row items-center gap-8 md:gap-12 transition-all duration-1000 
-            ${theme === "dark" ? "bg-gray-900/40 border-gray-800" : "bg-white border-gray-100"} border shadow-2xl backdrop-blur-sm`}>
+        {/* Hero Section */}
+        <section className="min-h-screen w-full flex items-center justify-center px-4 sm:px-6 py-10 md:py-0 z-0">
+          <div className="max-w-4xl w-full mx-auto text-center flex flex-col items-center">
             
-            <div className="relative group flex-shrink-0 w-32 h-32 sm:w-40 sm:h-40 md:w-52 md:h-52">
-              <div className={`absolute -inset-1 rounded-full blur-lg transition-all duration-700 ${showSuryo ? "bg-blue-500 opacity-30 scale-105" : "bg-transparent opacity-0"}`}></div>
-              <Image 
-                src="/profile.png" 
-                alt="Widi" 
-                width={208} 
-                height={208} 
-                priority
-                className={`relative rounded-full object-cover w-full h-full transition-all duration-700 ${showSuryo ? "scale-105" : "scale-100"}`} 
-              />
-            </div>
+            <h1 className="text-3xl sm:text-6xl md:text-7xl font-extrabold font-poppins mb-4 sm:mb-6 tracking-tight flex flex-wrap justify-center items-center gap-x-3 sm:gap-x-4">
+              <span>WIDI</span>
+              <span>NUGROHO</span>
+            </h1>
 
-            <div className="flex-1 text-center md:text-left w-full">
-              <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold font-poppins mb-4 tracking-tight flex flex-wrap justify-center md:justify-start items-center">
-                <span>WIDI</span>
-                <span className={`transition-all duration-1000 ease-in-out overflow-hidden flex items-center ${showSuryo ? "max-w-[150px] md:max-w-[300px] opacity-100 mx-2" : "max-w-0 opacity-0 mx-0"}`}>
-                  <span className="text-blue-500 uppercase">Suryo</span>
-                </span>
-                <span className={`transition-all duration-700 ${!showSuryo && "ml-2"}`}>NUGROHO</span>
-              </h1>
+            <div className={`transition-all duration-500 max-w-3xl mx-auto ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+              <p className="text-sm sm:text-lg md:text-xl leading-relaxed font-normal mb-6 sm:mb-8 px-2">
+                Lulusan Teknik Informatika{" "}
+                <a 
+                  href="https://uns.ac.id/id/" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-blue-500 underline decoration-blue-400/50 underline-offset-4 font-medium hover:text-blue-600 transition-colors"
+                >
+                  UNS
+                </a>{" "}
+                (IPK 3.81) yang menyukai perkembangan teknologi. Antusias dalam Development Website atau perangkat lunak, pembuatan alur sistem, dan manajemen data.
+              </p>
 
-              <div className={`transition-all duration-500 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
-                <p className="text-sm sm:text-base md:text-lg leading-relaxed font-medium">
-                  Lulusan D3 Teknik Informatika Universitas Sebelas Maret (IPK 3.81) dengan fokus dan ketertarikan mendalam pada
-                  pengembangan perangkat lunak serta ekosistem bisnis digital. Berpengalaman dalam proyek magang dan freelance yang
-                  memperkuat keahlian praktis sebagai Full Stack Developer, Front End Developer, dan System Analyst. Saya adalah
-                  seorang problem solver yang dedikatif dalam menciptakan solusi teknologi yang efisien, inovatif, dan berdampak.
-                  Saya dapat bekerja baik secara individu maupun dalam tim, serta{" "}
-                  <span className={`font-bold transition-all duration-500 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
-                    terbuka untuk mempelajari berbagai teknologi baru.
-                  </span>
+              {/* Services / Layanan */}
+              <div className="mb-8 sm:mb-12">
+                <p className="text-xs sm:text-base font-medium mb-3 sm:mb-5 opacity-70">
+                  Kebanyakan orang menghubungi saya saat mereka membutuhkan:
                 </p>
-                
-                <div className="mt-6">
-                  <a 
-                    href="https://drive.google.com/file/d/1s-ildIIrPXcifuOSgcwJs12aC0Y7-vBh/view?usp=sharing"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="relative inline-block px-8 py-3 font-bold text-white rounded-full transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg overflow-hidden group"
-                    style={{ backgroundColor: "#ef4444" }}
-                  >
-                    <span className="relative z-10">Lihat Curriculum Vitae</span>
-                    <div className="absolute inset-0 bg-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-                  </a>
+                <div className="flex flex-wrap justify-center gap-2 sm:gap-3.5">
+                  {services.map((service, index) => {
+                    const itemDelayThreshold = index * 0.15;
+                    const isActive = scrollCardProgress > itemDelayThreshold;
+
+                    const backgroundStyle = theme === "dark"
+                      ? { 
+                          backgroundColor: isActive ? "rgba(29, 78, 216, 0.65)" : "transparent", 
+                          borderColor: isActive ? "#2563eb" : "transparent",
+                          color: "#bfdbfe" 
+                        }
+                      : { 
+                          backgroundColor: isActive ? "#dbeafe" : "transparent", 
+                          borderColor: isActive ? "#2563eb" : "transparent",
+                          color: "#1d4ed8" 
+                        };
+
+                    return (
+                      <div 
+                        key={index}
+                        className="relative overflow-hidden text-xs sm:text-lg md:text-xl px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-bold transition-all duration-300"
+                        style={{ color: theme === "dark" ? "#e5e7eb" : "#1f2937" }}
+                      >
+                        <div 
+                          className="absolute inset-0 rounded-xl sm:rounded-2xl border-2 transition-all duration-700 ease-out z-0 shadow-md"
+                          style={{
+                            ...backgroundStyle,
+                            transform: isActive ? "translateX(0%)" : "translateX(-105%)",
+                            opacity: isActive ? 1 : 0,
+                          }}
+                        />
+                        <span className="relative z-10">
+                          {service}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-              <div className={`mt-5 h-1 bg-blue-500 rounded-full transition-all duration-1000 mx-auto md:mx-0 ${showSuryo ? "w-full opacity-100" : "w-16 opacity-50"}`}></div>
+              
+              <div>
+                <a 
+                  href="https://drive.google.com/file/d/1s-ildIIrPXcifuOSgcwJs12aC0Y7-vBh/view?usp=sharing"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block px-6 sm:px-8 py-3 sm:py-4 text-xs sm:text-base font-bold text-white rounded-xl sm:rounded-2xl transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/20 bg-blue-600 hover:bg-blue-700"
+                >
+                  CV
+                </a>
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="relative z-10 w-full rounded-t-[2.5rem] md:rounded-t-[5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.1)] py-12 md:py-20 px-4 md:px-10"
+        {/* Content Section */}
+        <section className="relative z-10 w-full rounded-t-[2rem] sm:rounded-t-[4rem] shadow-[0_-20px_40px_rgba(0,0,0,0.05)] py-10 sm:py-20 px-3 sm:px-10"
           style={{ backgroundColor: theme === "dark" ? "#0a0a0a" : "#f8fafc", color: theme === "dark" ? "#fff" : "#000" }}>
           
-          <div className="max-w-6xl mx-auto mb-20 md:mb-24 px-4">
+          {/* Let's Make Collaboration */}
+          <div id="kontak" className="max-w-4xl mx-auto px-4 pt-4 pb-8 sm:pb-12">
             <RevealContainer>
-              <h2 className="text-3xl md:text-5xl font-extrabold mb-12 text-center font-poppins">Portofolio</h2>
+              <h2 className={`text-2xl sm:text-4xl md:text-5xl font-extrabold mb-6 sm:mb-10 text-center font-poppins transition-all duration-300 ${highlightKontak ? "text-blue-500 scale-105" : ""}`}>
+                Let's Make Collaboration
+              </h2>
               
-              <div className="flex flex-wrap justify-center gap-4">
+              <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 max-w-2xl mx-auto">
                 {[
-                  { title: "Projek", desc: "Kumpulan projek web & video", color: "#3b82f6" },
-                  { title: "Sertifikat", desc: "Kumpulan sertifikasi profesional", color: "#22c55e" },
-                  { title: "Lomba", desc: "Prestasi & perlombaan", color: "#a855f7" },
-                  { title: "Organisasi", desc: "Daftar pengalaman organisasi", color: "#eab308" },
-                  { title: "Pendidikan", desc: "Daftar pendidikan resmi", color: "#f50bbb" },
-                ].map((item, idx) => (
-                  <Link 
-                    key={idx} 
-                    href={`/#${item.title.toLowerCase()}`} 
-                    className="group relative block p-[1px] rounded-xl overflow-hidden transition-all duration-500 hover:scale-[1.02]"
-                  >
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" 
-                         style={{ background: `linear-gradient(90deg, ${item.color}, transparent)` }}></div>
-                    
-                    <div className={`relative flex items-center justify-center px-6 py-3 rounded-xl transition-all duration-500 min-h-[48px] ${theme === "dark" ? "bg-gray-900" : "bg-white"} border ${theme === "dark" ? "border-gray-800" : "border-gray-100"}`}>
-                      
-                      <span className="font-bold whitespace-nowrap transition-all duration-500 ease-in-out group-hover:opacity-0 group-hover:max-w-0 group-hover:p-0 opacity-100 max-w-[100px] p-0">
-                        {item.title}
-                      </span>
-
-                      <span 
-                        className="font-medium whitespace-nowrap overflow-hidden transition-all duration-500 ease-in-out opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-[250px] text-sm"
-                        style={{ color: item.color }}
-                      >
-                        {item.desc}
-                      </span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </RevealContainer>
-          </div>
-
-          <div id="kontak" className="max-w-4xl mx-auto mb-20 md:mb-24 px-4">
-            <RevealContainer>
-              <h2 className={`text-3xl md:text-4xl font-extrabold mb-10 md:mb-12 text-center font-poppins transition-all duration-300 ${highlightKontak ? "text-blue-500 scale-110" : ""}`}>Hubungi Saya</h2>
-              
-              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center justify-center max-w-md md:max-w-none mx-auto w-full">
-                {[
-                  { href: "https://github.com/WidiNug23", icon: <FaGithub className="text-2xl" />, labels: ["Github", "WidiNug23"], color: "#6e7681" },
-                  { href: "mailto:collabswithwidi@gmail.com", icon: <FaEnvelope className="text-2xl" />, labels: ["Email", "Gmail"], color: "#EA4335" },
-                  { href: "https://www.instagram.com/widingr23", icon: <FaInstagram className="text-2xl" />, labels: ["Follow", "Instagram"], color: "#ec4899" },
-                  { href: "https://www.tiktok.com/@widnug23", icon: <FaTiktok className="text-2xl" />, labels: ["Follow", "TikTok"], color: "#6e7681" },
-                  { href: "https://www.linkedin.com/in/widi-suryo-nugroho-a607632a2/", icon: <FaLinkedin className="text-2xl" />, labels: ["Connect", "LinkedIn"], color: "#0077b5" },
-                  // { href: "https://wa.me/", icon: <FaWhatsapp className="text-2xl" />, labels: ["Chat", "WhatsApp"], color: "#25D366" },
-                  // { href: "https://www.shutterstock.com/g/widinugroho23?rid=360011507", icon: <SiShutterstock className="text-2xl" />, labels: ["Assets", "Shutterstock"], color: "#FF3A00" },
-                  { href: "https://lynk.id/widinugroho23", icon: <FiLink className="text-2xl" />, labels: ["Links", "Lynk"], color: "#14b8a6" },
+                  { href: "https://github.com/WidiNug23", icon: <FaGithub className="text-xl sm:text-3xl" /> },
+                  { href: "mailto:collabswithwidi@gmail.com", icon: <FaEnvelope className="text-xl sm:text-3xl" /> },
+                  { href: "https://www.instagram.com/widingr23", icon: <FaInstagram className="text-xl sm:text-3xl" /> },
+                  { href: "https://www.tiktok.com/@widnug23", icon: <FaTiktok className="text-xl sm:text-3xl" /> },
+                  { href: "https://www.linkedin.com/in/widi-suryo-nugroho-a607632a2/", icon: <FaLinkedin className="text-xl sm:text-3xl" /> },
+                  { href: "https://lynk.id/widinugroho23", icon: <FiLink className="text-xl sm:text-3xl" /> },
                 ].map((item, index) => (
-                  <RotatingLabelItem key={index} item={item} theme={theme} />
+                  <a
+                    key={index}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`p-3 sm:p-5 rounded-xl sm:rounded-2xl transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center shadow-md group ${
+                      theme === "dark" 
+                        ? "bg-gray-900 hover:bg-blue-600 text-white border-gray-800 hover:border-blue-500" 
+                        : "bg-white hover:bg-blue-600 text-gray-800 hover:text-white border-gray-100 hover:border-blue-500"
+                    } border`}
+                  >
+                    {item.icon}
+                  </a>
                 ))}
               </div>
             </RevealContainer>
           </div>
 
-          {/* Pie Chart Section - Diperbaiki posisinya */}
-          <div ref={chartRef} className="min-h-screen w-full flex items-center justify-center py-12 px-4">
+          {/* Pie Chart / Tech Stack Section */}
+          <div ref={chartRef} className="w-full flex items-center justify-center py-8 sm:py-16 px-2 sm:px-4 mb-10 sm:mb-20 overflow-visible">
             {chartRendered && (
-              <div className="relative flex items-center justify-center w-full max-w-[750px] mx-auto select-none">
-                <svg viewBox="0 0 500 500" className="w-full h-auto overflow-visible animate-[pieRotateIn_1s_ease-out]">
+              <div className="relative flex items-center justify-center w-full max-w-[650px] mx-auto select-none scale-90 sm:scale-100">
+                <svg viewBox="0 0 700 700" className="w-full h-auto overflow-visible">
                   <g>
                     {toolsData.map((tool, index) => {
                       const isHovered = hoveredIndex === index;
-                      const sliceInfo = createPieSlice(index, totalItems, 115, 245);
+                      const sliceInfo = createPieSlice(index, totalItems, 130, 270);
                       const defaultSliceColor = theme === "dark" 
                         ? (index % 2 === 0 ? "rgba(31, 41, 55, 0.45)" : "rgba(17, 24, 39, 0.6)")
                         : (index % 2 === 0 ? "rgba(241, 245, 249, 0.95)" : "rgba(226, 232, 240, 0.85)");
 
                       const strokeColor = theme === "dark" ? "#1e293b" : "#cbd5e1";
-                      const logoSize = 32; 
+                      const logoSize = 34; 
+
+                      const rad = (sliceInfo.midAngle * Math.PI) / 180;
+                      const scatterDistance = (1 - chartProgress) * 200;
+                      const offsetX = Math.cos(rad) * scatterDistance;
+                      const offsetY = Math.sin(rad) * scatterDistance;
+                      const sliceOpacity = chartProgress;
 
                       return (
                         <g 
@@ -333,9 +359,12 @@ export default function Home() {
                           onMouseLeave={() => setHoveredIndex(null)}
                           className="cursor-pointer"
                           style={{
-                            transform: isHovered ? `translate(${sliceInfo.moveX}px, ${sliceInfo.moveY}px) scale(1.03)` : 'translate(0px, 0px) scale(1)',
-                            transformOrigin: '250px 250px',
-                            transition: 'transform 0.3s ease-out',
+                            transform: isHovered 
+                              ? `translate(${sliceInfo.moveX + offsetX}px, ${sliceInfo.moveY + offsetY}px) scale(1.03)` 
+                              : `translate(${offsetX}px, ${offsetY}px) scale(1)`,
+                            transformOrigin: '350px 350px',
+                            transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease-out',
+                            opacity: sliceOpacity,
                           }}
                         >
                           <path
@@ -363,22 +392,27 @@ export default function Home() {
                   </g>
                 </svg>
 
-                <div className={`absolute z-30 w-[38%] h-[38%] rounded-full flex flex-col items-center justify-center p-3 text-center border pointer-events-none backdrop-blur-md shadow-inner ${
+                <div 
+                  className={`absolute z-30 w-[35%] h-[35%] rounded-full flex flex-col items-center justify-center p-2 sm:p-3 text-center border pointer-events-none backdrop-blur-md shadow-inner transition-all duration-500 ${
                     theme === "dark" ? "bg-black/90 border-gray-800 shadow-black" : "bg-white/95 border-gray-200/60 shadow-gray-200"
                   }`}
+                  style={{
+                    opacity: chartProgress,
+                    transform: `scale(${0.5 + chartProgress * 0.5})`,
+                  }}
                 >
                   {hoveredIndex !== null ? (
                     <div className="flex flex-col items-center justify-center w-full">
-                      <div className="h-10 sm:h-14 flex items-center justify-center mb-1 sm:mb-2">
-                        <img src={toolsData[hoveredIndex].logo} alt={toolsData[hoveredIndex].name} className="w-8 h-8 sm:w-12 sm:h-12 object-contain" />
+                      <div className="h-8 sm:h-14 flex items-center justify-center mb-1">
+                        <img src={toolsData[hoveredIndex].logo} alt={toolsData[hoveredIndex].name} className="w-6 h-6 sm:w-12 sm:h-12 object-contain" />
                       </div>
-                      <span className={`text-[9px] sm:text-xs font-black uppercase tracking-widest px-1.5 py-0.5 sm:px-2 rounded-md ${theme === "dark" ? "text-blue-400 bg-blue-950/40" : "text-blue-600 bg-blue-50"}`}>
+                      <span className={`text-[8px] sm:text-xs font-black uppercase tracking-widest px-1 sm:px-2 rounded-md ${theme === "dark" ? "text-blue-400 bg-blue-950/40" : "text-blue-600 bg-blue-50"}`}>
                         {toolsData[hoveredIndex].name}
                       </span>
                     </div>
                   ) : (
                     <div className="text-center opacity-70">
-                      <span className="text-[4vw] sm:text-[3.5vw] md:text-base font-bold uppercase tracking-[0.12em] block text-blue-500 font-poppins">Tech Stack</span>
+                      <span className="text-[3.5vw] sm:text-[3.5vw] md:text-base font-bold uppercase tracking-[0.12em] block text-blue-500 font-poppins">Tech Stack</span>
                     </div>
                   )}
                 </div>
@@ -386,11 +420,12 @@ export default function Home() {
             )}
           </div>
 
-          <div id="projek" className="pt-16 md:pt-24"><ProjekPage /></div>
-          <div id="sertifikat" className="pt-16 md:pt-24"><SertifikatPage /></div>
-          <div id="lomba" className="pt-16 md:pt-24"><LombaPage /></div>
-          <div id="organisasi" className="pt-16 md:pt-24"><OrganisasiPage /></div>
-          <div id="pendidikan" className="pt-16 md:pt-24"><PendidikanPage /></div>
+          {/* Sisa Halaman (Projek, Sertifikat, Lomba, Organisasi, Pendidikan) */}
+          <div id="projek" className="pt-10 md:pt-20"><ProjekPage /></div>
+          <div id="sertifikat" className="pt-10 md:pt-20"><SertifikatPage /></div>
+          <div id="lomba" className="pt-10 md:pt-20"><LombaPage /></div>
+          <div id="organisasi" className="pt-10 md:pt-20"><OrganisasiPage /></div>
+          <div id="pendidikan" className="pt-10 md:pt-20"><PendidikanPage /></div>
         </section>
       </div>
 
@@ -402,15 +437,6 @@ export default function Home() {
 
         .reveal-init { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
         .reveal-active { opacity: 1; transform: translateY(0); }
-
-        @keyframes pieRotateIn {
-          from { opacity: 0; transform: scale(0.8) rotate(-90deg); }
-          to { opacity: 1; transform: scale(1) rotate(0deg); }
-        }
-        
-        @keyframes shimmer {
-          100% { transform: translateX(100%); }
-        }
       `}</style>
     </>
   );

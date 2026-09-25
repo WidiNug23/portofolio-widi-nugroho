@@ -35,6 +35,24 @@ export default function OrganisasiPage() {
   const [organisasi] = useState([
     {
       id: 1,
+      nama: "PT Danadipa Bertu Perkasa",
+      jabatan: "Full-Stack Developer Freelance",
+      tahun_masuk: "2026",
+      tahun_keluar: "2026",
+      deskripsi: "Melakukan pengumpulan kebutuhan-kebutuhan website yang terdiri dari 3 role pengguna, fitur website (dokumentasi, portfolio,news), dan basis data untuk website. Melakukan implementasi perancangan ke dalam source code menggunakan framework Laravel. Melakukan deployment, testing, dan maintenance website. ",
+      file_path: "",
+    },
+    {
+      id: 1,
+      nama: "Pemerintah Desa Mejayan",
+      jabatan: "Full-Stack Developer Freelance",
+      tahun_masuk: "2025",
+      tahun_keluar: "2026",
+      deskripsi: "Melakukan development website profile desa dan website pengajuan surat secara online. Membangun autentikasi dengan menggunakan token, validasi OTP, dan middleware role-base. membuat strategi SEO menggunakan Google Search Console",
+      file_path: "",
+    },
+    {
+      id: 1,
       nama: "D3 Teknik Informatika UNS PSDKU",
       jabatan: "Divisi Dokumentasi Prodi",
       tahun_masuk: "2022",
@@ -133,7 +151,6 @@ export default function OrganisasiPage() {
           {organisasi.map((o, index) => {
             const isEven = index % 2 === 0;
             const isExpanded = expanded[o.id];
-            const textToShow = isExpanded ? o.deskripsi : o.deskripsi?.length > 180 ? o.deskripsi.substring(0, 180) + "..." : o.deskripsi;
             const fileUrl = normalizeFileUrl(o.file_path);
             const type = getFileType(o.file_path);
 
@@ -176,17 +193,18 @@ export default function OrganisasiPage() {
                         </p>
 
                         <div className="relative">
-                          <p className={`text-sm leading-relaxed ${isDark ? "text-gray-400" : "text-gray-600"}`}>
-                            {textToShow}
-                          </p>
-                          {o.deskripsi?.length > 180 && (
-                            <button
-                              onClick={() => toggleExpand(o.id)}
-                              className="mt-3 text-[10px] font-black uppercase tracking-widest text-yellow-500 hover:underline"
-                            >
-                              {isExpanded ? "Show Less" : "Read Full Story"}
-                            </button>
+                          {isExpanded && (
+                            <p className={`text-sm leading-relaxed mb-3 animate-fade-in ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                              {o.deskripsi}
+                            </p>
                           )}
+                          
+                          <button
+                            onClick={() => toggleExpand(o.id)}
+                            className="text-[10px] font-black uppercase tracking-widest text-yellow-500 hover:underline focus:outline-none"
+                          >
+                            {isExpanded ? "Show Less" : "Read More"}
+                          </button>
                         </div>
 
                         {/* File Attachment */}

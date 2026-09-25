@@ -18,6 +18,8 @@ function LayoutContent({ children }) {
   const [isFloatingOpen, setIsFloatingOpen] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [imageAspectRatios, setImageAspectRatios] = useState({});
   const floatingRef = useRef(null);
   
   const { theme, toggleTheme } = useTheme();
@@ -32,64 +34,66 @@ function LayoutContent({ children }) {
     { href: "/#organisasi", label: "Pengalaman & Organisasi" },
     { href: "/#pendidikan", label: "Pendidikan" },
     { href: "/#kontak", label: "Kontak" },
+    { href: "https://drive.google.com/file/d/1s-ildIIrPXcifuOSgcwJs12aC0Y7-vBh/view?usp=sharing", label: "Curriculum Vitae", external: true },
   ];
 
-  // LOGIC: Enhanced Supabase Tracking dengan Geolocation + Loading Control
+  // Daftar path foto preview
+  const latestPreviews = [
+    { image: "/uploads/width_378.png", link: "/#lomba" },
+    { image: "/uploads/width_800.png", link: "/#lomba" },
+    { image: "/uploads/width_750.png", link: "/#lomba" },
+    { image: "/uploads/width_600.png", link: "/#lomba" }
+  ];
+
+  // Fungsi untuk mendeteksi rasio asli foto secara otomatis & aman dari cache refresh
+  const handleImageLoad = (idx, imgElement) => {
+    if (imgElement && imgElement.naturalWidth && imgElement.naturalHeight) {
+      const ratio = imgElement.naturalWidth / imgElement.naturalHeight;
+      setImageAspectRatios(prev => {
+        if (prev[idx] === ratio) return prev;
+        return {
+          ...prev,
+          [idx]: ratio
+        };
+      });
+    }
+  };
+
   useEffect(() => {
     const trackView = async () => {
-      setIsLoading(true); // Aktifkan loading saat inisialisasi / ganti page
-      let locationData = {
-        city: 'Unknown',
-        country: 'Unknown',
-        region: 'Unknown'
-      };
+      setIsLoading(true);
+      let locationData = { city: 'Unknown', country: 'Unknown', region: 'Unknown' };
 
       try {
-        // PRIORITAS 1: ipwho.is
         const res0 = await fetch('https://ipwho.is/');
         const data0 = await res0.json();
         if (data0.success) {
-          locationData = {
-            city: data0.city || 'Unknown',
-            country: data0.country || 'Unknown',
-            region: data0.region || 'Unknown'
-          };
+          locationData = { city: data0.city || 'Unknown', country: data0.country || 'Unknown', region: data0.region || 'Unknown' };
         } else {
           throw new Error('ipwho.is failed');
         }
       } catch (err0) {
         try {
-          // FALLBACK 1: ipapi.co
           const res1 = await fetch('https://ipapi.co/json/');
           if (res1.ok) {
             const data1 = await res1.json();
-            locationData = {
-              city: data1.city || 'Unknown',
-              country: data1.country_name || 'Unknown',
-              region: data1.region || 'Unknown'
-            };
+            locationData = { city: data1.city || 'Unknown', country: data1.country_name || 'Unknown', region: data1.region || 'Unknown' };
           } else {
             throw new Error('ipapi.co failed');
           }
         } catch (err1) {
           try {
-            // FALLBACK 2: ip-api.com
             const res2 = await fetch('http://ip-api.com/json/');
             const data2 = await res2.json();
             if (data2.status === 'success') {
-              locationData = {
-                city: data2.city,
-                country: data2.country,
-                region: data2.regionName
-              };
+              locationData = { city: data2.city, country: data2.country, region: data2.regionName };
             }
           } catch (err2) {
-            console.error("Semua layanan Geolocation gagal:", err2);
+            console.error("Geolocation failed:", err2);
           }
         }
       }
 
-      // Kirim ke Supabase
       try {
         const currentFullPath = window.location.pathname + window.location.hash;
         await supabase.from('page_views').insert([
@@ -101,11 +105,9 @@ function LayoutContent({ children }) {
             region: locationData.region,
           }
         ]);
-        console.log("View tracked successfully to Supabase");
       } catch (dbError) {
         console.error("Database Insert Error:", dbError);
       } finally {
-        // Proses selesai, matikan loading di navbar
         setIsLoading(false);
       }
     };
@@ -123,12 +125,38 @@ function LayoutContent({ children }) {
     };
 
     window.addEventListener("scroll", handleScroll);
-    
     return () => {
       window.removeEventListener("hashchange", handleHashChange);
       window.removeEventListener("scroll", handleScroll);
     };
   }, [pathname]);
+
+  // Solusi tuntas untuk menangani refresh pada URL ber-hash (Projek, Sertifikat, Lomba, Organisasi, dll)
+  useEffect(() => {
+    if (window.location.hash) {
+      const hash = window.location.hash;
+      const cleanId = hash.substring(1);
+
+      // Cegah browser melakukan lompatan scroll kacau saat refresh
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+      }
+
+      window.scrollTo(0, 0);
+
+      // Beri jeda agar DOM ter-render sempurna, lalu arahkan pas ke seksi tujuan dengan offset navbar
+      const timer = setTimeout(() => {
+        const section = document.getElementById(cleanId);
+        if (section) {
+          const offset = 90; // Tinggi offset navbar
+          const elementPosition = section.getBoundingClientRect().top + window.scrollY;
+          window.scrollTo({ top: elementPosition - offset, behavior: "smooth" });
+        }
+      }, 250);
+
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -140,13 +168,11 @@ function LayoutContent({ children }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleScrollToSection = (e, href) => {
-    if (href.startsWith("/statistic")) {
-        setMenuOpen(false);
-        return;
+  const handleScrollToSection = (e, href, external) => {
+    if (external) {
+      setMenuOpen(false);
+      return;
     }
-
-    if (!href.includes("#") && href !== "/") return;
 
     e.preventDefault();
     setMenuOpen(false);
@@ -164,13 +190,21 @@ function LayoutContent({ children }) {
     if (pathname === "/") {
       const section = document.getElementById(cleanId);
       if (section) {
-        const offset = 80;
+        const offset = 90;
         const elementPosition = section.getBoundingClientRect().top + window.scrollY;
         window.scrollTo({ top: elementPosition - offset, behavior: "smooth" });
         window.history.pushState(null, null, `#${cleanId}`);
       }
     } else {
       router.push(href);
+      setTimeout(() => {
+        const section = document.getElementById(cleanId);
+        if (section) {
+          const offset = 90;
+          const elementPosition = section.getBoundingClientRect().top + window.scrollY;
+          window.scrollTo({ top: elementPosition - offset, behavior: "smooth" });
+        }
+      }, 300);
     }
   };
 
@@ -194,7 +228,7 @@ function LayoutContent({ children }) {
       }`}>
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6">
           
-          {/* LOGO & NAVBAR MICRO-LOADING CONTAINER */}
+          {/* LOGO & LOADING */}
           <div className="flex items-center gap-3 sm:gap-4">
             <Link href="/" className="group">
               <h1 className={`text-2xl font-black tracking-tighter transition-all duration-300 ${
@@ -204,7 +238,6 @@ function LayoutContent({ children }) {
               </h1>
             </Link>
 
-            {/* Spinner Loading Ring Inline (Selalu memuat teks di mobile & desktop) */}
             <div className={`flex items-center gap-1.5 sm:gap-2 transition-all duration-500 transform ${
               isLoading ? "opacity-100 scale-100 w-auto" : "opacity-0 scale-0 w-0 overflow-hidden"
             }`}>
@@ -215,58 +248,178 @@ function LayoutContent({ children }) {
             </div>
           </div>
 
-          <ul className="hidden lg:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  onClick={(e) => handleScrollToSection(e, link.href)}
-                  className="relative px-4 py-2 text-sm font-medium transition-all duration-300 hover:text-blue-500 group"
-                >
-                  {link.label}
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                </Link>
-              </li>
-            ))}
-            <li className="ml-4 pl-4 border-l border-gray-500/30">
-              <button
-                onClick={toggleTheme}
-                className={`p-2.5 rounded-xl transition-all duration-300 ${
-                  theme === "dark" ? "bg-gray-800 text-yellow-400 hover:bg-gray-700" : "bg-gray-100 text-yellow-600 hover:bg-gray-200"
-                }`}
-              >
-                {theme === "dark" ? <FaSun size={18} /> : <FaMoon size={18} />}
-              </button>
-            </li>
-          </ul>
-
-          <div className="flex items-center gap-3 lg:hidden">
-            <button onClick={toggleTheme} className="p-2 text-yellow-500">
-              {theme === "dark" ? <FaSun size={20} /> : <FaMoon size={20} />}
+          {/* Right Action: Theme Toggle & Burger Button */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={toggleTheme}
+              className={`p-2.5 rounded-xl transition-all duration-300 ${
+                theme === "dark" ? "bg-gray-800 text-yellow-400 hover:bg-gray-700" : "bg-gray-100 text-yellow-600 hover:bg-gray-200"
+              }`}
+            >
+              {theme === "dark" ? <FaSun size={18} /> : <FaMoon size={18} />}
             </button>
-            <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 transition-transform active:scale-90">
-              {menuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+            <button 
+              onClick={() => setMenuOpen(!menuOpen)} 
+              className={`p-3 rounded-2xl transition-all duration-300 flex items-center justify-center border ${
+                theme === "dark" ? "bg-gray-900 border-gray-800 text-white hover:bg-gray-800" : "bg-gray-100 border-gray-200 text-gray-900 hover:bg-gray-200"
+              }`}
+              aria-label="Menu"
+            >
+              {menuOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        <div className={`absolute top-full left-0 w-full lg:hidden transition-all duration-500 overflow-hidden ${
-          menuOpen ? "max-h-[600px] border-b shadow-xl" : "max-h-0"
-        } ${theme === "dark" ? "bg-gray-900 border-gray-800" : "bg-white border-gray-100"}`}>
-          <ul className="flex flex-col p-4">
-            {navLinks.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  onClick={(e) => handleScrollToSection(e, link.href)}
-                  className="block px-4 py-4 text-base font-semibold border-b border-gray-500/10 last:border-0 hover:text-blue-500"
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        {/* Fullscreen Overlay Menu */}
+        <div className={`fixed inset-0 top-0 left-0 w-full h-screen z-[200] transition-all duration-500 ease-in-out flex flex-col justify-between overflow-y-auto ${
+          menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none translate-y-[-20px]"
+        } ${theme === "dark" ? "bg-[#0b0b0b]" : "bg-[#f8fafc]"}`}>
+          
+          {/* Top Bar inside Overlay */}
+          <div className="w-full flex items-center justify-between p-6 max-w-7xl mx-auto z-25">
+            <Link href="/" onClick={() => setMenuOpen(false)} className="text-2xl font-black tracking-tighter">
+              WIDI<span className="text-blue-500">.</span>
+            </Link>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={toggleTheme}
+                className={`p-2.5 rounded-xl transition-all duration-300 ${
+                  theme === "dark" ? "bg-gray-800 text-yellow-400" : "bg-white text-yellow-600 shadow-sm"
+                }`}
+              >
+                {theme === "dark" ? <FaSun size={18} /> : <FaMoon size={18} />}
+              </button>
+              <button 
+                onClick={() => setMenuOpen(false)} 
+                className={`p-3 rounded-2xl transition-all duration-300 flex items-center justify-center border shadow-lg ${
+                  theme === "dark" ? "bg-gray-800 border-gray-700 text-white hover:bg-gray-700" : "bg-white border-gray-200 text-gray-900 hover:bg-gray-50"
+                }`}
+              >
+                <FaTimes size={22} />
+              </button>
+            </div>
+          </div>
+
+          {/* Main Content Grid: Kiri (Smart Fan-out Card Deck) & Kanan (Navigasi) */}
+          <div className="max-w-7xl w-full mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center my-auto">
+            
+            {/* Sisi Kiri: Default 9:16 penuh, berubah mulus ke rasio asli foto saat di-hover */}
+            <div className="lg:col-span-6 hidden lg:flex items-center justify-center h-[420px] relative">
+              <div 
+                className="relative flex items-center justify-center w-full max-w-[500px] h-full"
+                onMouseLeave={() => setHoveredIndex(null)}
+              >
+                {latestPreviews.map((item, idx) => {
+                  const isHovered = hoveredIndex === idx;
+                  let translateX = (idx - 1.5) * 55; 
+                  let translateY = Math.abs(idx - 1.5) * 10; 
+                  let rotate = (idx - 1.5) * 8; 
+
+                  if (hoveredIndex !== null) {
+                    if (idx < hoveredIndex) {
+                      translateX -= 80;
+                      rotate -= 4;
+                    } else if (idx > hoveredIndex) {
+                      translateX += 80;
+                      rotate += 4;
+                    } else {
+                      translateX = (idx - 1.5) * 15;
+                      translateY = -10;
+                      rotate = 0;
+                    }
+                  }
+
+                  // Rasio aspek natural foto (fallback ke 9/16 jika belum termuat)
+                  const aspectRatio = imageAspectRatios[idx] || (9 / 16);
+
+                  // Kalkulasi ukuran fleksibel saat di-hover berdasarkan rasio aslinya
+                  let cardWidth = '130px';
+                  let cardHeight = '230px'; // Default 9:16 penuh tanpa warna abu-abu
+
+                  if (isHovered) {
+                    const baseHeight = 260; // Tinggi dasar saat di-hover
+                    let calcWidth = baseHeight * aspectRatio;
+                    
+                    // Batasi lebar agar tidak terlalu ekstrem (terlalu panjang/lebar)
+                    if (calcWidth > 340) {
+                      calcWidth = 340;
+                    } else if (calcWidth < 140) {
+                      calcWidth = 140;
+                    }
+
+                    cardWidth = `${calcWidth}px`;
+                    cardHeight = `${calcWidth / aspectRatio}px`;
+                  }
+
+                  return (
+                    <a 
+                      key={idx} 
+                      href={item.link}
+                      onMouseEnter={() => setHoveredIndex(idx)}
+                      onClick={(e) => handleScrollToSection(e, item.link)}
+                      className={`absolute rounded-2xl overflow-hidden border-2 border-white/25 bg-gray-900 transition-all duration-500 ease-out origin-bottom ${
+                        isHovered 
+                          ? "z-40 shadow-[0_25px_60px_rgba(0,0,0,0.85)] ring-2 ring-blue-500/60" 
+                          : "z-10 shadow-xl hover:z-20"
+                      }`}
+                      style={{
+                        transform: `translate(${translateX}px, ${translateY}px) rotate(${rotate}deg)`,
+                        width: cardWidth,
+                        height: cardHeight,
+                      }}
+                    >
+                      <img 
+                        src={item.image} 
+                        alt="Preview" 
+                        ref={(el) => {
+                          if (el && el.complete) {
+                            handleImageLoad(idx, el);
+                          }
+                        }}
+                        onLoad={(e) => handleImageLoad(idx, e.target)}
+                        className={`w-full h-full transition-all duration-500 ${
+                          isHovered ? "object-cover" : "object-cover"
+                        }`}
+                      />
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Sisi Kanan: Daftar Menu Navigasi Besar */}
+            <div className="lg:col-span-6 flex flex-col justify-center space-y-2 sm:space-y-3 text-left">
+              {navLinks.map((link) => (
+                <div key={link.href}>
+                  <Link
+                    href={link.href}
+                    {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    onClick={(e) => handleScrollToSection(e, link.href, link.external)}
+                    className={`text-2xl sm:text-4xl md:text-5xl font-black tracking-tight transition-all duration-300 hover:text-blue-500 hover:translate-x-3 inline-block ${
+                      theme === "dark" ? "text-gray-200" : "text-gray-800"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                </div>
+              ))}
+            </div>
+
+          </div>
+
+          {/* Footer di dalam Menu Overlay (Posisi Paling Bawah) */}
+          <div className="py-6 px-6 border-t border-gray-700/20 max-w-7xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+            <p className={theme === "dark" ? "text-gray-400 font-medium" : "text-gray-600 font-medium"}>
+              © {new Date().getFullYear()} Widi Nugroho. All Rights Reserved.
+            </p>
+            <div className="flex gap-6 font-bold">
+              <a href="https://github.com/WidiNug23" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">GitHub</a>
+              <a href="https://www.linkedin.com/in/widi-suryo-nugroho-a607632a2/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">LinkedIn</a>
+              <a href="https://www.instagram.com/widingr23" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">Instagram</a>
+              <a href="mailto:collabswithwidi@gmail.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">Email</a>
+            </div>
+          </div>
+
         </div>
       </nav>
 
@@ -282,7 +435,6 @@ function LayoutContent({ children }) {
               { icon: <FaLinkedin />, href: "https://www.linkedin.com/in/widi-suryo-nugroho-a607632a2/", color: "hover:text-blue-500" },
               { icon: <FaGithub />, href: "https://github.com/WidiNug23", color: "hover:text-gray-400" },
               { icon: <MdEmail />, href: "mailto:collabswithwidi@gmail.com", color: "hover:text-red-500" },
-              // { icon: <FaWhatsapp />, href: "https://wa.me/", color: "hover:text-green-500" },
             ].map((soc, i) => (
               <a 
                 key={i} href={soc.href} target="_blank" rel="noopener noreferrer"
@@ -302,53 +454,6 @@ function LayoutContent({ children }) {
           </div>
         </div>
       </footer>
-
-      {/* Floating Action Button */}
-      <div 
-        ref={floatingRef}
-        className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[999] flex flex-col items-end pointer-events-none"
-      >
-        <div className={`mb-4 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] origin-bottom-right pointer-events-auto ${
-          isFloatingOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-50 translate-y-10 pointer-events-none"
-        }`}>
-          <div className={`p-6 rounded-[2.5rem] shadow-2xl border min-w-[250px] flex flex-col gap-5 ${
-            theme === "dark" ? "bg-gray-900/90 border-gray-700/50 backdrop-blur-xl" : "bg-white/90 border-gray-200/50 backdrop-blur-xl"
-          }`}>
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 px-2 opacity-70">Hubungi Saya</span>
-            <div className="flex flex-col gap-4">
-              <a href="https://www.instagram.com/widingr23" target="_blank" rel="noopener noreferrer" className="flex items-center group/item gap-4">
-                <div className="w-11 h-11 flex items-center justify-center bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 text-white rounded-2xl shadow-lg group-hover/item:scale-110 transition-transform">
-                  <FaInstagram size={20} />
-                </div>
-                <span className="text-sm font-bold tracking-tight">Instagram</span>
-              </a>
-              <a href="mailto:collabswithwidi@gmail.com" className="flex items-center group/item gap-4">
-                <div className="w-11 h-11 flex items-center justify-center bg-red-500 text-white rounded-2xl shadow-lg group-hover/item:scale-110 transition-transform">
-                  <MdEmail size={20} />
-                </div>
-                <span className="text-sm font-bold tracking-tight">Email</span>
-              </a>
-              {/* <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" className="flex items-center group/item gap-4">
-                <div className="w-11 h-11 flex items-center justify-center bg-green-500 text-white rounded-2xl shadow-lg group-hover/item:scale-110 transition-transform">
-                  <FaWhatsapp size={20} />
-                </div>
-                <span className="text-sm font-bold tracking-tight">WhatsApp</span>
-              </a> */}
-            </div>
-          </div>
-        </div>
-
-        <div className="relative group pointer-events-auto">
-          <button 
-            onClick={() => setIsFloatingOpen(!isFloatingOpen)}
-            className={`w-14 h-14 flex items-center justify-center rounded-full shadow-2xl transition-all duration-500 relative z-10 ${
-              isFloatingOpen ? "rotate-90 scale-90" : "rotate-0 scale-100"
-            } ${theme === "dark" ? "bg-white text-blue-500" : "bg-blue-600 text-white"}`}
-          >
-            {isFloatingOpen ? <FaTimes className="text-2xl" /> : <FaComments className="text-2xl" />}
-          </button>
-        </div>
-      </div>
     </body>
   );
 }

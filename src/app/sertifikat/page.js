@@ -16,9 +16,7 @@ const SpinningClockIcon = () => (
         className="text-[#9be414] drop-shadow-[0_0_8px_rgba(155,228,20,0.5)]"
       >
         <circle cx="12" cy="12" r="10" />
-        {/* Jarum Jam */}
         <polyline points="12 6 12 12" className="origin-center animate-[spin_5s_linear_infinite]" />
-        {/* Jarum Menit */}
         <polyline points="12 12 16 14" className="origin-center animate-[spin_2s_linear_infinite]" />
       </svg>
     </div>
@@ -123,13 +121,13 @@ export default function SertifikatPage() {
       
       {/* HEADER SECTION */}
       <header className="max-w-4xl mx-auto mb-20 text-center">
-        <h1 className={`text-4xl md:text-6xl font-extrabold mb-4 tracking-tight ${isDark ? "neon-glow text-white" : "text-gray-900"}`}>
+        <h1 className="text-4xl md:text-6xl font-extrabold mb-4 tracking-tight">
           Sertifikat
         </h1>
-        <div className={`h-1.5 w-24 mx-auto rounded-full ${isDark ? 'bg-[#9be414]' : 'bg-[#9be414]'}`}></div>
+        <div className="h-1.5 w-24 mx-auto rounded-full bg-[#9be414]"></div>
       </header>
 
-      {/* LIST SECTION - PERBAIKAN TOTAL LAYOUT UNTUK MOBILE ELEMEN */}
+      {/* LIST SECTION */}
       {sertifikat.length === 0 ? (
         <div className="flex justify-center items-center h-40">
            <p className="opacity-50 italic animate-pulse">Memuat data sertifikat...</p>
@@ -141,144 +139,107 @@ export default function SertifikatPage() {
             const textToShow = isExpanded || s.deskripsi?.length <= 140 ? s.deskripsi : s.deskripsi?.substring(0, 140) + "...";
             const pdfUrl = normalizePdfUrl(s.pdf_file);
 
-// Ganti bagian return map Anda dengan struktur ini:
-return (
-  <div 
-    key={s.id} 
-    className="sertifikat-card opacity-0 translate-y-6 transition-all duration-700 w-full md:break-inside-avoid mb-8"
-  >
-    {/* Hapus z-50 dari sini, biarkan flow normal */}
-    <div className="neon-border rounded-[2.5rem] p-[1px] relative w-full h-full">
-      <div className={`h-full rounded-[2.4rem] p-6 md:p-8 flex flex-col transition-all duration-500 ${isDark ? "bg-gray-900/40 backdrop-blur-xl border border-white/5" : "bg-white shadow-lg border border-gray-100"}`}>
-        
-        {s.isComingSoon ? (
-          <SpinningClockIcon />
-        ) : (
-          <>
-            <div className="flex flex-col flex-grow">
-              {/* TAGS */}
-              <div className="flex flex-wrap gap-2 mb-4">
-                {s.tingkat && (
-                  <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${isDark ? 'bg-[#9be414]/10 text-[#9be414]' : 'bg-lime-50 text-lime-700'}`}>
-                    {s.tingkat}
-                  </span>
-                )}
-                <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${isDark ? 'bg-gray-800/50 text-gray-400' : 'bg-gray-100 text-gray-600'}`}>
-                  {s.tahun || "TBA"}
-                </span>
-              </div>
+            return (
+              <div 
+                key={s.id} 
+                className="sertifikat-card opacity-0 translate-y-6 transition-all duration-700 w-full md:break-inside-avoid mb-8"
+              >
+                <div className={`h-full rounded-[2.5rem] p-6 md:p-8 flex flex-col justify-between transition-all duration-500 border ${
+                  isDark 
+                    ? "bg-gray-900/40 backdrop-blur-xl border-gray-800" 
+                    : "bg-white shadow-lg border-gray-100"
+                }`}>
+                  
+                  {s.isComingSoon ? (
+                    <SpinningClockIcon />
+                  ) : (
+                    <div className="flex flex-col h-full">
+                      {/* TAGS */}
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {s.tingkat && (
+                          <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${isDark ? 'bg-[#9be414]/10 text-[#9be414]' : 'bg-lime-50 text-lime-700'}`}>
+                            {s.tingkat}
+                          </span>
+                        )}
+                        <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${isDark ? 'bg-gray-800/50 text-gray-400' : 'bg-gray-100 text-gray-600'}`}>
+                          {s.tahun || "TBA"}
+                        </span>
+                      </div>
 
-              {/* TITLE */}
-              <h2 className={`text-xl md:text-2xl font-bold mb-3 leading-tight ${isDark ? "text-white" : "text-gray-900"}`}>
-                {s.nama}
-              </h2>
+                      {/* TITLE */}
+                      <h2 className={`text-xl md:text-2xl font-bold mb-3 leading-tight ${isDark ? "text-white" : "text-gray-900"}`}>
+                        {s.nama}
+                      </h2>
 
-              {/* DESKRIPSI */}
-              <div className="mb-6">
-                <p className={`text-xs md:text-sm leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                  {textToShow}
-                </p>
-                {s.deskripsi?.length > 140 && (
-                  <button 
-                    onClick={() => toggleExpand(s.id)} 
-                    className="text-[9px] font-black text-[#9be414] uppercase tracking-widest hover:underline mt-2 block relative z-10"
-                  >
-                    {isExpanded ? "Sembunyikan" : "Detail Deskripsi"}
-                  </button>
-                )}
-              </div>
+                      {/* DESKRIPSI */}
+                      <div className="mb-6">
+                        <p className={`text-xs md:text-sm leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                          {textToShow}
+                        </p>
+                        {s.deskripsi?.length > 140 && (
+                          <button 
+                            onClick={() => toggleExpand(s.id)} 
+                            className="text-[9px] font-black text-[#9be414] uppercase tracking-widest hover:underline mt-2 block relative z-10"
+                          >
+                            {isExpanded ? "Sembunyikan" : "Detail Deskripsi"}
+                          </button>
+                        )}
+                      </div>
 
-              {/* FOOTER AREA */}
-              <div className="mt-auto">
-                <div className={`grid grid-cols-2 gap-4 pt-4 border-t ${isDark ? 'border-white/5' : 'border-gray-100'} mb-6`}>
-                  <div>
-                    <p className={`text-[9px] uppercase tracking-widest font-black mb-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Penerbit</p>
-                    <p className={`text-xs font-bold ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{s.penerbit || "-"}</p>
-                  </div>
-                  {s.hasil && (
-                    <div>
-                      <p className={`text-[9px] uppercase tracking-widest font-black mb-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Hasil</p>
-                      <p className="text-xs font-bold text-[#9be414] italic">{s.hasil}</p>
+                      {/* FOOTER AREA: PENERBIT, HASIL (TANPA CARD, WARNA TETAP MENONJOL), & TOMBOL BUKA DOKUMEN */}
+                      <div className={`pt-4 border-t ${isDark ? 'border-gray-800' : 'border-gray-100'} mt-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4`}>
+                        
+                        <div className="flex items-center gap-6">
+                          <div>
+                            <p className={`text-[9px] uppercase tracking-widest font-black mb-0.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Penerbit</p>
+                            <p className={`text-xs font-bold ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{s.penerbit || "-"}</p>
+                          </div>
+                          {s.hasil && (
+                            <div>
+                              <p className={`text-[9px] uppercase tracking-widest font-black mb-0.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Hasil</p>
+                              <p className={`text-xs font-black italic ${isDark ? 'text-[#9be414]' : 'text-lime-700'}`}>
+                                {s.hasil}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+
+                        {pdfUrl && (
+                          <a 
+                            href={pdfUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`px-5 py-3 rounded-xl font-black text-[11px] tracking-widest uppercase text-center transition-all whitespace-nowrap ${
+                              isDark 
+                                ? 'bg-[#9be414] text-black hover:bg-[#b0f524]' 
+                                : 'bg-black text-white hover:bg-gray-800'
+                            }`}
+                          >
+                            Buka Dokumen
+                          </a>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
-
-                {/* TOMBOL DIBUAT SEBAGAI BLOCK, TANPA Z-INDEX BERLEBIHAN */}
-                {pdfUrl && (
-                  <a 
-                    href={pdfUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`block w-full py-4 rounded-xl font-black text-[12px] tracking-widest uppercase text-center transition-all ${
-                      isDark 
-                        ? 'bg-[#9be414] text-black hover:bg-[#b0f524]' 
-                        : 'bg-black text-white hover:bg-gray-800'
-                    }`}
-                  >
-                    Buka Dokumen
-                  </a>
-                )}
               </div>
-            </div>
-          </>
-        )}
-      </div>
-    </div>
-  </div>
-);
+            );
           })}
         </div>
       )}
 
-<style jsx>{`
-        .neon-glow {
-          text-shadow: 0 0 20px rgba(155, 228, 20, 0.4);
-        }
-        
+      <style jsx>{`
         .sertifikat-card.reveal {
           opacity: 1 !important;
           transform: translateY(0) !important;
         }
 
-        /* Perbaikan Bayangan Neon */
-        .neon-border {
-          transition: all 0.5s ease;
-        }
-
-        .neon-border::before {
-          content: "";
-          position: absolute;
-          inset: -2px; /* Dibuat sedikit lebih luas agar glow lebih menyebar */
-          background: linear-gradient(135deg, #9be414, #00c6ff);
-          z-index: -1;
-          border-radius: 2.6rem; /* Sedikit lebih besar dari radius card */
-          opacity: 0;
-          filter: blur(15px); /* Menambahkan efek blur untuk hasil glow yang nyata */
-          transition: opacity 0.5s ease;
-        }
-
-        .neon-border::before {
-          content: "";
-          position: absolute;
-          inset: -1px;
-          background: linear-gradient(135deg, #9be414, transparent, #00ff99);
-          z-index: -1;
-          border-radius: inherit;
-          opacity: 0;
-          transition: opacity 0.6s ease;
-        }
-
-        .sertifikat-card:hover .neon-border::before {
-          opacity: 0.4; /* Intensitas glow saat di-hover */
-        }
-
         .sertifikat-card:hover {
-          transform: translateY(-5px) !important; /* Efek angkat saat di-hover */
+          transform: translateY(-5px) !important;
         }
         
-        /* Opsional: Tambahkan bayangan lembut pada card agar lebih 'timbul' */
         .sertifikat-card {
-            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+          transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
 
         @keyframes spin {
