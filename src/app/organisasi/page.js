@@ -4,8 +4,8 @@ import { useTheme } from "../ThemeContext";
 
 // Komponen Jarum Jam Berputar untuk Coming Soon
 const SpinningClockIcon = () => (
-  <div className="flex flex-col items-center justify-center py-10 gap-4 w-full bg-yellow-500/5 rounded-3xl border-2 border-dashed border-yellow-500/20">
-    <div className="relative w-16 h-16">
+  <div className="flex flex-col items-center justify-center py-8 sm:py-10 gap-4 w-full bg-yellow-500/5 rounded-3xl border-2 border-dashed border-yellow-500/20">
+    <div className="relative w-14 h-14 sm:w-16 sm:h-16">
       <svg 
         viewBox="0 0 24 24" 
         fill="none" 
@@ -22,7 +22,7 @@ const SpinningClockIcon = () => (
         <polyline points="12 12 16 14" className="origin-center animate-[spin_12s_linear_infinite]" />
       </svg>
     </div>
-    <p className="text-yellow-500/60 text-[10px] font-black uppercase tracking-[0.3em] animate-pulse">
+    <p className="text-yellow-500/60 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] animate-pulse text-center px-2">
       Next Experience Loading
     </p>
   </div>
@@ -39,11 +39,11 @@ export default function OrganisasiPage() {
       jabatan: "Full-Stack Developer Freelance",
       tahun_masuk: "2026",
       tahun_keluar: "2026",
-      deskripsi: "Melakukan pengumpulan kebutuhan-kebutuhan website yang terdiri dari 3 role pengguna, fitur website (dokumentasi, portfolio,news), dan basis data untuk website. Melakukan implementasi perancangan ke dalam source code menggunakan framework Laravel. Melakukan deployment, testing, dan maintenance website. ",
+      deskripsi: "Melakukan pengumpulan kebutuhan-kebutuhan website yang terdiri dari 3 role pengguna, fitur website (dokumentasi, portfolio,news), dan basis data untuk website. Melakukan implementasi perancangan ke dalam source code menggunakan framework Laravel. Melakukan deployment, testing, dan maintenance website.",
       file_path: "",
     },
     {
-      id: 1,
+      id: 2,
       nama: "Pemerintah Desa Mejayan",
       jabatan: "Full-Stack Developer Freelance",
       tahun_masuk: "2025",
@@ -52,7 +52,7 @@ export default function OrganisasiPage() {
       file_path: "",
     },
     {
-      id: 1,
+      id: 3,
       nama: "D3 Teknik Informatika UNS PSDKU",
       jabatan: "Divisi Dokumentasi Prodi",
       tahun_masuk: "2022",
@@ -61,7 +61,7 @@ export default function OrganisasiPage() {
       file_path: "",
     },
     {
-      id: 2,
+      id: 4,
       nama: "Himpunan Mahasiswa PSDKU UNS",
       jabatan: "Staff Divisi Media Komunikasi",
       tahun_masuk: "2023",
@@ -70,7 +70,7 @@ export default function OrganisasiPage() {
       file_path: "",
     },
     {
-      id: 3,
+      id: 5,
       nama: "PT. Garapan Indonesia Sukses",
       jabatan: "Full Stack Developer",
       tahun_masuk: "2024",
@@ -79,7 +79,7 @@ export default function OrganisasiPage() {
       file_path: "",
     },
     {
-      id: 4,
+      id: 6,
       nama: "PT. Garapan Indonesia Sukses",
       jabatan: "Multimedia Content Creator",
       tahun_masuk: "2025",
@@ -88,16 +88,39 @@ export default function OrganisasiPage() {
       file_path: "",
     },
     {
-      id: 5,
+      id: 7,
       nama: "[COMING SOON]",
       isComingSoon: true,
     },
   ]);
 
-  const [expanded, setExpanded] = useState({});
+  const [hovered, setHovered] = useState({});
+  const [clicked, setClicked] = useState({}); // Menyimpan state klik (true, false, atau undefined/null jika belum pernah diklik)
   const [popupImage, setPopupImage] = useState(null);
 
-  const toggleExpand = (id) => setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+  const handleMouseEnter = (id) => {
+    setHovered((prev) => ({ ...prev, [id]: true }));
+  };
+
+  const handleMouseLeave = (id) => {
+    setHovered((prev) => ({ ...prev, [id]: false }));
+  };
+
+  const handleClickCard = (id) => {
+    setClicked((prev) => {
+      const currentVal = prev[id];
+      let nextVal;
+      
+      if (currentVal === undefined || currentVal === null) {
+        // Jika belum pernah diklik, ambil kebalikan dari status hover saat itu
+        nextVal = !hovered[id];
+      } else {
+        // Jika sudah pernah diklik, tinggal dibalik statusnya
+        nextVal = !currentVal;
+      }
+      return { ...prev, [id]: nextVal };
+    });
+  };
 
   const normalizeFileUrl = (filePath) => {
     if (!filePath) return null;
@@ -133,24 +156,32 @@ export default function OrganisasiPage() {
   }, []);
 
   return (
-    <main className={`min-h-screen font-poppins transition-colors duration-500 pt-32 pb-20 px-4 sm:px-12 md:px-20 lg:px-32 ${isDark ? "bg-[#080808] text-gray-100" : "bg-slate-50 text-gray-900"}`}>
+    <main className={`min-h-screen font-poppins transition-colors duration-500 pt-24 sm:pt-28 md:pt-32 pb-16 sm:pb-20 px-4 sm:px-8 md:px-16 lg:px-24 xl:px-32 ${isDark ? "bg-[#080808] text-gray-100" : "bg-slate-50 text-gray-900"}`}>
       
       {/* Header Section */}
-      <header className="max-w-4xl mx-auto mb-20 text-center">
-        <h1 className={`text-4xl md:text-6xl font-extrabold mb-4 tracking-tight ${isDark ? "neon-glow text-white" : "text-gray-900"}`}>
+      <header className="max-w-4xl mx-auto mb-12 sm:mb-16 md:mb-20 text-center">
+        <h1 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-3 sm:mb-4 tracking-tight ${isDark ? "neon-glow text-white" : "text-gray-900"}`}>
           Pengalaman & Organisasi
         </h1>
-        <div className={`h-1.5 w-24 mx-auto rounded-full ${isDark ? 'bg-yellow-500 shadow-[0_0_15px_#f59e0b]' : 'bg-yellow-500'}`}></div>
+        <div className={`h-1.5 w-20 sm:w-24 mx-auto rounded-full ${isDark ? 'bg-yellow-500 shadow-[0_0_15px_#f59e0b]' : 'bg-yellow-500'}`}></div>
       </header>
 
       <div className="max-w-6xl mx-auto relative">
         {/* Central Vertical Line (Desktop Only) */}
-        <div className={`absolute left-0 md:left-1/2 transform md:-translate-x-1/2 h-full w-[1px] ${isDark ? 'bg-gray-800' : 'bg-gray-200'} hidden md:block`}></div>
+        <div className={`absolute left-1/2 transform -translate-x-1/2 h-full w-[1px] ${isDark ? 'bg-gray-800' : 'bg-gray-200'} hidden md:block`}></div>
 
-        <div className="flex flex-col gap-12">
+        <div className="flex flex-col gap-8 sm:gap-10 md:gap-12">
           {organisasi.map((o, index) => {
             const isEven = index % 2 === 0;
-            const isExpanded = expanded[o.id];
+            const isHovered = !!hovered[o.id];
+            const clickState = clicked[o.id];
+
+            // Logika Penentuan Expanded:
+            // Jika user sudah melakukan klik manual (clickState tidak undefined), ikuti nilai klik tersebut.
+            // Jika belum pernah diklik (clickState === undefined), ikuti pergerakan kursor (hover).
+            const isExpanded = clickState !== undefined ? clickState : isHovered;
+            const showLessActive = isExpanded;
+
             const fileUrl = normalizeFileUrl(o.file_path);
             const type = getFileType(o.file_path);
 
@@ -162,59 +193,73 @@ export default function OrganisasiPage() {
                 {/* Desktop Spacer */}
                 <div className="hidden md:block md:w-1/2"></div>
 
-                {/* Timeline Dot */}
-                <div className={`absolute left-0 md:left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full border-2 ${isDark ? 'bg-yellow-500 border-gray-900 shadow-[0_0_10px_#f59e0b]' : 'bg-yellow-500 border-white shadow-md'} z-10 hidden md:block`}></div>
+                {/* Timeline Dot (Desktop Only) */}
+                <div className={`absolute left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full border-2 ${isDark ? 'bg-yellow-500 border-gray-900 shadow-[0_0_10px_#f59e0b]' : 'bg-yellow-500 border-white shadow-md'} z-10 hidden md:block`}></div>
 
                 {/* Card Content */}
-                <div className="w-full md:w-1/2 px-0 md:px-12">
-                  <div className={`relative group p-8 rounded-[2rem] transition-all duration-500 border ${
-                    isDark ? "bg-gray-900/40 border-white/5 hover:border-yellow-500/40 backdrop-blur-xl" : "bg-white border-gray-100 shadow-xl hover:shadow-2xl"
-                  }`}>
+                <div className="w-full md:w-1/2 px-0 md:px-8 lg:px-12">
+                  <div 
+                    onMouseEnter={() => handleMouseEnter(o.id)}
+                    onMouseLeave={() => handleMouseLeave(o.id)}
+                    onClick={() => !o.isComingSoon && handleClickCard(o.id)}
+                    className={`relative group p-6 sm:p-8 rounded-[1.5rem] sm:rounded-[2rem] transition-all duration-500 border cursor-pointer w-full ${
+                      isDark ? "bg-gray-900/40 border-white/5 hover:border-yellow-500/40 backdrop-blur-xl" : "bg-white border-gray-100 shadow-xl hover:shadow-2xl"
+                    }`}
+                  >
                     
                     {o.isComingSoon ? (
                       <SpinningClockIcon />
                     ) : (
                       <>
                         {/* Year Badge */}
-                        <div className="flex items-center gap-2 mb-4">
-                          <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                          <span className={`px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest ${
                             isDark ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20' : 'bg-yellow-100 text-yellow-700'
                           }`}>
                             {o.tahun_masuk} — {o.tahun_keluar}
                           </span>
                         </div>
 
-                        <h2 className={`text-xl md:text-2xl font-bold mb-1 leading-tight ${isDark ? "text-white group-hover:text-yellow-400" : "text-gray-800"} transition-colors`}>
+                        <h2 className={`text-lg sm:text-xl md:text-2xl font-bold mb-1 leading-snug sm:leading-tight ${isDark ? "text-white group-hover:text-yellow-400" : "text-gray-800"} transition-colors`}>
                           {o.nama}
                         </h2>
                         
-                        <p className={`font-semibold mb-6 text-sm uppercase tracking-tighter ${isDark ? 'text-gray-500' : 'text-yellow-600'}`}>
+                        <p className={`font-semibold mb-3 sm:mb-4 text-xs sm:text-sm uppercase tracking-tighter ${isDark ? 'text-gray-500' : 'text-yellow-600'}`}>
                           {o.jabatan}
                         </p>
 
+                        {/* Animated Expand Description & Button Container */}
                         <div className="relative">
-                          {isExpanded && (
-                            <p className={`text-sm leading-relaxed mb-3 animate-fade-in ${isDark ? "text-gray-400" : "text-gray-600"}`}>
-                              {o.deskripsi}
-                            </p>
-                          )}
+                          <div className={`grid transition-all duration-500 ease-in-out ${
+                            isExpanded ? "grid-rows-[1fr] opacity-100 mb-3" : "grid-rows-[0fr] opacity-0 mb-0"
+                          }`}>
+                            <div className="overflow-hidden">
+                              <p className={`text-xs sm:text-sm leading-relaxed ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                                {o.deskripsi}
+                              </p>
+                            </div>
+                          </div>
                           
                           <button
-                            onClick={() => toggleExpand(o.id)}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleClickCard(o.id);
+                            }}
                             className="text-[10px] font-black uppercase tracking-widest text-yellow-500 hover:underline focus:outline-none"
                           >
-                            {isExpanded ? "Show Less" : "Read More"}
+                            {showLessActive ? "Show Less" : "Read More"}
                           </button>
                         </div>
 
                         {/* File Attachment */}
                         {fileUrl && (
-                          <div className="mt-8 rounded-2xl overflow-hidden border border-white/5 bg-black/20">
+                          <div className="mt-6 sm:mt-8 rounded-2xl overflow-hidden border border-white/5 bg-black/20" onClick={(e) => e.stopPropagation()}>
                             {type === "image" ? (
                               <img
                                 src={fileUrl}
                                 alt={o.nama}
-                                className="w-full h-44 object-cover transition-transform duration-700 hover:scale-110 cursor-zoom-in"
+                                className="w-full h-36 sm:h-44 object-cover transition-transform duration-700 hover:scale-110 cursor-zoom-in"
                                 onClick={() => setPopupImage(fileUrl)}
                               />
                             ) : type === "pdf" ? (
@@ -222,7 +267,7 @@ export default function OrganisasiPage() {
                                 href={fileUrl}
                                 target="_blank"
                                 rel="noreferrer"
-                                className={`flex items-center justify-center gap-3 p-4 text-xs font-black tracking-widest uppercase ${
+                                className={`flex items-center justify-center gap-3 p-3 sm:p-4 text-[10px] sm:text-xs font-black tracking-widest uppercase ${
                                   isDark ? 'text-gray-300 hover:bg-white/5' : 'text-gray-700 hover:bg-gray-50'
                                 } transition-all`}
                               >
@@ -244,14 +289,14 @@ export default function OrganisasiPage() {
       {/* Popup Lightbox */}
       {popupImage && (
         <div
-          className="fixed inset-0 bg-black/95 backdrop-blur-md flex justify-center items-center z-[1000] p-6 transition-all"
+          className="fixed inset-0 bg-black/95 backdrop-blur-md flex justify-center items-center z-[1000] p-4 sm:p-6 transition-all"
           onClick={() => setPopupImage(null)}
         >
-          <button className="absolute top-10 right-10 text-white/50 hover:text-white text-4xl transition-colors z-[1001]">&times;</button>
+          <button className="absolute top-6 right-6 sm:top-10 sm:right-10 text-white/50 hover:text-white text-3xl sm:text-4xl transition-colors z-[1001]">&times;</button>
           <img
             src={popupImage}
             alt="Preview Full"
-            className="max-h-[85vh] max-w-full rounded-lg shadow-2xl animate-fade-in"
+            className="max-h-[85vh] max-w-full rounded-lg shadow-2xl animate-fade-in object-contain"
           />
         </div>
       )}

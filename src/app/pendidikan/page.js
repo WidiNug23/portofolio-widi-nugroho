@@ -1,77 +1,80 @@
 "use client";
-import { useState, useEffect } from "react";
+
+import { useEffect, useRef, useState } from "react";
 import { useTheme } from "../ThemeContext";
 
-// Komponen Jarum Jam Berputar
-const SpinningClock = () => (
-  <div className="flex flex-col items-center justify-center py-10 gap-4 w-full bg-pink-500/5 rounded-2xl border border-dashed border-pink-500/20 my-4">
-    <div className="relative w-14 h-14">
-      <svg 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth="1.5" 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-        className="text-pink-500 drop-shadow-[0_0_8px_rgba(245,11,187,0.5)]"
+const educationData = [
+  {
+    id: 1,
+    nama: "Universitas Sebelas Maret",
+    jurusan: "D3 Teknik Informatika",
+    tahun_masuk: "2022",
+    tahun_lulus: "2025",
+    nilai: "3.81",
+    logo: "/uploads/Copy of Logo_UNS.png",
+    deskripsi:
+      "Mendalami pengembangan perangkat lunak, basis data, dan infrastruktur IT. Fokus pada pengembangan web modern dan manajemen proyek TI.",
+    file_path: "",
+  },
+  {
+    id: 2,
+    nama: "SMA Negeri 1 Mejayan",
+    jurusan: "IPA",
+    tahun_masuk: "2019",
+    tahun_lulus: "2022",
+    nilai: "88.13",
+    logo: "/uploads/DgN0gGmUYAA6hu5.png",
+    deskripsi:
+      "Menyelesaikan pendidikan menengah atas dengan fokus pada ilmu pengetahuan alam dan aktif dalam kegiatan organisasi sekolah.",
+    file_path: "",
+  },
+];
+
+const SpinningClock = ({ theme }) => {
+  return (
+    <div className="flex flex-col items-center justify-center gap-4">
+      <div
+        className={`flex items-center justify-center w-16 h-16 rounded-full border ${
+          theme === "dark" ? "border-gray-700 bg-gray-900" : "border-gray-200 bg-gray-50"
+        }`}
       >
-        <circle cx="12" cy="12" r="10" />
-        {/* Jarum Jam */}
-        <polyline points="12 6 12 12" className="origin-center animate-[spin_6s_linear_infinite]" />
-        {/* Jarum Menit */}
-        <polyline points="12 12 16 14" className="origin-center animate-[spin_2s_linear_infinite]" />
-      </svg>
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="w-7 h-7 text-pink-500"
+        >
+          <circle cx="12" cy="12" r="9" />
+          <polyline
+            points="12 7 12 12 15 14"
+            className="origin-center animate-[spin_4s_linear_infinite]"
+          />
+        </svg>
+      </div>
+
+      <div className="text-center">
+        <p className={`text-xs font-semibold uppercase tracking-[0.25em] ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+          Future Education
+        </p>
+        <p className={`text-xs mt-2 ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}>
+          Stay tuned for the next milestone
+        </p>
+      </div>
     </div>
-    <div className="text-center">
-      <p className="text-pink-500/60 text-[10px] font-black uppercase tracking-[0.3em] animate-pulse">
-        Future Education
-      </p>
-      <p className="text-[9px] mt-1 text-gray-500 italic">Stay tuned for the next milestone</p>
-    </div>
-  </div>
-);
+  );
+};
 
-export default function PendidikanPage() {
-  const { theme } = useTheme();
+function EducationStory({ education, theme }) {
+  const sectionRef = useRef(null);
+  const [progress, setProgress] = useState(0);
 
-  const [pendidikan, setPendidikan] = useState([
-    {
-      id: 1,
-      nama: "Universitas Sebelas Maret",
-      jurusan: "D3 Teknik Informatika",
-      tahun_masuk: "2022",
-      tahun_lulus: "2025",
-      nilai: "3.81",
-      logo: "/uploads/Copy of Logo_UNS.png",
-      deskripsi: "Mendalami pengembangan perangkat lunak, basis data, dan infrastruktur IT. Fokus pada pengembangan web modern dan manajemen proyek TI.",
-      file_path: "",
-    },
-    {
-      id: 2,
-      nama: "SMA Negeri 1 Mejayan",
-      jurusan: "IPA",
-      tahun_masuk: "2019",
-      tahun_lulus: "2022",
-      nilai: "88.13",
-      logo: "/uploads/DgN0gGmUYAA6hu5.png",
-      deskripsi: "Menyelesaikan pendidikan menengah atas dengan fokus pada ilmu pengetahuan alam dan aktif dalam kegiatan organisasi sekolah.",
-      file_path: "",
-    },
-    {
-      id: 3,
-      nama: "[COMING SOON]", // Tetap di data sebagai identifier, tapi dihilangkan di UI
-      logo: null,
-    },
-  ]);
-
-  const [expanded, setExpanded] = useState({});
-  const [popupImage, setPopupImage] = useState(null);
-
-  const toggleExpand = (id) =>
-    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
-
-  const normalizeFileUrl = (filePath) =>
-    !filePath ? null : filePath.startsWith("/") ? filePath : `/${filePath}`;
+  const normalizeFileUrl = (filePath) => {
+    if (!filePath) return null;
+    return filePath.startsWith("/") ? filePath : `/${filePath}`;
+  };
 
   const getFileType = (filePath) => {
     if (!filePath) return null;
@@ -81,163 +84,192 @@ export default function PendidikanPage() {
     return null;
   };
 
-  useEffect(() => {
-    document.body.style.overflow = popupImage ? "hidden" : "auto";
-  }, [popupImage]);
+  const fileUrl = normalizeFileUrl(education.file_path);
+  const fileType = getFileType(education.file_path);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("reveal");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
+    let animationFrameId;
 
-    const cards = document.querySelectorAll(".pendidikan-card");
-    cards.forEach((card) => observer.observe(card));
+    const handleScroll = () => {
+      if (!sectionRef.current) return;
+      const rect = sectionRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const totalScrollDistance = rect.height - viewportHeight;
 
-    return () => observer.disconnect();
-  }, [pendidikan]);
+      if (totalScrollDistance <= 0) {
+        setProgress(1);
+        return;
+      }
+
+      const currentProgress = -rect.top / totalScrollDistance;
+      const clamped = Math.max(0, Math.min(1, currentProgress));
+      setProgress(clamped);
+    };
+
+    const onScroll = () => {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = requestAnimationFrame(handleScroll);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    handleScroll();
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
+  // LOGO: Diperbesar dan posisi awal digeser lebih ke kanan (320px)
+  const logoMoveProgress = isMobile ? 1 : Math.max(0, Math.min(1, (progress - 0.05) / 0.35));
+  const logoTranslateX = isMobile ? 0 : (1 - logoMoveProgress) * 320; 
+  const logoScale = isMobile ? 1 : 0.9 + logoMoveProgress * 0.1;
+  const logoOpacity = isMobile ? 1 : 1 - Math.max(0, logoMoveProgress - 0.9) * 0.5;
+
+  const yearProgress = isMobile ? 1 : Math.max(0, Math.min(1, (progress - 0.25) / 0.15));
+  const nameProgress = isMobile ? 1 : Math.max(0, Math.min(1, (progress - 0.38) / 0.15));
+  const majorProgress = isMobile ? 1 : Math.max(0, Math.min(1, (progress - 0.52) / 0.15));
+  const descriptionProgress = isMobile ? 1 : Math.max(0, Math.min(1, (progress - 0.65) / 0.2));
+
+  const revealStyle = (elemProgress, translate = 30) => ({
+    opacity: isMobile ? 1 : elemProgress,
+    transform: isMobile ? "none" : `translateY(${(1 - elemProgress) * translate}px)`,
+    willChange: "opacity, transform",
+  });
 
   return (
-    <main className={`min-h-screen font-poppins transition-colors duration-500 pt-28 pb-20 px-4 sm:px-8 md:px-16 lg:px-24 ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}>
-      
-      {/* Header Section */}
-      <div className="max-w-4xl mx-auto mb-16 text-center">
-        <h1 className={`text-4xl md:text-6xl font-extrabold mb-4 tracking-tight ${theme === "dark" ? "neon-glow text-white" : "text-gray-900"}`}>
-          Pendidikan
-        </h1>
-        <div className={`h-1 w-20 mx-auto rounded-full ${theme === 'dark' ? 'bg-pink-600 shadow-[0_0_10px_#f50bbb]' : 'bg-pink-500'}`}></div>
-      </div>
-
-      <div className="relative max-w-5xl mx-auto">
-        {/* Timeline Line */}
-        <div className={`absolute left-0 md:left-8 top-0 bottom-0 w-[2px] ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'} hidden sm:block`}></div>
-
-        <div className="flex flex-col gap-12">
-          {pendidikan.map((p) => {
-            const isExpanded = expanded[p.id];
-            const textToShow = isExpanded ? p.deskripsi : p.deskripsi?.length > 150 ? p.deskripsi.substring(0, 150) + "..." : p.deskripsi;
-            const fileUrl = normalizeFileUrl(p.file_path);
-            const type = getFileType(p.file_path);
-            const isComingSoon = p.nama === "[COMING SOON]";
-
-            return (
-              <div key={p.id} className="pendidikan-card opacity-0 translate-y-10 transition-all duration-1000 relative sm:pl-16 group">
-                
-                {/* Timeline Dot */}
-                <div className={`absolute left-[-5px] sm:left-[27px] top-10 w-4 h-4 rounded-full border-4 z-20 transition-transform duration-300 group-hover:scale-125 ${theme === 'dark' ? 'bg-pink-600 border-gray-950 shadow-[0_0_8px_#f50bbb]' : 'bg-pink-500 border-white shadow-md'}`}></div>
-
-                <div className="neon-border rounded-3xl p-[1px] overflow-hidden relative">
-                  <div className={`relative rounded-[23px] p-6 md:p-8 flex flex-col lg:flex-row gap-8 transition-all duration-500 overflow-hidden ${theme === "dark" ? "bg-gray-900/40 backdrop-blur-md group-hover:bg-gray-900/60" : "bg-white shadow-sm border border-gray-100 group-hover:shadow-xl"}`}>
-                    
-                    {/* LOGO INSTANSI WATERMARK */}
-                    {!isComingSoon && p.logo && (
-                      <div className="absolute right-[-30px] top-1/2 -translate-y-1/2 pointer-events-none z-0 opacity-15 transition-all duration-500 group-hover:opacity-30 group-hover:scale-110">
-                        <img 
-                          src={p.logo} 
-                          alt="" 
-                          className="h-60 w-60 md:h-50 md:w-90 object-contain"
-                        />
-                      </div>
-                    )}
-
-                    {/* Content Layer */}
-                    <div className="flex-1 relative z-10">
-                      {isComingSoon ? (
-                        <SpinningClock />
-                      ) : (
-                        <>
-                          <div className="flex flex-wrap items-center gap-3 mb-6">
-                            <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase ${theme === 'dark' ? 'bg-pink-600/20 text-pink-400' : 'bg-pink-100 text-pink-600'}`}>
-                              {p.tahun_masuk || "TBA"} — {p.tahun_lulus || "TBA"}
-                            </span>
-                            {p.nilai && (
-                              <span className={`px-3 py-1 rounded-full text-xs font-bold border ${theme === 'dark' ? 'border-yellow-500/50 text-yellow-500' : 'border-yellow-600 text-yellow-700'}`}>
-                                Nilai/IPK: {p.nilai}
-                              </span>
-                            )}
-                          </div>
-
-                          <h2 className={`text-2xl md:text-3xl font-bold mb-2 tracking-tight ${theme === "dark" ? "text-white group-hover:text-pink-400" : "text-gray-900"} transition-colors`}>
-                            {p.nama}
-                          </h2>
-                          
-                          <p className={`text-lg font-medium mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                            {p.jurusan || "Jurusan belum ditentukan"}
-                          </p>
-
-                          {p.deskripsi && (
-                            <div className="mb-6 max-w-2xl">
-                              <p className={`leading-relaxed text-sm md:text-base ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                                {textToShow}
-                              </p>
-                              {p.deskripsi.length > 150 && (
-                                <button
-                                  onClick={() => toggleExpand(p.id)}
-                                  className={`mt-2 text-xs font-bold uppercase tracking-widest hover:underline ${theme === "dark" ? "text-pink-500" : "text-pink-600"}`}
-                                >
-                                  {isExpanded ? "Sembunyikan" : "Selengkapnya"}
-                                </button>
-                              )}
-                            </div>
-                          )}
-
-                          {fileUrl && type === "pdf" && (
-                            <a href={fileUrl} target="_blank" rel="noreferrer" className={`inline-flex items-center gap-2 font-bold px-6 py-3 rounded-xl transition-all ${theme === "dark" ? "bg-pink-600 text-white hover:bg-pink-500" : "bg-pink-500 text-white hover:bg-pink-600 shadow-lg"}`}>
-                              <span>📄</span> Lihat Sertifikat / Ijazah
-                            </a>
-                          )}
-                        </>
-                      )}
-                    </div>
-
-                    {/* Right Content */}
-                    {!isComingSoon && fileUrl && type && (
-                      <div className={`relative z-10 w-full lg:w-72 rounded-2xl overflow-hidden border transition-all ${theme === 'dark' ? 'border-gray-800' : 'border-gray-200'}`}>
-                        {type === "pdf" ? (
-                          <object data={fileUrl} type="application/pdf" width="100%" height="200px" className="bg-transparent" />
-                        ) : (
-                          <img src={fileUrl} alt={p.nama} className="w-full h-48 object-cover cursor-zoom-in" onClick={() => setPopupImage(fileUrl)} />
-                        )}
-                      </div>
-                    )}
-                  </div>
+    <section ref={sectionRef} className={`relative ${isMobile ? "py-16 px-4" : "h-[320vh] my-12"}`}>
+      <div className={`${isMobile ? "relative" : "sticky top-24 h-[80vh] flex items-center"}`}>
+        <div className="w-full max-w-5xl mx-auto px-5 sm:px-8 md:px-10 lg:px-12">
+          
+          {/* Grid diperketat gap-nya agar jarak logo & teks tidak terlalu jauh */}
+          <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] gap-6 md:gap-8 items-center">
+            
+            {/* KOLOM LOGO (Ukuran Diperbesar) */}
+            <div className="flex justify-center md:justify-start">
+              <div
+                className="flex items-center justify-center transition-all duration-75"
+                style={{
+                  transform: isMobile ? "none" : `translateX(${logoTranslateX}px) scale(${logoScale})`,
+                  opacity: logoOpacity,
+                  willChange: "transform, opacity",
+                }}
+              >
+                <div className="w-44 h-44 sm:w-52 sm:h-52 md:w-64 md:h-64 flex items-center justify-center p-2">
+                  {education.logo ? (
+                    <img src={education.logo} alt={`Logo ${education.nama}`} className="w-full h-full object-contain drop-shadow-2xl" />
+                  ) : (
+                    <span className="text-xs">Logo</span>
+                  )}
                 </div>
               </div>
-            );
-          })}
+            </div>
+
+            {/* KOLOM KONTEN TEKS */}
+            <div className="flex flex-col justify-center">
+              
+              {/* YEAR & IPK */}
+              <div className="min-h-[38px] sm:min-h-[42px] flex items-center mb-3 sm:mb-4" style={revealStyle(yearProgress)}>
+                <div className="flex flex-wrap gap-2.5">
+                  <span className={`inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-semibold ${
+                    theme === "dark" ? "bg-gray-900 text-gray-300 border border-gray-800" : "bg-gray-50 text-gray-600 border border-gray-200"
+                  }`}>
+                    {education.tahun_masuk || "TBA"} <span className="mx-2 text-pink-500">—</span> {education.tahun_lulus || "TBA"}
+                  </span>
+
+                  {education.nilai && (
+                    <span className={`inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-semibold ${
+                      theme === "dark" ? "bg-gray-900 text-gray-300 border border-gray-800" : "bg-gray-50 text-gray-600 border border-gray-200"
+                    }`}>
+                      IPK {education.nilai}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* NAME */}
+              <div style={revealStyle(nameProgress)}>
+                <h2 className={`text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight leading-snug sm:leading-tight ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  {education.nama}
+                </h2>
+              </div>
+
+              {/* MAJOR */}
+              <div className="mt-2 sm:mt-3" style={revealStyle(majorProgress)}>
+                <p className={`text-sm sm:text-base md:text-lg font-medium ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
+                  {education.jurusan || "Jurusan belum ditentukan"}
+                </p>
+              </div>
+
+              <div className={`w-full h-px my-4 sm:my-5 ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`} style={{ opacity: isMobile ? 1 : descriptionProgress }} />
+
+              {/* DESCRIPTION */}
+              <div className="max-w-xl" style={revealStyle(descriptionProgress)}>
+                <p className={`text-xs sm:text-sm md:text-base leading-relaxed sm:leading-7 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                  {education.deskripsi}
+                </p>
+
+                {fileUrl && fileType && (
+                  <div className="mt-4 sm:mt-5">
+                    {fileType === "pdf" ? (
+                      <a
+                        href={fileUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-pink-500 hover:bg-pink-600 text-white text-sm font-semibold transition-colors shadow-lg"
+                      >
+                        Lihat Dokumen <span>↗</span>
+                      </a>
+                    ) : (
+                      <img src={fileUrl} alt={`Dokumen ${education.nama}`} className="max-w-sm rounded-xl border cursor-pointer" />
+                    )}
+                  </div>
+                )}
+              </div>
+
+            </div>
+
+          </div>
+
         </div>
       </div>
+    </section>
+  );
+}
 
-      {/* Popup Image Viewer */}
-      {popupImage && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex justify-center items-center z-[100] p-4" onClick={() => setPopupImage(null)}>
-          <img src={popupImage} alt="Full Preview" className="max-h-[90vh] max-w-[95vw] rounded-lg animate-zoom" />
+export default function PendidikanPage() {
+  const { theme } = useTheme();
+
+  return (
+    <main className={`min-h-screen font-poppins transition-colors duration-500 pt-24 sm:pt-28 pb-20 ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}>
+      
+      {/* HEADER UTAMA */}
+      <section className="px-5 sm:px-8 md:px-12 lg:px-20 pb-6 sm:pb-10">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className={`text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+            Pendidikan
+          </h1>
+          <div className="w-12 h-[3px] rounded-full bg-pink-500 mx-auto mt-4 sm:mt-6" />
         </div>
-      )}
+      </section>
 
-      <style jsx>{`
-        .neon-glow { text-shadow: 0 0 15px rgba(245, 11, 187, 0.4); }
-        .pendidikan-card.reveal { opacity: 1; transform: translateY(0); }
-        @keyframes animate-zoom { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .neon-border::before {
-          content: ""; position: absolute; inset: -2px;
-          background: linear-gradient(135deg, #f50bbb, transparent, #f50bbb);
-          z-index: -1; opacity: 0; transition: opacity 0.5s;
-        }
-        .pendidikan-card:hover .neon-border::before { opacity: 0.3; }
-        
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
+      {/* EDUCATION STORY */}
+      <section>
+        {educationData.map((education) => (
+          <EducationStory key={education.id} education={education} theme={theme} />
+        ))}
+      </section>
+
+      {/* COMING SOON */}
+      <section className="px-5 sm:px-8 md:px-12 lg:px-20 py-16 sm:py-20">
+        <div className={`max-w-5xl mx-auto min-h-[250px] rounded-[32px] border flex items-center justify-center p-6 ${
+          theme === "dark" ? "border-gray-800 bg-gray-950" : "border-gray-200 bg-white"
+        }`}>
+          <SpinningClock theme={theme} />
+        </div>
+      </section>
     </main>
   );
 }
