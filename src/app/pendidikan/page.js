@@ -57,11 +57,11 @@ const SpinningClock = ({ theme }) => {
 
       <div className="text-center">
         <p className={`text-xs font-semibold uppercase tracking-[0.25em] ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
-          Future Education
+          Next Education
         </p>
-        <p className={`text-xs mt-2 ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}>
+        {/* <p className={`text-xs mt-2 ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}>
           Stay tuned for the next milestone
-        </p>
+        </p> */}
       </div>
     </div>
   );

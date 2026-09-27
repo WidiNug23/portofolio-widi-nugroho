@@ -24,7 +24,7 @@ const SpinningClockIcon = () => (
       <p className="text-[#9be414]/70 text-[11px] font-black uppercase tracking-[0.3em] animate-pulse">
         Incoming Certificate
       </p>
-      <p className="text-[10px] mt-1 text-gray-500 italic">Verifying achievements...</p>
+      {/* <p className="text-[10px] mt-1 text-gray-500 italic">Verifying achievements...</p> */}
     </div>
   </div>
 );

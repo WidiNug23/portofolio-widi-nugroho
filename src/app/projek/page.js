@@ -152,9 +152,9 @@ const projekData = [
   },
   {
     id: 10,
-    tag: "Internal Project",
+    tag: "Upcoming Project",
     judul: "Upcoming Project",
-    deskripsi: `Projek baru sedang dalam tahap pengembangan. Segera hadir!`,
+    // deskripsi: `Projek baru sedang dalam tahap pengembangan. Segera hadir!`,
     images: JSON.stringify([]),
     isUpcoming: true,
   },
