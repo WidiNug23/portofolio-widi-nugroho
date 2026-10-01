@@ -349,7 +349,7 @@ export default function Home() {
                   }`}
                 >
                   <a 
-                    href="https://drive.google.com/file/d/1s-ildIIrPXcifuOSgcwJs12aC0Y7-vBh/view?usp=sharing" 
+                    href="https://drive.google.com/file/d/1rTpfl4BvLvQh4JRl3yQG1b6a8LZfHM5J/view?usp=sharing" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="group inline-flex items-center justify-center px-5 sm:px-6 py-3 sm:py-4 text-xs sm:text-base font-bold text-white rounded-xl sm:rounded-2xl transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/20 bg-blue-600 hover:bg-blue-700 overflow-hidden"
