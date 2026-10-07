@@ -48,6 +48,9 @@ export default function Home() {
   const [highlightKontak, setHighlightKontak] = useState(false);
   const [scrollPos, setScrollPos] = useState(0);
 
+  // State untuk mengontrol status animasi (false = diam, true = animasi 3 kali)
+  const [isWidiAnimating, setIsWidiAnimating] = useState(false);
+
   const heroSectionRef = useRef(null);
   const techStackRef = useRef(null);
   const techTrackRef = useRef(null);
@@ -109,10 +112,49 @@ export default function Home() {
     }
   }, []);
 
+  // Efek untuk mengelola siklus idle (diam 3 detik -> animasi 3 detik (3x putaran) -> ulang)
   useEffect(() => {
-    const handleScroll = () => setScrollPos(window.scrollY);
+    let idleTimeout = null;
+    let animTimeout = null;
+
+    const startCycle = () => {
+      // Hentikan animasi, masuk masa diam selama 3 detik
+      setIsWidiAnimating(false);
+      
+      idleTimeout = setTimeout(() => {
+        // Nyalakan animasi (berjalan 3 detik karena durasi 1s x 3 kali)
+        setIsWidiAnimating(true);
+
+        animTimeout = setTimeout(() => {
+          // Setelah animasi selesai (3 detik), mulai siklus baru lagi dari diam
+          startCycle();
+        }, 3000); // 3 detik durasi animasi 3 kali putaran
+      }, 3000); // 3 detik waktu diam
+    };
+
+    // Jalankan siklus pertama kali saat load
+    startCycle();
+
+    const handleScroll = () => {
+      setScrollPos(window.scrollY);
+      
+      // Saat ada scroll, reset total siklus dan hentikan animasi
+      setIsWidiAnimating(false);
+      if (idleTimeout) clearTimeout(idleTimeout);
+      if (animTimeout) clearTimeout(animTimeout);
+
+      // Setelah user berhenti scroll, tunggu 3 detik baru jalankan siklus animasi kembali
+      idleTimeout = setTimeout(() => {
+        startCycle();
+      }, 3000);
+    };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (idleTimeout) clearTimeout(idleTimeout);
+      if (animTimeout) clearTimeout(animTimeout);
+    };
   }, []);
 
   useEffect(() => {
@@ -176,7 +218,7 @@ export default function Home() {
       }
     };
 
-    const handleScroll = () => {
+    const handleScrollAnim = () => {
       if (animationFrameRef.current) return;
       animationFrameRef.current = requestAnimationFrame(updateTechStack);
     };
@@ -186,21 +228,20 @@ export default function Home() {
       if (techTrackRef.current) {
         techTrackRef.current.style.transform = "translate3d(0, 0, 0)";
       }
-      handleScroll();
+      handleScrollAnim();
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScrollAnim, { passive: true });
     window.addEventListener("resize", handleResize);
-    handleScroll();
+    handleScrollAnim();
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scroll", handleScrollAnim);
       window.removeEventListener("resize", handleResize);
       if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
     };
   }, []);
 
-  // Kalkulasi Progress untuk Pinned Hero Section (Tinggi 400vh)
   let heroProgress = 0;
   if (heroSectionRef.current) {
     const rect = heroSectionRef.current.getBoundingClientRect();
@@ -210,7 +251,6 @@ export default function Home() {
     }
   }
 
-  // Tahapan Bertahap Progress Hero
   const showBio = heroProgress > 0.15;
   const bioProgress = Math.min(Math.max((heroProgress - 0.15) / 0.25, 0), 1);
 
@@ -252,9 +292,11 @@ export default function Home() {
           <div className="sticky top-0 h-screen w-full flex items-center justify-center px-4 sm:px-6 pt-16 overflow-hidden">
             <div className="max-w-4xl w-full mx-auto text-center flex flex-col items-center justify-center">
               
-              {/* NAMA WIDI NUGROHO (Diposisikan di tengah dengan ruang seimbang) */}
+              {/* NAMA WIDI NUGROHO */}
               <h1 
-                className="text-4xl sm:text-6xl md:text-7xl font-extrabold font-poppins tracking-tight flex flex-wrap justify-center items-center gap-x-3 sm:gap-x-4 transition-all duration-700 ease-out"
+                className={`text-4xl sm:text-6xl md:text-7xl font-extrabold font-poppins tracking-tight flex flex-wrap justify-center items-center gap-x-3 sm:gap-x-4 transition-all duration-700 ease-out ${
+                  isWidiAnimating ? "animate-widi-three-times" : ""
+                }`}
                 style={{
                   transform: heroProgress > 0.12 ? "translateY(-20px)" : "translateY(0px)",
                   marginBottom: heroProgress > 0.12 ? "1.5rem" : "0rem"
@@ -266,7 +308,6 @@ export default function Home() {
 
               <div className={`transition-all duration-500 max-w-3xl mx-auto ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
                 
-                {/* DESKRIPSI (Muncul Bertahap Kata demi Kata / Wave-up) */}
                 <div 
                   className={`transition-all duration-500 mb-6 sm:mb-8 px-2 ${
                     showBio ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -296,7 +337,6 @@ export default function Home() {
                   </p>
                 </div>
 
-                {/* SERVICES TITLE & BADGES (Muncul Bertahap) */}
                 <div className="mb-6 sm:mb-10">
                   <div 
                     className="transition-all duration-500 text-xs sm:text-base font-medium mb-3 sm:mb-5"
@@ -342,7 +382,6 @@ export default function Home() {
                   </div>
                 </div>
                 
-                {/* BUTTON CV (Muncul paling terakhir di tahap akhir hero scroll) */}
                 <div 
                   className={`transition-all duration-700 transform ${
                     showCvButton ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95 pointer-events-none"
@@ -378,7 +417,6 @@ export default function Home() {
         {/* CONTENT SECTION */}
         <section className="relative z-10 w-full rounded-t-[2rem] sm:rounded-t-[4rem] shadow-[0_-20px_40px_rgba(0,0,0,0.05)] py-10 sm:py-20 px-3 sm:px-10" style={{ backgroundColor: theme === "dark" ? "#0a0a0a" : "#f8fafc", color: theme === "dark" ? "#fff" : "#000" }}>
           
-          {/* CONTACT */}
           <div id="kontak" className="max-w-4xl mx-auto px-4 pt-4 pb-1 sm:pb-1">
             <RevealContainer>
               <h2 className={`text-2xl sm:text-4xl md:text-5xl font-extrabold mb-6 sm:mb-10 text-center font-poppins transition-all duration-300 ${highlightKontak ? "text-blue-500 scale-105" : ""}`}>
@@ -415,7 +453,6 @@ export default function Home() {
             </RevealContainer>
           </div>
 
-          {/* TECH STACK SECTION */}
           <section ref={techStackRef} className="relative w-full h-[190vh] pt-0 -mb-32 sm:-mb-48 overflow-visible">
             <div className="sticky top-0 h-screen w-full flex items-center overflow-hidden">
               
@@ -437,7 +474,6 @@ export default function Home() {
             </div>
           </section>
 
-          {/* SISA HALAMAN DINAMIS */}
           <div id="projek" className="pt-10 md:pt-20"><ProjekPage /></div>
           <div id="sertifikat" className="pt-10 md:pt-20"><SertifikatPage /></div>
           <div id="lomba" className="pt-10 md:pt-20"><LombaPage /></div>
@@ -454,6 +490,35 @@ export default function Home() {
 
         .reveal-init { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
         .reveal-active { opacity: 1; transform: translateY(0); }
+
+        /* Keyframes Animasi Naik Turun Widi Nugroho sebanyak 3 kali (durasi total 3 detik, 1 detik per 1 kali naik turun) */
+        @keyframes widiAnimThreeTimes {
+          0% {
+            transform: translateY(0px);
+          }
+          16.66% {
+            transform: translateY(-20px); /* Naik */
+          }
+          33.33% {
+            transform: translateY(0px);   /* Turun (Putaran ke-1 selesai) */
+          }
+          50% {
+            transform: translateY(-12px); /* Naik */
+          }
+          66.66% {
+            transform: translateY(0px);   /* Turun (Putaran ke-2 selesai) */
+          }
+          83.33% {
+            transform: translateY(-12px); /* Naik */
+          }
+          100% {
+            transform: translateY(0px);   /* Turun (Putaran ke-3 selesai) */
+          }
+        }
+
+        .animate-widi-three-times {
+          animation: widiAnimThreeTimes 3s ease-in-out forwards;
+        }
       `}</style>
     </>
   );
