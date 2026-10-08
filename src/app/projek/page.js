@@ -208,7 +208,6 @@ const SpinningClockIcon = () => (
 export default function ProjekPage() {
   const { theme } = useTheme();
 
-  const [expanded, setExpanded] = useState({});
   const [modalVideoID, setModalVideoID] = useState(null);
   const [modalPDF, setModalPDF] = useState(null);
 
@@ -315,7 +314,6 @@ export default function ProjekPage() {
       <div className="max-w-5xl mx-auto">
         <div className="relative flex flex-col gap-20 pb-28">
           {projekData.map((p, index) => {
-            const isExpanded = expanded[p.id];
             const youtubeID = extractYouTubeID(p.link_demo);
             let images = [];
             try {
@@ -327,7 +325,6 @@ export default function ProjekPage() {
             const demoUrl = cleanUrl(p.link_demo);
             const githubUrl = cleanUrl(p.link_github);
 
-            // Posisi sticky dan scale bertahap
             const topOffset = 90;
             const scaleValue = 1 - index * 0.015;
 
@@ -431,26 +428,12 @@ export default function ProjekPage() {
 
                         <div className={`w-full h-px mb-3 ${isDark ? "bg-white/[0.08]" : "bg-slate-200"}`} />
 
-                        {/* DESKRIPSI */}
-                        <div className={`overflow-hidden transition-all duration-500 ${isExpanded ? "max-h-[1000px]" : "max-h-[85px]"}`}>
+                        {/* DESKRIPSI: overflow-y-auto (hanya muncul scrollbar jika teks melebihi max-h-[110px]) */}
+                        <div className="max-h-[110px] overflow-y-auto pr-3 custom-scrollbar">
                           <p className={`text-xs sm:text-sm leading-relaxed whitespace-pre-line ${isDark ? "text-white/70" : "text-slate-600"}`}>
                             {p.deskripsi || "Project sedang dalam tahap pengembangan."}
                           </p>
                         </div>
-
-                        {p.deskripsi && p.deskripsi.length > 150 && (
-                          <button
-                            onClick={() =>
-                              setExpanded((prev) => ({
-                                ...prev,
-                                [p.id]: !isExpanded,
-                              }))
-                            }
-                            className="mt-1.5 text-xs font-bold text-blue-500 hover:text-blue-400 transition-colors self-start block"
-                          >
-                            {isExpanded ? "Sembunyikan Detail" : "Lihat Detail"}
-                          </button>
-                        )}
                       </div>
 
                       {/* TOMBOL / BUTTONS DI BAGIAN BAWAH */}
@@ -508,6 +491,27 @@ export default function ProjekPage() {
           })}
         </div>
       </div>
+
+      {/* CUSTOM CSS UNTUK SCROLLBAR MINIMALIS HANYA MUNCUL SAAT ADA OVERFLOW */}
+      <style jsx global>{`
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: ${isDark ? "rgba(59, 130, 246, 0.6) transparent" : "rgba(37, 99, 235, 0.6) transparent"};
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: ${isDark ? "rgba(59, 130, 246, 0.6)" : "rgba(37, 99, 235, 0.6)"};
+          border-radius: 9999px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: ${isDark ? "rgba(59, 130, 246, 1)" : "rgba(37, 99, 235, 1)"};
+        }
+      `}</style>
 
       {/* MODAL YOUTUBE VIDEO */}
       {modalVideoID && (

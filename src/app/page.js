@@ -118,32 +118,26 @@ export default function Home() {
     let animTimeout = null;
 
     const startCycle = () => {
-      // Hentikan animasi, masuk masa diam selama 3 detik
       setIsWidiAnimating(false);
       
       idleTimeout = setTimeout(() => {
-        // Nyalakan animasi (berjalan 3 detik karena durasi 1s x 3 kali)
         setIsWidiAnimating(true);
 
         animTimeout = setTimeout(() => {
-          // Setelah animasi selesai (3 detik), mulai siklus baru lagi dari diam
           startCycle();
-        }, 3000); // 3 detik durasi animasi 3 kali putaran
-      }, 3000); // 3 detik waktu diam
+        }, 3000); 
+      }, 3000); 
     };
 
-    // Jalankan siklus pertama kali saat load
     startCycle();
 
     const handleScroll = () => {
       setScrollPos(window.scrollY);
       
-      // Saat ada scroll, reset total siklus dan hentikan animasi
       setIsWidiAnimating(false);
       if (idleTimeout) clearTimeout(idleTimeout);
       if (animTimeout) clearTimeout(animTimeout);
 
-      // Setelah user berhenti scroll, tunggu 3 detik baru jalankan siklus animasi kembali
       idleTimeout = setTimeout(() => {
         startCycle();
       }, 3000);
@@ -293,18 +287,10 @@ export default function Home() {
             <div className="max-w-4xl w-full mx-auto text-center flex flex-col items-center justify-center">
               
               {/* NAMA WIDI NUGROHO */}
-              <h1 
-                className={`text-4xl sm:text-6xl md:text-7xl font-extrabold font-poppins tracking-tight flex flex-wrap justify-center items-center gap-x-3 sm:gap-x-4 transition-all duration-700 ease-out ${
-                  isWidiAnimating ? "animate-widi-three-times" : ""
-                }`}
-                style={{
-                  transform: heroProgress > 0.12 ? "translateY(-20px)" : "translateY(0px)",
-                  marginBottom: heroProgress > 0.12 ? "1.5rem" : "0rem"
-                }}
-              >
-                <span>WIDI</span>
-                <span>NUGROHO</span>
-              </h1>
+              <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold font-poppins tracking-tight flex flex-wrap justify-center items-center gap-x-3 sm:gap-x-4">
+  <span>WIDI</span>
+  <span>NUGROHO</span>
+</h1>
 
               <div className={`transition-all duration-500 max-w-3xl mx-auto ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
                 
@@ -411,6 +397,9 @@ export default function Home() {
 
               </div>
             </div>
+
+
+
           </div>
         </section>
 
@@ -425,26 +414,32 @@ export default function Home() {
               
               <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 max-w-2xl mx-auto">
                 {[
-                  { name: "GitHub", href: "https://github.com/WidiNug23", icon: <FaGithub className="text-xl sm:text-3xl shrink-0" /> },
-                  { name: "Email", href: "mailto:collabswithwidi@gmail.com", icon: <FaEnvelope className="text-xl sm:text-3xl shrink-0" /> },
-                  { name: "Instagram", href: "https://www.instagram.com/widingr23", icon: <FaInstagram className="text-xl sm:text-3xl shrink-0" /> },
-                  { name: "TikTok", href: "https://www.tiktok.com/@widnug23", icon: <FaTiktok className="text-xl sm:text-3xl shrink-0" /> },
-                  { name: "LinkedIn", href: "https://www.linkedin.com/in/widi-suryo-nugroho-a607632a2/", icon: <FaLinkedin className="text-xl sm:text-3xl shrink-0" /> },
-                  { name: "Lynk.id", href: "https://lynk.id/widinugroho23", icon: <FiLink className="text-xl sm:text-3xl shrink-0" /> },
+                  { name: "GitHub", label: "WidiNug23", href: "https://github.com/WidiNug23", icon: <FaGithub className="text-xl sm:text-3xl shrink-0" /> },
+                  { name: "Email", label: "collabswithwidi@gmail.com", href: "mailto:collabswithwidi@gmail.com", icon: <FaEnvelope className="text-xl sm:text-3xl shrink-0" /> },
+                  { name: "Instagram", label: "widingr23", href: "https://www.instagram.com/widingr23", icon: <FaInstagram className="text-xl sm:text-3xl shrink-0" /> },
+                  // { name: "TikTok", label: "@widnug23", href: "https://www.tiktok.com/@widnug23", icon: <FaTiktok className="text-xl sm:text-3xl shrink-0" /> },
+                  { name: "LinkedIn", label: "Widi Suryo Nugroho", href: "https://www.linkedin.com/in/widi-suryo-nugroho-a607632a2/", icon: <FaLinkedin className="text-xl sm:text-3xl shrink-0" /> },
+                  { name: "Lynk.id", label: "widinugroho23", href: "https://lynk.id/widinugroho23", icon: <FiLink className="text-xl sm:text-3xl shrink-0" /> },
                 ].map((item, index) => (
                   <a
                     key={index}
                     href={item.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`group relative flex items-center p-3.5 sm:p-5 rounded-xl sm:rounded-2xl transition-all duration-300 hover:scale-105 active:scale-95 shadow-md border overflow-hidden ${
+                    className={`group relative flex items-center p-3.5 sm:p-5 rounded-xl sm:rounded-2xl transition-all duration-300 hover:scale-105 active:scale-95 shadow-md border overflow-visible ${
                       theme === "dark"
                         ? "bg-gray-900 hover:bg-blue-600 text-white border-gray-800 hover:border-blue-500"
                         : "bg-white hover:bg-blue-600 text-gray-800 hover:text-white border-gray-100 hover:border-blue-500"
                     }`}
                   >
+                    {/* Tooltip di bagian atas button */}
+                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1 text-xs font-medium text-white bg-gray-900 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-35 border border-gray-700">
+                      {item.label}
+                      <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></span>
+                    </span>
+
                     {item.icon}
-                    <span className="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out group-hover:max-w-[120px] group-hover:ml-2.5 text-xs sm:text-base font-bold opacity-0 group-hover:opacity-100">
+                    <span className="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out group-hover:max-w-[150px] group-hover:ml-2.5 text-xs sm:text-base font-bold opacity-0 group-hover:opacity-100">
                       {item.name}
                     </span>
                   </a>
@@ -491,33 +486,49 @@ export default function Home() {
         .reveal-init { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
         .reveal-active { opacity: 1; transform: translateY(0); }
 
-        /* Keyframes Animasi Naik Turun Widi Nugroho sebanyak 3 kali (durasi total 3 detik, 1 detik per 1 kali naik turun) */
+        /* Keyframes Animasi Naik Turun Widi Nugroho sebanyak 3 kali */
         @keyframes widiAnimThreeTimes {
           0% {
             transform: translateY(0px);
           }
           16.66% {
-            transform: translateY(-20px); /* Naik */
+            transform: translateY(-20px);
           }
           33.33% {
-            transform: translateY(0px);   /* Turun (Putaran ke-1 selesai) */
+            transform: translateY(0px);
           }
           50% {
-            transform: translateY(-12px); /* Naik */
+            transform: translateY(-12px);
           }
           66.66% {
-            transform: translateY(0px);   /* Turun (Putaran ke-2 selesai) */
+            transform: translateY(0px);
           }
           83.33% {
-            transform: translateY(-12px); /* Naik */
+            transform: translateY(-12px);
           }
           100% {
-            transform: translateY(0px);   /* Turun (Putaran ke-3 selesai) */
+            transform: translateY(0px);
           }
         }
 
         .animate-widi-three-times {
           animation: widiAnimThreeTimes 3s ease-in-out forwards;
+        }
+
+        /* Animasi scroll wheel pada indikator mouse */
+        @keyframes scrollWheel {
+          0% {
+            transform: translateY(0);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(10px);
+            opacity: 0;
+          }
+        }
+
+        .animate-scroll-wheel {
+          animation: scrollWheel 1.5s infinite;
         }
       `}</style>
     </>
