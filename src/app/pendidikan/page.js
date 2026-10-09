@@ -7,7 +7,7 @@ const educationData = [
   {
     id: 1,
     nama: "Universitas Sebelas Maret",
-    jurusan: "D3 Teknik Informatika",
+    jurusan: "Teknik Informatika",
     tahun_masuk: "2022",
     tahun_lulus: "2025",
     nilai: "3.81",

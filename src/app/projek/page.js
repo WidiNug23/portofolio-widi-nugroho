@@ -305,7 +305,7 @@ export default function ProjekPage() {
             isDark ? "neon-glow" : "text-slate-900"
           }`}
         >
-          PROJECTS
+          Projek
         </h1>
         <div className="h-1.5 w-16 mx-auto rounded-full bg-blue-500 mb-4" />
       </div>
