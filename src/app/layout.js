@@ -194,7 +194,7 @@ function LayoutContent({ children }) {
           : "bg-transparent py-5"
       }`}>
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 w-full">
-          
+           
           <div className="flex items-center gap-3 sm:gap-4">
             <Link 
               href="/" 
@@ -212,7 +212,22 @@ function LayoutContent({ children }) {
             </Link>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Tombol Bendera Inggris (Tanpa Background, Membuka di Tab yang Sama) */}
+            <a
+              href="https://portfolio-widi-nugroho.vercel.app/"
+              className="p-1.5 rounded-lg opacity-80 hover:opacity-100 transition-all flex items-center justify-center"
+              title="English"
+            >
+              <img 
+                src="https://flagcdn.com/w20/gb.png" 
+                srcSet="https://flagcdn.com/w40/gb.png 2x" 
+                width="22" 
+                alt="English" 
+                className="rounded-[2px] shadow-sm object-cover"
+              />
+            </a>
+
             <button
               onClick={toggleTheme}
               className={`p-2 rounded-xl transition-all duration-300 ${
@@ -240,7 +255,7 @@ function LayoutContent({ children }) {
           ? "translate-y-0 pointer-events-auto" 
           : "-translate-y-full pointer-events-none"
       } ${theme === "dark" ? "bg-[#0b0b0b]" : "bg-[#f8fafc]"}`}>
-        
+         
         <div className="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center my-auto">
           <div className="lg:col-span-6 hidden lg:flex items-center justify-center h-[420px] relative">
             <div 
@@ -355,7 +370,7 @@ function LayoutContent({ children }) {
         theme === "dark" ? "bg-gray-950 border-gray-800 text-gray-300" : "bg-gray-50 border-gray-200 text-gray-700"
       }`}>
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 md:gap-12 pb-12 md:pb-16 border-b border-gray-700/20">
-          
+           
           <div className="flex flex-col space-y-2">
             <h2 className={`text-2xl font-semibold tracking-tighter ${
               theme === "dark" ? "text-white" : "text-gray-900"
