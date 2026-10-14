@@ -14,7 +14,7 @@ const projekData = [
       "https://sistem-gudang-ten.vercel.app/",
     link_github:
       "https://github.com/WidiNug23/sistem-gudang.git",
-    pdf_file: "",
+    pdf_file: "https://drive.google.com/drive/folders/1o98cub7kC0qtYO1JOSV1L4VBr61Zpt-6?usp=sharing",
     images: JSON.stringify([
       "gudang1.1.png",
       "gudang1.2.png",
@@ -89,7 +89,7 @@ const projekData = [
     id: 22,
     tag: "Internship Project",
     judul: "SIPBIBU – Sistem Pencegahan dan Penanganan Baby Blues Pada Ibu",
-    deskripsi: `SIPBIBU merupakan website yang dibuat sebagai upaya untuk menekan angka baby blues pada Ibu.\n\nFitur-fitur utama:\n• Kuesioner Model Suryani & EPDS\n• Forum Diskusi Ibu\n• Konsultasi Online Psikolog\n• Edukasi Video & Audio`,
+    deskripsi: `SIPBIBU merupakan website yang dibuat sebagai upaya untuk menekan angka baby blues pada Ibu.\n\nFitur-fitur utama:\nKuesioner Model Suryani & EPDS\nForum Diskusi Ibu\nKonsultasi Online Psikolog\nEdukasi Video & Audio`,
     link_demo: "https://sipbibu.tifpsdku.com",
     link_github: "",
     pdf_file:
@@ -236,6 +236,23 @@ export default function ProjekPage() {
     const regExp = /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([^&?/\s]{11})/;
     const match = clean.match(regExp);
     return match ? match[1] : null;
+  };
+
+  // Helper untuk mengecek apakah pdf_file berupa link eksternal (http/https)
+  const isExternalUrl = (url) => {
+    const clean = cleanUrl(url);
+    return clean.startsWith("http://") || clean.startsWith("https://");
+  };
+
+  const handlePdfClick = (pdfFile) => {
+    const cleaned = cleanUrl(pdfFile);
+    if (isExternalUrl(cleaned)) {
+      // Jika berupa link eksternal (Google Drive, dll), buka di tab baru
+      window.open(cleaned, "_blank", "noopener,noreferrer");
+    } else {
+      // Jika berupa path lokal, buka modal preview PDF
+      setModalPDF(cleaned);
+    }
   };
 
   const openLightbox = (projekID, imgIndex) => {
@@ -428,7 +445,7 @@ export default function ProjekPage() {
 
                         <div className={`w-full h-px mb-3 ${isDark ? "bg-white/[0.08]" : "bg-slate-200"}`} />
 
-                        {/* DESKRIPSI: overflow-y-auto (hanya muncul scrollbar jika teks melebihi max-h-[110px]) */}
+                        {/* DESKRIPSI */}
                         <div className="max-h-[110px] overflow-y-auto pr-3 custom-scrollbar">
                           <p className={`text-xs sm:text-sm leading-relaxed whitespace-pre-line ${isDark ? "text-white/70" : "text-slate-600"}`}>
                             {p.deskripsi || "Project sedang dalam tahap pengembangan."}
@@ -474,7 +491,7 @@ export default function ProjekPage() {
 
                         {p.pdf_file && (
                           <button
-                            onClick={() => setModalPDF(p.pdf_file)}
+                            onClick={() => handlePdfClick(p.pdf_file)}
                             className="inline-flex items-center justify-center px-3.5 py-2 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest border border-red-500/40 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300"
                           >
                             Dokumen
@@ -492,7 +509,7 @@ export default function ProjekPage() {
         </div>
       </div>
 
-      {/* CUSTOM CSS UNTUK SCROLLBAR MINIMALIS HANYA MUNCUL SAAT ADA OVERFLOW */}
+      {/* CUSTOM CSS UNTUK SCROLLBAR MINIMALIS */}
       <style jsx global>{`
         .custom-scrollbar {
           scrollbar-width: thin;
@@ -537,7 +554,7 @@ export default function ProjekPage() {
         </div>
       )}
 
-      {/* MODAL PDF DOCUMENT */}
+      {/* MODAL PDF DOCUMENT (Hanya untuk Path Lokal) */}
       {modalPDF && (
         <div
           className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-8"
